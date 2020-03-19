@@ -7,9 +7,11 @@ import { connect } from 'react-redux';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { ObjectSpaceNormalMap } from 'three';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 
 var initializeDomEvents = require('threex-domevents');
 var THREEx = {};
+
 initializeDomEvents(THREE, THREEx);
 
 const Canvas = styled.canvas`
@@ -28,10 +30,10 @@ const Wrapper = styled.section`
 class Viewer extends React.Component {
 	componentDidMount() {
 		console.log('mounted');
-		this.initRayCasting();
+
 		this.sceneSetup();
 		this.addObjectsToScene();
-		this.modelLoader();
+
 		this.startAnimationLoop();
 	}
 
@@ -51,10 +53,10 @@ class Viewer extends React.Component {
 		this.scene.add(lights[1]);
 		this.scene.add(lights[2]);
 
-		// const cubeGeo = new THREE.BoxGeometry(1000, 1000, 1000);
-		// const material = new THREE.MeshBasicMaterial(0xffff00);
-		// const cube = new THREE.Mesh(cubeGeo, material);
-		// this.scene.add(cube);
+		const cubeGeo = new THREE.BoxGeometry(1000, 1000, 1000);
+		const material = new THREE.MeshBasicMaterial(0xffff00);
+		const cube = new THREE.Mesh(cubeGeo, material);
+		this.scene.add(cube);
 
 		// this.loadObject();
 		let controls = new OrbitControls(this.camera, this.el);
@@ -97,15 +99,18 @@ class Viewer extends React.Component {
 			const root = gltf.scene;
 
 			this.scene.add(root);
-
 			this.createChildArray(this.scene);
-			console.log(this.objects);
+			// this.rayCasty();
+			this.canvas.addEventListener('mousemove', this.onMouseMove, false);
+			this.root = root;
+			/// GET THE RAY CASTER WORKING WITH A REGULAR CUBE thEN AdD THE OBJECT
 
-			this.initRayCasting();
+			console.log('done');
 		});
 	};
 	onMouseMove = event => {
 		event.preventDefault();
+		console.log('mouse');
 
 		this.mouse.x = (event.clientX / this.canvas.width) * 2 - 1;
 		this.mouse.y = -(event.clientY / this.canvas.height) * 2 + 1;
@@ -123,47 +128,62 @@ class Viewer extends React.Component {
 		);
 
 		this.camera.position.setZ(2000);
-
+		this.raycaster = new THREE.Raycaster();
+		this.mouse = new THREE.Vector2();
 		this.renderer = new THREE.WebGLRenderer();
+
 		this.canvas = this.renderer.domElement;
 		this.renderer.setSize(width, height);
 		this.el.appendChild(this.canvas);
-		this.canvas.addEventListener('mousemove', this.onMouseMove, false);
+		this.stats = new Stats();
+		this.el.appendChild(this.stats.dom);
+		this.modelLoader();
+
+		// console.log(this.objects);
+		// this.initRayCasting();
+		// this.canvas.addEventListener('mousemove', this.onMouseMove, false);
 	};
-	resizeRendererToDisplaySize = renderer => {
-		const canvas = this.renderer.domElement;
-		const width = canvas.clientWidth;
-		const height = canvas.clientHeight;
-		const needResize = canvas.width !== width || canvas.height !== height;
-		if (needResize) {
-			this.renderer.setSize(width, height, false);
-		}
-	};
-	sleazyRays = () => {
+
+	rayCasty = () => {
+		// console.log(this.raycaster);
 		// update the picking ray with the camera and mouse position
+
 		this.raycaster.setFromCamera(this.mouse, this.camera);
+		// console.log(this.raycaster);
 
 		// calculate objects intersecting the picking ray
-		const intersects = this.raycaster.intersectObjects(this.objects);
+		const intersects = this.raycaster.intersectObjects(this.scene.children);
+		// console.log(this.objects);
 
 		// console.log(this.scene.children);
 		// console.log('intersects', intersects);
 		if (intersects.length) {
-			console.log(intersects[0].object.name);
+			console.log(intersects);
+			// intersects[i].object.material.color.set(0xff0000);
 		}
 
 		// for (var i = 0; i < intersects.length; i++) {
-		// 	// console.log(intersects[i].object.name);
+		// 	console.log(intersects[i].object.name);
 		// 	intersects[i].object.material.color.set(0xff0000);
 		// }
 	};
+	// rayCasty2;
 
 	startAnimationLoop = () => {
-		this.sleazyRays();
-		this.renderer.render(this.scene, this.camera);
 		this.requestID = window.requestAnimationFrame(this.startAnimationLoop);
+		// this.rayCasty();
+		this.raycaster.setFromCamera(this.mouse, this.camera);
+		const intersects = this.raycaster.intersectObjects(this.scene.children);
 
-		// this.resizeRendererToDisplaySize(this.renderer);
+		if (intersects.length) {
+			// console.log(intersects);
+
+			console.log(intersects[0]);
+			// intersects[i].object.material.color.set(0xff0000);
+		}
+		this.stats.update();
+
+		this.renderer.render(this.scene, this.camera);
 	};
 	render() {
 		return (
