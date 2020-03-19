@@ -15,11 +15,11 @@ function mapStateToProps(state) {
 
 const FormWrap = styled.form`
 	border: 5px solid fuchsia;
-	height: 20%;
-	width: 50%;
 	display: flex;
-	align-items: flex-end;
+	align-items: center;
 	justify-content: center;
+	margin: 10px;
+	padding: 5px;
 `;
 
 class FormContainer extends React.Component {

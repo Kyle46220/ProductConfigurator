@@ -4,12 +4,22 @@ import Viewer from './Viewer';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import FormContainer from './form';
+import styled from 'styled-components';
 const initialState = {};
 
 // function getKeyByValue(object, value) {
 // 	return Object.keys(object).find(key => object[key] === value);
 // 	// this is somehow going to be useful for creating an action creator or reducer that can update any value in the state object. like in the reducer below, i want the hardcoded 'height' to be omething like action.myUpdatingValue.key and the value to be action.myUpdatingValue. both sides of the key/value pair come in.
 // }
+
+const Wrapper = styled.section`
+	height: 100vh;
+	width: 100vw;
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+`;
 class App extends React.Component {
 	reducer(state = initialState, action) {
 		let newState = {};
@@ -34,12 +44,12 @@ class App extends React.Component {
 
 	render() {
 		return (
-			<div className="App">
-				<Provider store={this.store}>
+			<Provider store={this.store}>
+				<Wrapper className="App">
 					<Viewer />
-					<FormContainer></FormContainer>
-				</Provider>
-			</div>
+					<FormContainer />
+				</Wrapper>
+			</Provider>
 		);
 	}
 }

@@ -6,6 +6,11 @@ import { connect } from 'react-redux';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { ObjectSpaceNormalMap } from 'three';
+
+var initializeDomEvents = require('threex-domevents');
+var THREEx = {};
+initializeDomEvents(THREE, THREEx);
 
 const Canvas = styled.canvas`
 	border: 5px solid fuchsia;
@@ -13,8 +18,8 @@ const Canvas = styled.canvas`
 	display: inline;
 `;
 const Wrapper = styled.section`
-	height: 100vh;
-	width: 100vw;
+	height: 100%;
+	width: 100%;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -22,6 +27,7 @@ const Wrapper = styled.section`
 
 class Viewer extends React.Component {
 	componentDidMount() {
+		console.log('mounted');
 		this.sceneSetup();
 		this.addObjectsToScene();
 		this.startAnimationLoop();
@@ -44,19 +50,45 @@ class Viewer extends React.Component {
 		this.scene.add(lights[1]);
 		this.scene.add(lights[2]);
 
+		const cubeGeo = new THREE.BoxGeometry(1000, 1000, 1000);
+		const material = new THREE.MeshBasicMaterial(0xffff00);
+		const cube = new THREE.Mesh(cubeGeo, material);
+		this.scene.add(cube);
+
 		// this.loadObject();
 		let controls = new OrbitControls(this.camera, this.el);
 		controls.width = this.el.clientWidth;
 		controls.height = 500;
 		controls.update();
 	};
+	createChildArray = scene => {
+		this.objects = [];
 
+		const objects = this.objects;
+		scene.traverse(obj => objects.push(obj));
+	};
+
+	// definePartGeometries = (names, objects) => {
+	// 	//this function goes through the object array and defines each object based on the names
+	// 	names.forEach(objects.getElementByName('name'));
+	// };
+	// addListenerToGeometry = mesh => {
+	// 	const domEvents = new THREEx.DomEvents(this.camera, this.canvas);
+	// 	domEvents.addEventListener(
+	// 		mesh,
+	// 		'click',
+	// 		(e = {
+	// 			//this doesn't need to be inside a function.
+	// 		})
+	// 	);
+	// };
 	modelLoader = () => {
 		const gltfLoader = new GLTFLoader();
-		const url = 'cabinetTest1.gltf';
+		const url = '/cabinetTest1.gltf';
 		gltfLoader.load(url, gltf => {
 			const root = gltf.scene;
 			this.scene.add(root);
+			this.createChildArray(this.scene);
 		});
 	};
 	sceneSetup = () => {
@@ -71,9 +103,12 @@ class Viewer extends React.Component {
 			1000 * 10 // far plane
 		);
 
+		this.camera.position.setZ(1000);
+
 		this.renderer = new THREE.WebGLRenderer();
+		this.canvas = this.renderer.domElement;
 		this.renderer.setSize(width, height);
-		this.el.appendChild(this.renderer.domElement);
+		this.el.appendChild(this.canvas);
 	};
 	resizeRendererToDisplaySize = renderer => {
 		const canvas = this.renderer.domElement;
@@ -81,7 +116,7 @@ class Viewer extends React.Component {
 		const height = canvas.clientHeight;
 		const needResize = canvas.width !== width || canvas.height !== height;
 		if (needResize) {
-			renderer.setSize(width, height, false);
+			this.renderer.setSize(width, height, false);
 		}
 	};
 
@@ -93,9 +128,7 @@ class Viewer extends React.Component {
 	render() {
 		return (
 			<Wrapper>
-				<Canvas>
-					<div className="viewer" ref={ref => (this.el = ref)} />
-				</Canvas>
+				<div className="viewer" ref={ref => (this.el = ref)} />
 			</Wrapper>
 		);
 	}
