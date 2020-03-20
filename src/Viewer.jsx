@@ -31,7 +31,7 @@ const Wrapper = styled.section`
 class Viewer extends React.Component {
 	componentDidMount() {
 		console.log('mounted');
-
+		this.rayCasty();
 		this.sceneSetup();
 		this.addObjectsToScene();
 
@@ -66,17 +66,30 @@ class Viewer extends React.Component {
 		controls.update();
 		// console.log(this.scene.children);
 	};
+	rand(min, max) {
+		if (max === undefined) {
+			max = min;
+			min = 0;
+		}
+		return min + (max - min) * Math.random();
+	}
+
+	randomColor() {
+		return `hsl(${this.rand(360) | 0}, ${this.rand(50, 100) | 0}%, 50%)`;
+	}
 	createChildArray = scene => {
 		this.objects = [];
 
 		const objects = this.objects;
 		scene.traverse(obj => objects.push(obj));
-		this.objects = this.objects.slice(12);
+		this.objects = this.objects.slice(11);
 		console.log(this.objects);
 		this.objects.forEach(i => {
-			i.material = new THREE.MeshStandardMaterial();
+			i.material = new THREE.MeshStandardMaterial({
+				color: this.randomColor()
+			});
 		});
-		this.objects[0].material.color.setHex(0x00ffff);
+		// this.objects[0].material.color.setHex(0x00ffff);
 	};
 
 	// definePartGeometries = (names, objects) => {
@@ -144,8 +157,8 @@ class Viewer extends React.Component {
 		);
 
 		this.camera.position.setZ(2000);
-		this.raycaster = new THREE.Raycaster();
-		this.mouse = new THREE.Vector2();
+		// this.raycaster = new THREE.Raycaster();
+		this.mouse = new THREE.Vector2(-1, -1);
 		this.renderer = new THREE.WebGLRenderer();
 
 		this.canvas = this.renderer.domElement;
@@ -158,28 +171,27 @@ class Viewer extends React.Component {
 		console.log(this.canvas);
 	};
 
-	rayCasty = () => {
-		const rayCast = new PickHelper();
-		rayCast.pick(this.mouse, this.objects, this.camera, 0.01);
+	rayCasty = time => {
+		this.rayCast = new PickHelper();
 		// update the picking ray with the camera and mouse position
 		// this.raycaster.setFromCamera(this.mouse, this.camera);
-
 		// calculate objects intersecting the picking ray
 		// const intersects = this.raycaster.intersectObjects(this.scene.children);
-
 		// if (intersects.length) {
 		// console.log(intersects);
 		// intersects[i].object.material.color.set(0xff0000);
 		// };
-
 		// for (var i = 0; i < intersects.length; i++) {
 		// 	console.log(intersects[i].object.name);
 		// 	intersects[i].object.material.color.set(0xff0000);
 		// }
 	};
-	startAnimationLoop = () => {
-		this.requestID = window.requestAnimationFrame(this.startAnimationLoop);
-		this.rayCasty();
+
+	startAnimationLoop = time => {
+		time *= 0.001;
+		// this.rayCasty(time);
+
+		this.rayCast.pick(this.mouse, this.objects, this.camera, time);
 		// this.raycaster.setFromCamera(this.mouse, this.camera);
 		// const intersects = this.raycaster.intersectObjects(this.scene.children);
 
@@ -190,6 +202,7 @@ class Viewer extends React.Component {
 		this.stats.update();
 
 		this.renderer.render(this.scene, this.camera);
+		this.requestID = window.requestAnimationFrame(this.startAnimationLoop);
 	};
 	render() {
 		return (

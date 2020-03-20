@@ -8,10 +8,13 @@ class PickHelper {
 	}
 	pick(normalizedPosition, array, camera, time) {
 		// restore the color if there is a picked object
+
 		if (this.pickedObject) {
-			this.pickedObject.material.color.setHex(
+			console.log('saved', this.pickedObjectSavedColour);
+			this.pickedObject.material.emissive.setHex(
 				this.pickedObjectSavedColor
 			);
+			console.log('pick');
 			this.pickedObject = undefined;
 		}
 
@@ -21,14 +24,14 @@ class PickHelper {
 		const intersectedObjects = this.raycaster.intersectObjects(array);
 		if (intersectedObjects.length) {
 			// pick the first object. It's the closest one
-			console.log(intersectedObjects[0]);
+
 			this.pickedObject = intersectedObjects[0].object;
 			// save its color
 
-			this.pickedObjectSavedColor = this.pickedObject.material.color.getHex();
+			this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
 			console.log(this.pickedObjectSavedColor);
 			// set its emissive color to flashing red/yellow
-			this.pickedObject.material.color.setHex(
+			this.pickedObject.material.emissive.setHex(
 				(time * 8) % 2 > 1 ? 0xffff00 : 0xff0000
 			);
 		}
