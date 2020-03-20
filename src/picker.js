@@ -1,0 +1,38 @@
+import * as THREE from 'three';
+
+class PickHelper {
+	constructor() {
+		this.raycaster = new THREE.Raycaster();
+		this.pickedObject = null;
+		this.pickedObjectSavedColor = 0;
+	}
+	pick(normalizedPosition, array, camera, time) {
+		// restore the color if there is a picked object
+		if (this.pickedObject) {
+			this.pickedObject.material.color.setHex(
+				this.pickedObjectSavedColor
+			);
+			this.pickedObject = undefined;
+		}
+
+		// cast a ray through the frustum
+		this.raycaster.setFromCamera(normalizedPosition, camera);
+		// get the list of objects the ray intersected
+		const intersectedObjects = this.raycaster.intersectObjects(array);
+		if (intersectedObjects.length) {
+			// pick the first object. It's the closest one
+			console.log(intersectedObjects[0]);
+			this.pickedObject = intersectedObjects[0].object;
+			// save its color
+
+			this.pickedObjectSavedColor = this.pickedObject.material.color.getHex();
+			console.log(this.pickedObjectSavedColor);
+			// set its emissive color to flashing red/yellow
+			this.pickedObject.material.color.setHex(
+				(time * 8) % 2 > 1 ? 0xffff00 : 0xff0000
+			);
+		}
+	}
+}
+
+export default PickHelper;

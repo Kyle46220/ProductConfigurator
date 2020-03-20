@@ -6,7 +6,8 @@ import { connect } from 'react-redux';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { ObjectSpaceNormalMap } from 'three';
+import PickHelper from './picker';
+// import { ObjectSpaceNormalMap } from 'three';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 
 var initializeDomEvents = require('threex-domevents');
@@ -56,13 +57,14 @@ class Viewer extends React.Component {
 		const cubeGeo = new THREE.BoxGeometry(1000, 1000, 1000);
 		const material = new THREE.MeshBasicMaterial(0xffff00);
 		const cube = new THREE.Mesh(cubeGeo, material);
-		this.scene.add(cube);
+		// this.scene.add(cube);
 
 		// this.loadObject();
 		let controls = new OrbitControls(this.camera, this.el);
 		controls.width = this.el.clientWidth;
 		controls.height = 500;
 		controls.update();
+		// console.log(this.scene.children);
 	};
 	createChildArray = scene => {
 		this.objects = [];
@@ -71,6 +73,10 @@ class Viewer extends React.Component {
 		scene.traverse(obj => objects.push(obj));
 		this.objects = this.objects.slice(12);
 		console.log(this.objects);
+		this.objects.forEach(i => {
+			i.material = new THREE.MeshStandardMaterial();
+		});
+		this.objects[0].material.color.setHex(0x00ffff);
 	};
 
 	// definePartGeometries = (names, objects) => {
@@ -88,10 +94,10 @@ class Viewer extends React.Component {
 	// 	);
 	// };
 
-	initRayCasting = () => {
-		this.raycaster = new THREE.Raycaster();
-		this.mouse = new THREE.Vector2();
-	};
+	// initRayCasting = () => {
+	// 	this.raycaster = new THREE.Raycaster();
+	// 	this.mouse = new THREE.Vector2();
+	// };
 	modelLoader = () => {
 		const gltfLoader = new GLTFLoader();
 		const url = '/cabinetTest1.gltf';
@@ -100,20 +106,30 @@ class Viewer extends React.Component {
 
 			this.scene.add(root);
 			this.createChildArray(this.scene);
-			// this.rayCasty();
-			this.canvas.addEventListener('mousemove', this.onMouseMove, false);
+
 			this.root = root;
 			/// GET THE RAY CASTER WORKING WITH A REGULAR CUBE thEN AdD THE OBJECT
 
 			console.log('done');
 		});
 	};
+
+	getCanvasRelativePosition = event => {
+		const rect = this.canvas.getBoundingClientRect();
+		//
+		return {
+			x: event.clientX - rect.left,
+			y: event.clientY - rect.top
+		};
+	};
 	onMouseMove = event => {
 		event.preventDefault();
-		console.log('mouse');
+		// console.log(this.canvas.clientWidth);
+		const pos = this.getCanvasRelativePosition(event);
 
-		this.mouse.x = (event.clientX / this.canvas.width) * 2 - 1;
-		this.mouse.y = -(event.clientY / this.canvas.height) * 2 + 1;
+		this.mouse.x = (pos.x / this.canvas.clientWidth) * 2 - 1;
+		this.mouse.y = -(pos.y / this.canvas.clientHeight) * 2 + 1;
+		// console.log(this.mouse);
 	};
 	sceneSetup = () => {
 		const width = 500;
@@ -138,49 +154,39 @@ class Viewer extends React.Component {
 		this.stats = new Stats();
 		this.el.appendChild(this.stats.dom);
 		this.modelLoader();
-
-		// console.log(this.objects);
-		// this.initRayCasting();
-		// this.canvas.addEventListener('mousemove', this.onMouseMove, false);
+		this.canvas.addEventListener('mousemove', this.onMouseMove, false);
+		console.log(this.canvas);
 	};
 
 	rayCasty = () => {
-		// console.log(this.raycaster);
+		const rayCast = new PickHelper();
+		rayCast.pick(this.mouse, this.objects, this.camera, 0.01);
 		// update the picking ray with the camera and mouse position
-
-		this.raycaster.setFromCamera(this.mouse, this.camera);
-		// console.log(this.raycaster);
+		// this.raycaster.setFromCamera(this.mouse, this.camera);
 
 		// calculate objects intersecting the picking ray
-		const intersects = this.raycaster.intersectObjects(this.scene.children);
-		// console.log(this.objects);
+		// const intersects = this.raycaster.intersectObjects(this.scene.children);
 
-		// console.log(this.scene.children);
-		// console.log('intersects', intersects);
-		if (intersects.length) {
-			console.log(intersects);
-			// intersects[i].object.material.color.set(0xff0000);
-		}
+		// if (intersects.length) {
+		// console.log(intersects);
+		// intersects[i].object.material.color.set(0xff0000);
+		// };
 
 		// for (var i = 0; i < intersects.length; i++) {
 		// 	console.log(intersects[i].object.name);
 		// 	intersects[i].object.material.color.set(0xff0000);
 		// }
 	};
-	// rayCasty2;
-
 	startAnimationLoop = () => {
 		this.requestID = window.requestAnimationFrame(this.startAnimationLoop);
-		// this.rayCasty();
-		this.raycaster.setFromCamera(this.mouse, this.camera);
-		const intersects = this.raycaster.intersectObjects(this.scene.children);
+		this.rayCasty();
+		// this.raycaster.setFromCamera(this.mouse, this.camera);
+		// const intersects = this.raycaster.intersectObjects(this.scene.children);
 
-		if (intersects.length) {
-			// console.log(intersects);
+		// if (intersects.length > 0) {
 
-			console.log(intersects[0]);
-			// intersects[i].object.material.color.set(0xff0000);
-		}
+		// 	intersects[0].object.material.color.set(0xff0000);
+		// }
 		this.stats.update();
 
 		this.renderer.render(this.scene, this.camera);
