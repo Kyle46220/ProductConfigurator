@@ -5,7 +5,66 @@ import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import FormContainer from './form';
 import styled from 'styled-components';
-const initialState = {};
+const initialState = {
+	height: '',
+	width: '',
+	depth: '',
+	colour: 'fuchsia',
+	min: { x: 0, y: 0, z: 0 },
+	max: { x: 0, y: 0, z: 0 },
+	config: {
+		shelves: [
+			{
+				shelfId: '',
+				totalShelfQty: '',
+				min: { x: 0, y: 0, z: 0 },
+				max: { x: 0, y: 0, z: 0 },
+				divs: [
+					{
+						divId: '',
+						totalDivQty: '',
+						cupboard: false,
+						drawer: false,
+						min: { x: 0, y: 0, z: 0 },
+						max: { x: 0, y: 0, z: 0 }
+					},
+					{
+						divId: '',
+						totalDivQty: '',
+						cupboard: false,
+						drawer: false,
+						min: { x: 0, y: 0, z: 0 },
+						max: { x: 0, y: 0, z: 0 }
+					}
+				]
+			},
+			{
+				shelfId: '',
+				totalShelfQty: '',
+				min: { x: 0, y: 0, z: 0 },
+				max: { x: 0, y: 0, z: 0 },
+				divs: [
+					{
+						divId: '',
+						totalDivQty: '',
+						cupboard: false,
+						drawer: false,
+						min: { x: 0, y: 0, z: 0 },
+						max: { x: 0, y: 0, z: 0 }
+					},
+					{
+						divId: '',
+						totalDivQty: '',
+						cupboard: false,
+						drawer: false,
+						min: { x: 0, y: 0, z: 0 },
+						max: { x: 0, y: 0, z: 0 }
+					}
+				]
+			}
+		]
+	}
+};
 
 // function getKeyByValue(object, value) {
 // 	return Object.keys(object).find(key => object[key] === value);
@@ -24,6 +83,11 @@ class App extends React.Component {
 	reducer(state = initialState, action) {
 		let newState = {};
 		switch (action.type) {
+			case 'ADD_SHELF':
+				newState = {
+					...state,
+					shelves: state.shelves.push(action.newShelf)
+				};
 			case 'UPDATE_HEIGHT':
 				console.log(action.whatever); // you can pass as many things through here in the action as you want.
 				newState = { ...state, height: action.newHeight };

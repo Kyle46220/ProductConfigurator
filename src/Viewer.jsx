@@ -27,6 +27,9 @@ const Wrapper = styled.section`
 	justify-content: center;
 	align-items: center;
 `;
+function mapStateToProps(state) {
+	return { config: state.config };
+}
 
 class Viewer extends React.Component {
 	componentDidMount() {
@@ -34,6 +37,10 @@ class Viewer extends React.Component {
 		this.rayCasty();
 		this.sceneSetup();
 		this.addObjectsToScene();
+		// this.makeInvisibleCube(
+		// 	{ x: 0, y: 0, z: 0 },
+		// 	{ x: 100, y: 100, z: 100 }
+		// );
 
 		this.startAnimationLoop();
 	}
@@ -77,6 +84,70 @@ class Viewer extends React.Component {
 	randomColor() {
 		return `hsl(${this.rand(360) | 0}, ${this.rand(50, 100) | 0}%, 50%)`;
 	}
+
+	calculateOpenAreas(Mesh1, Mesh2) {
+		// i wanna make this so it accepts a mesh and takes the bounding box.
+		console.log(Mesh1);
+		const { boundingBox } = Mesh1;
+		//figure out how to do the object destructuring for this.
+		console.log(boundingBox);
+		const box = new THREE.Box3();
+		const Divider = this.getPiece(this.objects, 'Div');
+		// so this could bring out the piece from the state object. then when you calculate the bounding box below, it will make sense. you just get dividerA and dividerA+1. Then jsut applpy this function if shelfQTy.length-1 > shelfQTy.index or something (ie its not the last shelf.)
+		const Solid15 = this.getPiece(this.objects, 'Solid15');
+
+		const DividerGeo = Divider[0].geometry.boundingBox.max;
+		const Solid15Geo = Solid15[0].geometry.boundingBox.min;
+		box.expandByPoint({
+			x: DividerGeo.x - 18,
+			y: DividerGeo.y,
+			z: DividerGeo.z
+		});
+		box.expandByPoint({
+			x: Solid15Geo.x + 18,
+			y: Solid15Geo.y,
+			z: Solid15Geo.z
+		});
+		const helper = new THREE.Box3Helper(box, 0xff00ff);
+		console.log(box);
+		this.scene.add(helper);
+		// this.makeInvisibleCube(
+		// 	{
+		// 		x: this.gapsMin[0].x + 18,
+		// 		y: this.gapsMin[0].y,
+		// 		z: this.gapsMin[0].z
+		// 	},
+		// 	{
+		// 		x: this.gapsMax[5].x - 18,
+		// 		y: this.gapsMax[5].y,
+		// 		z: this.gapsMax[5].z
+		// 	}
+		// );
+	}
+
+	getPiece(array, name) {
+		const left = array.filter(obj => {
+			return obj.name === name;
+		});
+		return left;
+	}
+
+	createSkeletonArray() {
+		// this picks out the bottom and left and starts the arrays for each level.
+		this.horiz = [];
+		this.vert = [];
+
+		const left = this.objects.filter(obj => {
+			return obj.name === 'Left';
+		});
+		const bottom = this.objects.filter(obj => {
+			return obj.name === 'Bottom';
+		});
+		this.horiz.push(bottom);
+		this.vert.push(left);
+		console.log(this.horiz, this.vert);
+	}
+
 	createChildArray = scene => {
 		this.objects = [];
 
@@ -86,31 +157,11 @@ class Viewer extends React.Component {
 		console.log(this.objects);
 		this.objects.forEach(i => {
 			i.material = new THREE.MeshStandardMaterial({
-				color: this.randomColor()
+				color: 0xffffff
 			});
 		});
-		// this.objects[0].material.color.setHex(0x00ffff);
 	};
 
-	// definePartGeometries = (names, objects) => {
-	// 	//this function goes through the object array and defines each object based on the names
-	// 	names.forEach(objects.getElementByName('name'));
-	// };
-	// addListenerToGeometry = mesh => {
-	// 	const domEvents = new THREEx.DomEvents(this.camera, this.canvas);
-	// 	domEvents.addEventListener(
-	// 		mesh,
-	// 		'click',
-	// 		(e = {
-	// 			//this doesn't need to be inside a function.
-	// 		})
-	// 	);
-	// };
-
-	// initRayCasting = () => {
-	// 	this.raycaster = new THREE.Raycaster();
-	// 	this.mouse = new THREE.Vector2();
-	// };
 	modelLoader = () => {
 		const gltfLoader = new GLTFLoader();
 		const url = '/cabinetTest1.gltf';
@@ -119,13 +170,33 @@ class Viewer extends React.Component {
 
 			this.scene.add(root);
 			this.createChildArray(this.scene);
+			const Divider = this.getPiece(this.objects, 'Div');
+			const Solid15 = this.getPiece(this.objects, 'Solid15');
+			this.calculateOpenAreas(Divider, Solid15);
+			this.createSkeletonArray();
 
 			this.root = root;
-			/// GET THE RAY CASTER WORKING WITH A REGULAR CUBE thEN AdD THE OBJECT
 
 			console.log('done');
 		});
 	};
+	makeInvisibleCube(vector1, vector2) {
+		console.log(vector1, vector2);
+		const box = new THREE.BoxGeometry(100, 100, 100);
+		const material = new THREE.MeshBasicMaterial();
+		const cube = new THREE.Mesh(box, material);
+		const bbox = new THREE.Box3(vector1, vector2);
+		const bhelp = new THREE.Box3Helper(box, 0x0000ff);
+		// this.scene.add(bhelp);
+		this.scene.add(cube);
+		const center = new THREE.Vector3();
+		bbox.getCenter(center);
+		console.log(center);
+		cube.position.z = center.z;
+
+		console.log('invisible end');
+		console.log(cube);
+	}
 
 	getCanvasRelativePosition = event => {
 		const rect = this.canvas.getBoundingClientRect();
@@ -147,6 +218,7 @@ class Viewer extends React.Component {
 	sceneSetup = () => {
 		const width = 500;
 		const height = 500;
+		this.objects = [];
 
 		this.scene = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera(
@@ -173,33 +245,27 @@ class Viewer extends React.Component {
 
 	rayCasty = time => {
 		this.rayCast = new PickHelper();
-		// update the picking ray with the camera and mouse position
-		// this.raycaster.setFromCamera(this.mouse, this.camera);
-		// calculate objects intersecting the picking ray
-		// const intersects = this.raycaster.intersectObjects(this.scene.children);
-		// if (intersects.length) {
-		// console.log(intersects);
-		// intersects[i].object.material.color.set(0xff0000);
-		// };
-		// for (var i = 0; i < intersects.length; i++) {
-		// 	console.log(intersects[i].object.name);
-		// 	intersects[i].object.material.color.set(0xff0000);
-		// }
 	};
+
+	rayCasty2() {
+		const box = new THREE.BoxGeometry(1000, 1000, 1000, {
+			wireframe: true
+		});
+		const material = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+		const cube = new THREE.Mesh(box, material);
+		this.scene.add(cube);
+		const raycaster2 = new THREE.Raycaster();
+		raycaster2.setFromCamera(this.mouse, this.camera);
+		const intersects = raycaster2.intersectObject(cube);
+	}
 
 	startAnimationLoop = time => {
 		time *= 0.001;
-		// this.rayCasty(time);
 
 		this.rayCast.pick(this.mouse, this.objects, this.camera, time);
-		// this.raycaster.setFromCamera(this.mouse, this.camera);
-		// const intersects = this.raycaster.intersectObjects(this.scene.children);
 
-		// if (intersects.length > 0) {
-
-		// 	intersects[0].object.material.color.set(0xff0000);
-		// }
 		this.stats.update();
+		// this.rayCasty2();
 
 		this.renderer.render(this.scene, this.camera);
 		this.requestID = window.requestAnimationFrame(this.startAnimationLoop);
@@ -213,4 +279,4 @@ class Viewer extends React.Component {
 	}
 }
 
-export default Viewer;
+export default connect(mapStateToProps)(Viewer);

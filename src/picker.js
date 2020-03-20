@@ -10,11 +10,10 @@ class PickHelper {
 		// restore the color if there is a picked object
 
 		if (this.pickedObject) {
-			console.log('saved', this.pickedObjectSavedColour);
 			this.pickedObject.material.emissive.setHex(
 				this.pickedObjectSavedColor
 			);
-			console.log('pick');
+
 			this.pickedObject = undefined;
 		}
 
@@ -29,7 +28,7 @@ class PickHelper {
 			// save its color
 
 			this.pickedObjectSavedColor = this.pickedObject.material.emissive.getHex();
-			console.log(this.pickedObjectSavedColor);
+
 			// set its emissive color to flashing red/yellow
 			this.pickedObject.material.emissive.setHex(
 				(time * 8) % 2 > 1 ? 0xffff00 : 0xff0000
