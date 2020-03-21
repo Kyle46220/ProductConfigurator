@@ -15,37 +15,39 @@ const initialState = {
 	config: {
 		shelves: [
 			{
-				shelfId: '',
+				id: '0',
 				totalShelfQty: '',
+				height: '550',
 				min: { x: 0, y: 0, z: 0 },
-				max: { x: 0, y: 0, z: 0 },
+				max: { x: 1000, y: 1000, z: 1000 },
 				divs: [
 					{
-						divId: '',
+						id: '0',
 						totalDivQty: '',
 						cupboard: false,
 						drawer: false,
 						min: { x: 0, y: 0, z: 0 },
-						max: { x: 0, y: 0, z: 0 }
+						max: { x: 100, y: 100, z: 100 }
 					},
 					{
-						divId: '',
+						id: '1',
 						totalDivQty: '',
 						cupboard: false,
 						drawer: false,
-						min: { x: 0, y: 0, z: 0 },
-						max: { x: 0, y: 0, z: 0 }
+						min: { x: 200, y: 200, z: 200 },
+						max: { x: 400, y: 400, z: 400 }
 					}
 				]
 			},
 			{
-				shelfId: '',
+				id: '1',
 				totalShelfQty: '',
-				min: { x: 0, y: 0, z: 0 },
-				max: { x: 0, y: 0, z: 0 },
+				height: '550',
+				min: { x: 800, y: 200, z: 600 },
+				max: { x: 0, y: -200, z: 618 },
 				divs: [
 					{
-						divId: '',
+						id: '',
 						totalDivQty: '',
 						cupboard: false,
 						drawer: false,
@@ -53,7 +55,7 @@ const initialState = {
 						max: { x: 0, y: 0, z: 0 }
 					},
 					{
-						divId: '',
+						id: '',
 						totalDivQty: '',
 						cupboard: false,
 						drawer: false,

@@ -84,52 +84,109 @@ class Viewer extends React.Component {
 	randomColor() {
 		return `hsl(${this.rand(360) | 0}, ${this.rand(50, 100) | 0}%, 50%)`;
 	}
+	addShelves(shelfMesh, positionArr) {
+		//this takes the whole config object. and clones the shelves based on this object.
+		console.log('adding shelves');
+		const { shelves } = this.props.config;
+		console.log(shelves);
+		this.partCloner(shelves, shelfMesh);
+	}
 
+	partCloner(array, meshArr) {
+		array.forEach(obj => {
+			// get id
+			const { id, min, max } = obj;
+			const [mesh] = meshArr;
+			console.log(mesh);
+
+			// here you can use clone or copy. might come up later.
+			// const clone = new THREE.Mesh(mesh.geometry, mesh.material);
+			// clone.copy(mesh);
+			const clone = mesh.clone();
+
+			// still need to figure out how to get the right coordinates based on the state object.
+			clone.position.set(max.x, max.y, max.z);
+			clone.parent = mesh.parent;
+			// need to put the parent id in here.
+			clone.name = `part ${id}`;
+			console.log(clone);
+
+			this.scene.add(clone);
+		});
+	}
+
+	cloneDivs(divMesh, shelfMesh, positionArr) {
+		//this takes an initial div, and an initial shelf, and makes a clones based on 2 inputs from state - shelf id, and div position array.
+		//destructure state object to get qty and position array
+		console.log(positionArr);
+		const [mesh] = divMesh;
+		const { shelfId, divs: dividers } = positionArr;
+		console.log(dividers);
+		this.partCloner(dividers, divMesh);
+		// to clone a div for each item in state objectand get the coords and do a position.
+
+		// dividers.forEach(obj => {
+		// 	// get id
+		// 	const { divId, min, max } = obj;
+
+		// 	// here you can use clone or copy. might come up later.
+		// 	// const clone = new THREE.Mesh(mesh.geometry, mesh.material);
+		// 	// clone.copy(mesh);
+		// 	const clone = mesh.clone();
+
+		// 	// still need to figure out how to get the right coordinates based on the state object.
+		// 	clone.position.set(max.x, max.y, max.z);
+		// 	clone.parent = mesh.parent;
+
+		// 	clone.name = `divider ${shelfId}${divId}`;
+		// 	console.log(clone);
+
+		// 	this.scene.add(clone);
+		// });
+	}
+	setDefaultState() {
+		// not sure if we need this yet.
+	}
 	calculateOpenAreas(Mesh1, Mesh2) {
 		// i wanna make this so it accepts a mesh and takes the bounding box.
 		console.log(Mesh1);
-		const { boundingBox } = Mesh1;
-		//figure out how to do the object destructuring for this.
-		console.log(boundingBox);
-		const box = new THREE.Box3();
-		const Divider = this.getPiece(this.objects, 'Div');
-		// so this could bring out the piece from the state object. then when you calculate the bounding box below, it will make sense. you just get dividerA and dividerA+1. Then jsut applpy this function if shelfQTy.length-1 > shelfQTy.index or something (ie its not the last shelf.)
-		const Solid15 = this.getPiece(this.objects, 'Solid15');
+		const [
+			{
+				name: Mesh1Name,
+				geometry: { boundingBox: Mesh1Box }
+			}
+		] = Mesh1;
+		const [
+			{
+				name: Mesh2Name,
+				geometry: { boundingBox: Mesh2Box }
+			}
+		] = Mesh2;
 
-		const DividerGeo = Divider[0].geometry.boundingBox.max;
-		const Solid15Geo = Solid15[0].geometry.boundingBox.min;
+		//figure out how to do the object destructuring for this.
+		console.log(Mesh1Name);
+		const box = new THREE.Box3();
+
 		box.expandByPoint({
-			x: DividerGeo.x - 18,
-			y: DividerGeo.y,
-			z: DividerGeo.z
+			x: Mesh1Box.min.x - 18,
+			y: Mesh1Box.min.y,
+			z: Mesh1Box.min.z
 		});
 		box.expandByPoint({
-			x: Solid15Geo.x + 18,
-			y: Solid15Geo.y,
-			z: Solid15Geo.z
+			x: Mesh2Box.max.x + 18,
+			y: Mesh2Box.max.y,
+			z: Mesh2Box.max.z
 		});
 		const helper = new THREE.Box3Helper(box, 0xff00ff);
 		console.log(box);
 		this.scene.add(helper);
-		// this.makeInvisibleCube(
-		// 	{
-		// 		x: this.gapsMin[0].x + 18,
-		// 		y: this.gapsMin[0].y,
-		// 		z: this.gapsMin[0].z
-		// 	},
-		// 	{
-		// 		x: this.gapsMax[5].x - 18,
-		// 		y: this.gapsMax[5].y,
-		// 		z: this.gapsMax[5].z
-		// 	}
-		// );
 	}
 
 	getPiece(array, name) {
-		const left = array.filter(obj => {
+		const object = array.filter(obj => {
 			return obj.name === name;
 		});
-		return left;
+		return object;
 	}
 
 	createSkeletonArray() {
@@ -172,8 +229,12 @@ class Viewer extends React.Component {
 			this.createChildArray(this.scene);
 			const Divider = this.getPiece(this.objects, 'Div');
 			const Solid15 = this.getPiece(this.objects, 'Solid15');
+			const Bottom = this.getPiece(this.objects, 'Bottom');
 			this.calculateOpenAreas(Divider, Solid15);
 			this.createSkeletonArray();
+			console.log(this.props.config);
+			this.addShelves(Bottom, this.props.config);
+			this.cloneDivs(Divider, Bottom, this.props.config.shelves[0]);
 
 			this.root = root;
 
