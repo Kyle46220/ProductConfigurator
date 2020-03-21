@@ -84,19 +84,44 @@ class Viewer extends React.Component {
 	randomColor() {
 		return `hsl(${this.rand(360) | 0}, ${this.rand(50, 100) | 0}%, 50%)`;
 	}
-	addShelves(shelfMesh, positionArr) {
+
+	addShelves(shelfMesh, divMesh, config) {
 		//this takes the whole config object. and clones the shelves based on this object.
 		console.log('adding shelves');
 		const { shelves } = this.props.config;
 		console.log(shelves);
-		this.partCloner(shelves, shelfMesh);
+
+		shelves.forEach(obj => {
+			// get id
+			const { id, min, max } = obj;
+			// const [mesh] = meshArr;
+			console.log(shelfMesh);
+
+			// here you can use clone or copy. might come up later.
+			// const clone = new THREE.Mesh(mesh.geometry, mesh.material);
+			// clone.copy(mesh);
+			const clone = shelfMesh.clone();
+			const { divs: dividers } = obj;
+
+			// still need to figure out how to get the right coordinates based on the state object.
+			clone.position.set(max.x, max.y, max.z);
+			clone.parent = shelfMesh.parent;
+			// need to put the parent id in here.
+			clone.name = `shelf ${obj.id}`;
+			console.log(clone);
+			// this.objects.push(clone); // this is to make raycaster work but should props change raycaster to just scene.children
+			this.partCloner(dividers, divMesh);
+			this.scene.add(clone);
+			this.objects.push(clone);
+		});
 	}
 
-	partCloner(array, meshArr) {
+	partCloner(array, mesh) {
 		array.forEach(obj => {
 			// get id
 			const { id, min, max } = obj;
-			const [mesh] = meshArr;
+			// console.log(meshArr);
+			// const [mesh] = meshArr;
 			console.log(mesh);
 
 			// here you can use clone or copy. might come up later.
@@ -108,46 +133,33 @@ class Viewer extends React.Component {
 			clone.position.set(max.x, max.y, max.z);
 			clone.parent = mesh.parent;
 			// need to put the parent id in here.
-			clone.name = `part ${id}`;
+			clone.name = `part ${array.id}${id}`;
 			console.log(clone);
+			// this.objects.push(clone); // this is to make raycaster work but should props change raycaster to just scene.children
 
 			this.scene.add(clone);
+			this.objects.push(clone);
 		});
 	}
 
-	cloneDivs(divMesh, shelfMesh, positionArr) {
-		//this takes an initial div, and an initial shelf, and makes a clones based on 2 inputs from state - shelf id, and div position array.
-		//destructure state object to get qty and position array
-		console.log(positionArr);
-		const [mesh] = divMesh;
-		const { shelfId, divs: dividers } = positionArr;
-		console.log(dividers);
-		this.partCloner(dividers, divMesh);
-		// to clone a div for each item in state objectand get the coords and do a position.
-
-		// dividers.forEach(obj => {
-		// 	// get id
-		// 	const { divId, min, max } = obj;
-
-		// 	// here you can use clone or copy. might come up later.
-		// 	// const clone = new THREE.Mesh(mesh.geometry, mesh.material);
-		// 	// clone.copy(mesh);
-		// 	const clone = mesh.clone();
-
-		// 	// still need to figure out how to get the right coordinates based on the state object.
-		// 	clone.position.set(max.x, max.y, max.z);
-		// 	clone.parent = mesh.parent;
-
-		// 	clone.name = `divider ${shelfId}${divId}`;
-		// 	console.log(clone);
-
-		// 	this.scene.add(clone);
-		// });
-	}
 	setDefaultState() {
 		// not sure if we need this yet.
+		// but I want a way to build in a bunch of constraints on the model so that they don't have to be built into all the sliders etc. is this a david k piano state machine type thing?
 	}
-	calculateOpenAreas(Mesh1, Mesh2) {
+
+	calcOpenAreas(shelf, objectArr) {
+		// need a naming convention.
+		// this will take the div position from a shelf arr and then call on the corresponding meshes (via the naming convention) to build the bounding box.
+		const { divs: dividers } = shelf;
+		dividers.forEach((divider, i) => {
+			if (divider.id < i) {
+				console.log(divider);
+				this.calculateOpenArea();
+			}
+		});
+	}
+
+	calculateOpenArea(Mesh1, Mesh2) {
 		// i wanna make this so it accepts a mesh and takes the bounding box.
 		console.log(Mesh1);
 		const [
@@ -189,15 +201,15 @@ class Viewer extends React.Component {
 		return object;
 	}
 
-	createSkeletonArray() {
+	createSkeletonArray(objects) {
 		// this picks out the bottom and left and starts the arrays for each level.
 		this.horiz = [];
 		this.vert = [];
 
-		const left = this.objects.filter(obj => {
+		const left = objects.filter(obj => {
 			return obj.name === 'Left';
 		});
-		const bottom = this.objects.filter(obj => {
+		const bottom = objects.filter(obj => {
 			return obj.name === 'Bottom';
 		});
 		this.horiz.push(bottom);
@@ -224,19 +236,34 @@ class Viewer extends React.Component {
 		const url = '/cabinetTest1.gltf';
 		gltfLoader.load(url, gltf => {
 			const root = gltf.scene;
-
-			this.scene.add(root);
-			this.createChildArray(this.scene);
-			const Divider = this.getPiece(this.objects, 'Div');
-			const Solid15 = this.getPiece(this.objects, 'Solid15');
-			const Bottom = this.getPiece(this.objects, 'Bottom');
-			this.calculateOpenAreas(Divider, Solid15);
-			this.createSkeletonArray();
+			console.log(root);
+			// this.scene.add(root);
+			const {
+				children: [{ children: sceneObjects }]
+			} = root;
+			console.log(this.scene.children);
+			this.sceneMeshes = sceneObjects.filter(obj => {
+				return obj.type === 'Mesh';
+			});
+			// console.log(sceneMeshes);
+			// this.createChildArray(this.scene);
+			const Divider = this.getPiece(sceneObjects, 'Div');
+			const Solid15 = this.getPiece(sceneObjects, 'Solid15');
+			const Bottom = this.getPiece(sceneObjects, 'Bottom');
+			const Left = this.getPiece(sceneObjects, 'Left');
+			this.calculateOpenArea(Divider, Solid15);
+			// this.createSkeletonArray();
 			console.log(this.props.config);
-			this.addShelves(Bottom, this.props.config);
-			this.cloneDivs(Divider, Bottom, this.props.config.shelves[0]);
+			const [leftMesh] = Left;
+			const [dividerMesh] = Divider;
+			const [shelfMesh] = Bottom;
+
+			this.objects.push(leftMesh, shelfMesh);
+			this.addShelves(shelfMesh, dividerMesh, this.props.config);
+			// this.cloneDivs(Divider, Bottom, this.props.config.shelves[0]);
 
 			this.root = root;
+			this.scene.add(leftMesh, shelfMesh);
 
 			console.log('done');
 		});

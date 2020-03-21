@@ -48,3 +48,9 @@ Gonna make transparent boxes in between the divs and then use raycasting to chan
 was building a function that creates a bounding box between two divs. this will work on all amount of divs if i put an if statement that checks if its not the rightmost div.
 
 See you tomorroW!
+
+I have built functions that place shelves and divs based on coordinates from the state object
+
+NOw, I will like to plug in the in between functions.
+
+Then I would like to build a state machine that provides the constraints that allow only sensible placement of parts.

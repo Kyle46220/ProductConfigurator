@@ -52,7 +52,7 @@ const initialState = {
 						cupboard: false,
 						drawer: false,
 						min: { x: 0, y: 0, z: 0 },
-						max: { x: 0, y: 0, z: 0 }
+						max: { x: 325, y: 325, z: 325 }
 					},
 					{
 						id: '',
@@ -60,7 +60,7 @@ const initialState = {
 						cupboard: false,
 						drawer: false,
 						min: { x: 0, y: 0, z: 0 },
-						max: { x: 0, y: 0, z: 0 }
+						max: { x: 499, y: 499, z: 499 }
 					}
 				]
 			}
