@@ -6,20 +6,22 @@ import { createStore } from 'redux';
 import FormContainer from './form';
 import styled from 'styled-components';
 const initialState = {
-	height: '',
-	width: '',
-	depth: '',
+	materialThickness: 18,
+	height: '1200',
+	width: '1000',
+	depth: '400',
 	colour: 'fuchsia',
-	min: { x: 0, y: 0, z: 0 },
-	max: { x: 0, y: 0, z: 0 },
+	shelfHeights: [180, 280, 380, 480],
+	min: { x: 0, y: -600, z: 0 },
+	max: { x: 500, y: 600, z: 400 },
 	config: {
 		shelves: [
 			{
 				id: '0',
 				totalShelfQty: '',
-				height: '550',
+				height: '280',
 				min: { x: 0, y: 0, z: 0 },
-				max: { x: 1000, y: 1000, z: 1000 },
+				max: { x: -982, y: 600, z: 400 },
 				divs: [
 					{
 						id: '0',
@@ -59,7 +61,7 @@ const initialState = {
 				id: '1',
 				totalShelfQty: '',
 				height: '550',
-				min: { x: 800, y: 200, z: 600 },
+				min: { x: 0, y: 380, z: 0 },
 				max: { x: 0, y: -200, z: 618 },
 				divs: [
 					{
@@ -117,6 +119,9 @@ class App extends React.Component {
 	reducer(state = initialState, action) {
 		let newState = {};
 		switch (action.type) {
+			case 'UPDATE_CONFIG':
+				newState = { ...state, config: action.newConfig };
+				break;
 			case 'ADD_SHELF':
 				newState = {
 					...state,

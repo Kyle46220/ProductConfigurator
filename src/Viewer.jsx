@@ -28,7 +28,13 @@ const Wrapper = styled.section`
 	align-items: center;
 `;
 function mapStateToProps(state) {
-	return { config: state.config };
+	return {
+		config: state.config,
+		height: state.height,
+		width: state.width,
+		depth: state.depth,
+		materialThickness: state.materialThickness
+	};
 }
 
 class Viewer extends React.Component {
@@ -59,6 +65,8 @@ class Viewer extends React.Component {
 		this.scene.add(lights[0]);
 		this.scene.add(lights[1]);
 		this.scene.add(lights[2]);
+		var axesHelper = new THREE.AxesHelper(500);
+		this.scene.add(axesHelper);
 
 		const cubeGeo = new THREE.BoxGeometry(1000, 1000, 1000);
 		const material = new THREE.MeshBasicMaterial(0xffff00);
@@ -70,6 +78,7 @@ class Viewer extends React.Component {
 		controls.width = this.el.clientWidth;
 		controls.height = 500;
 		controls.update();
+		this.buildCabinet(this.props.config, 18, 400, 1000);
 		// console.log(this.scene.children);
 	};
 	rand(min, max) {
@@ -215,7 +224,6 @@ class Viewer extends React.Component {
 		const object = array.filter(obj => {
 			return obj.name === name;
 		});
-		return object;
 	}
 
 	createSkeletonArray(objects) {
@@ -242,10 +250,25 @@ class Viewer extends React.Component {
 
 		this.objects.forEach(i => {
 			i.material = new THREE.MeshStandardMaterial({
-				color: 0xffffff
+				color: this.randomColor()
 			});
 		});
 	};
+
+	addRandomMaterial(array) {
+		console.log(array);
+		if (array instanceof Array) {
+			array.forEach(i => {
+				i.material = new THREE.MeshStandardMaterial({
+					color: `${this.randomColor()}`
+				});
+			});
+		} else {
+			array.material = new THREE.MeshStandardMaterial({
+				color: this.randomColor()
+			});
+		}
+	}
 
 	modelLoader = () => {
 		const gltfLoader = new GLTFLoader();
@@ -338,9 +361,61 @@ class Viewer extends React.Component {
 		this.el.appendChild(this.canvas);
 		this.stats = new Stats();
 		this.el.appendChild(this.stats.dom);
-		this.modelLoader();
+		// this.modelLoader();
 		this.canvas.addEventListener('mousemove', this.onMouseMove, false);
 	};
+	createShelf(width, height, depth, pos, material, scene) {
+		console.log('shelf make');
+		const shelfGeom = new THREE.BoxGeometry(width, height, depth);
+		const shelfMesh = new THREE.Mesh(shelfGeom, material);
+		shelfMesh.position.set(pos.x, pos.y, pos.z);
+		scene.add(shelfMesh);
+		console.log(shelfMesh);
+	}
+	buildCabinet(config, width, depth, materialThickness) {
+		const { shelves } = config;
+		// console.log(materialThickness, shelves, width, depth, height, min, max);
+		console.log(shelves);
+
+		shelves.forEach(item => {
+			console.log(item);
+			const { height, min, max } = item;
+			this.addRandomMaterial(item);
+			const shelf = this.createShelf(
+				materialThickness,
+				width,
+				depth,
+				min,
+				item.material,
+				this.scene
+			);
+			console.log(shelf);
+			// needs to be the JSON object not the mesh
+			this.createDividers(item);
+		});
+	}
+
+	createDividers(shelf) {
+		console.log(shelf);
+		// const { height } = shelf;
+		const { divs: positionArr } = shelf;
+
+		positionArr.forEach(item => {
+			this.addRandomMaterial(item);
+			const {
+				min: { x, y, z }
+			} = item;
+			const divGeom = new THREE.BoxGeometry(
+				this.props.config.materialThickness,
+				280,
+				400
+			);
+			const divMesh = new THREE.Mesh(divGeom, item.material);
+			divMesh.position.set(x, y, z);
+			this.scene.add(divMesh);
+			console.log(divMesh);
+		});
+	}
 
 	rayCasty = time => {
 		this.rayCast = new PickHelper();
