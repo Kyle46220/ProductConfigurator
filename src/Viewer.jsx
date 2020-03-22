@@ -33,7 +33,6 @@ function mapStateToProps(state) {
 
 class Viewer extends React.Component {
 	componentDidMount() {
-		console.log('mounted');
 		this.rayCasty();
 		this.sceneSetup();
 		this.addObjectsToScene();
@@ -87,15 +86,13 @@ class Viewer extends React.Component {
 
 	addShelves(shelfMesh, divMesh, config) {
 		//this takes the whole config object. and clones the shelves based on this object.
-		console.log('adding shelves');
+
 		const { shelves } = this.props.config;
-		console.log(shelves);
 
 		shelves.forEach(obj => {
 			// get id
 			const { id, min, max } = obj;
 			// const [mesh] = meshArr;
-			console.log(shelfMesh);
 
 			// here you can use clone or copy. might come up later.
 			// const clone = new THREE.Mesh(mesh.geometry, mesh.material);
@@ -107,8 +104,9 @@ class Viewer extends React.Component {
 			clone.position.set(max.x, max.y, max.z);
 			clone.parent = shelfMesh.parent;
 			// need to put the parent id in here.
-			clone.name = `shelf ${obj.id}`;
-			console.log(clone);
+			clone.name = `${obj.id}`;
+			this.id = obj.id;
+
 			// this.objects.push(clone); // this is to make raycaster work but should props change raycaster to just scene.children
 			this.partCloner(dividers, divMesh);
 			this.scene.add(clone);
@@ -122,7 +120,6 @@ class Viewer extends React.Component {
 			const { id, min, max } = obj;
 			// console.log(meshArr);
 			// const [mesh] = meshArr;
-			console.log(mesh);
 
 			// here you can use clone or copy. might come up later.
 			// const clone = new THREE.Mesh(mesh.geometry, mesh.material);
@@ -133,8 +130,8 @@ class Viewer extends React.Component {
 			clone.position.set(max.x, max.y, max.z);
 			clone.parent = mesh.parent;
 			// need to put the parent id in here.
-			clone.name = `part ${array.id}${id}`;
-			console.log(clone);
+			clone.name = `${this.id + id}`;
+
 			// this.objects.push(clone); // this is to make raycaster work but should props change raycaster to just scene.children
 
 			this.scene.add(clone);
@@ -146,22 +143,38 @@ class Viewer extends React.Component {
 		// not sure if we need this yet.
 		// but I want a way to build in a bunch of constraints on the model so that they don't have to be built into all the sliders etc. is this a david k piano state machine type thing?
 	}
+	calcShelfAreas(config) {
+		const { shelves } = config;
+		shelves.forEach(shelf => {
+			this.calcOpenAreas(shelf, this.objects);
+		});
+	}
 
 	calcOpenAreas(shelf, objectArr) {
 		// need a naming convention.
 		// this will take the div position from a shelf arr and then call on the corresponding meshes (via the naming convention) to build the bounding box.
 		const { divs: dividers } = shelf;
 		dividers.forEach((divider, i) => {
-			if (divider.id < i) {
-				console.log(divider);
-				this.calculateOpenArea();
+			if (divider.id < dividers.length - 1) {
+				// looking for a way to destructure the meshes and the pass them to below function.
+
+				const mesh1 = this.getPiece(
+					this.objects,
+					`${shelf.id + dividers[i].id}`
+				);
+				const mesh2 = this.getPiece(
+					this.objects,
+					`${shelf.id + dividers[i + 1].id}`
+				);
+				console.log(mesh1, mesh2);
+				this.calculateOpenArea(mesh1, mesh2);
 			}
 		});
 	}
 
 	calculateOpenArea(Mesh1, Mesh2) {
 		// i wanna make this so it accepts a mesh and takes the bounding box.
-		console.log(Mesh1);
+
 		const [
 			{
 				name: Mesh1Name,
@@ -176,21 +189,25 @@ class Viewer extends React.Component {
 		] = Mesh2;
 
 		//figure out how to do the object destructuring for this.
-		console.log(Mesh1Name);
+
 		const box = new THREE.Box3();
 
 		box.expandByPoint({
-			x: Mesh1Box.min.x - 18,
-			y: Mesh1Box.min.y,
-			z: Mesh1Box.min.z
+			x: Mesh1Box.max.x - 18,
+			y: Mesh1Box.max.y,
+			z: Mesh1Box.max.z
 		});
 		box.expandByPoint({
-			x: Mesh2Box.max.x + 18,
-			y: Mesh2Box.max.y,
-			z: Mesh2Box.max.z
+			x: Mesh2Box.min.x + 18,
+			y: Mesh2Box.min.y,
+			z: Mesh2Box.min.z
 		});
+		console.log(Mesh2Box, Mesh1Box);
+		const material = new THREE.MeshBasicMaterial();
+
 		const helper = new THREE.Box3Helper(box, 0xff00ff);
-		console.log(box);
+		// const cube = new THREE.Mesh(helper, material);
+		// this.scene.add(cube);
 		this.scene.add(helper);
 	}
 
@@ -214,7 +231,6 @@ class Viewer extends React.Component {
 		});
 		this.horiz.push(bottom);
 		this.vert.push(left);
-		console.log(this.horiz, this.vert);
 	}
 
 	createChildArray = scene => {
@@ -223,7 +239,7 @@ class Viewer extends React.Component {
 		const objects = this.objects;
 		scene.traverse(obj => objects.push(obj));
 		this.objects = this.objects.slice(11);
-		console.log(this.objects);
+
 		this.objects.forEach(i => {
 			i.material = new THREE.MeshStandardMaterial({
 				color: 0xffffff
@@ -236,40 +252,39 @@ class Viewer extends React.Component {
 		const url = '/cabinetTest1.gltf';
 		gltfLoader.load(url, gltf => {
 			const root = gltf.scene;
-			console.log(root);
-			// this.scene.add(root);
+
 			const {
 				children: [{ children: sceneObjects }]
 			} = root;
-			console.log(this.scene.children);
+
 			this.sceneMeshes = sceneObjects.filter(obj => {
 				return obj.type === 'Mesh';
 			});
-			// console.log(sceneMeshes);
-			// this.createChildArray(this.scene);
+
 			const Divider = this.getPiece(sceneObjects, 'Div');
 			const Solid15 = this.getPiece(sceneObjects, 'Solid15');
 			const Bottom = this.getPiece(sceneObjects, 'Bottom');
 			const Left = this.getPiece(sceneObjects, 'Left');
 			this.calculateOpenArea(Divider, Solid15);
 			// this.createSkeletonArray();
-			console.log(this.props.config);
+
 			const [leftMesh] = Left;
 			const [dividerMesh] = Divider;
 			const [shelfMesh] = Bottom;
 
 			this.objects.push(leftMesh, shelfMesh);
 			this.addShelves(shelfMesh, dividerMesh, this.props.config);
-			// this.cloneDivs(Divider, Bottom, this.props.config.shelves[0]);
 
 			this.root = root;
 			this.scene.add(leftMesh, shelfMesh);
+			const shelf = this.props.config.shelves[0];
+			this.calcOpenAreas(shelf, this.objects);
+			this.calcShelfAreas(this.props.config);
 
 			console.log('done');
 		});
 	};
 	makeInvisibleCube(vector1, vector2) {
-		console.log(vector1, vector2);
 		const box = new THREE.BoxGeometry(100, 100, 100);
 		const material = new THREE.MeshBasicMaterial();
 		const cube = new THREE.Mesh(box, material);
@@ -279,11 +294,8 @@ class Viewer extends React.Component {
 		this.scene.add(cube);
 		const center = new THREE.Vector3();
 		bbox.getCenter(center);
-		console.log(center);
-		cube.position.z = center.z;
 
-		console.log('invisible end');
-		console.log(cube);
+		cube.position.z = center.z;
 	}
 
 	getCanvasRelativePosition = event => {
@@ -296,17 +308,17 @@ class Viewer extends React.Component {
 	};
 	onMouseMove = event => {
 		event.preventDefault();
-		// console.log(this.canvas.clientWidth);
+
 		const pos = this.getCanvasRelativePosition(event);
 
 		this.mouse.x = (pos.x / this.canvas.clientWidth) * 2 - 1;
 		this.mouse.y = -(pos.y / this.canvas.clientHeight) * 2 + 1;
-		// console.log(this.mouse);
 	};
 	sceneSetup = () => {
 		const width = 500;
 		const height = 500;
 		this.objects = [];
+		this.id = 7;
 
 		this.scene = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera(
@@ -317,7 +329,7 @@ class Viewer extends React.Component {
 		);
 
 		this.camera.position.setZ(2000);
-		// this.raycaster = new THREE.Raycaster();
+
 		this.mouse = new THREE.Vector2(-1, -1);
 		this.renderer = new THREE.WebGLRenderer();
 
@@ -328,7 +340,6 @@ class Viewer extends React.Component {
 		this.el.appendChild(this.stats.dom);
 		this.modelLoader();
 		this.canvas.addEventListener('mousemove', this.onMouseMove, false);
-		console.log(this.canvas);
 	};
 
 	rayCasty = time => {

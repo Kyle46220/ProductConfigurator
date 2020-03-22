@@ -54,3 +54,44 @@ I have built functions that place shelves and divs based on coordinates from the
 NOw, I will like to plug in the in between functions.
 
 Then I would like to build a state machine that provides the constraints that allow only sensible placement of parts.
+
+Looking at the state machine Xstate docs. I think it is what I need.
+
+Today I'm looking at morph targets and statemachines.
+
+Morph targets seem to be you create a target object geometry, and then you morph your existing object into that geometry.
+Found some good examples on github.
+
+one thing to consider. Using morph targets - this is a way to make changes inside three js render loop, not React render looop.
+
+If i'm connecting this with redux, it may need to stay in react loop.
+
+Reading a good formum. - What is a scene graph? three js funamentals. Its like a node graph.
+
+Looking at redux with hooks and how this would work with react fiber.
+
+This seems to be the way to go.
+
+It seems like the key here, is going to be how to get the default cabinet designs. Do I want to import a model to get the defaults for the design?
+
+The instances of a design type ( eg bookcases) this will be stored in state. But what about the style? eg, grid slanted etc. Where will I store these?
+
+Basically its looking like I have an array of positions for a shelf with divs, then i copy this to multiple levels and define the height of each.
+
+This makes sense for a grid, but what about different styles? would the sstyle change be a function that clones or copies the shelf levels in a different way?
+
+I don't necessarily like this because It stoo hard coded.
+
+Wait ok, theres a value in state which determines how the shelves are copied on every level. Whether its, evenly spaced, offset, random or gradient. the positions of the divs in each shelf need to come from state.
+
+so in summary, I don't need the gltf loaded model. I can just use basic gemoetry.
+
+i can use react-fiber, and then I can make components for each shelf and div, and then easily update these from redux.
+
+I will still need some gltf models and transforms for the drawers and cupboard doors etc.
+
+how would the functions I have written be different if it was react components rather than three.js objects?
+
+if i load the objects as react comonenets, can i still put things between them? can i access their geometry still?
+
+I'm going to use three.js normal first. Then maybe rebuild with react fiber after i reach MVP for the component. I will be able to reuse most of the redux stuff anyway.

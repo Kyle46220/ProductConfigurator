@@ -36,6 +36,22 @@ const initialState = {
 						drawer: false,
 						min: { x: 200, y: 200, z: 200 },
 						max: { x: 400, y: 400, z: 400 }
+					},
+					{
+						id: '2',
+						totalDivQty: '',
+						cupboard: false,
+						drawer: false,
+						min: { x: 200, y: 200, z: 200 },
+						max: { x: 600, y: 600, z: 600 }
+					},
+					{
+						id: '3',
+						totalDivQty: '',
+						cupboard: false,
+						drawer: false,
+						min: { x: 200, y: 200, z: 200 },
+						max: { x: 800, y: 800, z: 800 }
 					}
 				]
 			},
@@ -47,7 +63,7 @@ const initialState = {
 				max: { x: 0, y: -200, z: 618 },
 				divs: [
 					{
-						id: '',
+						id: '0',
 						totalDivQty: '',
 						cupboard: false,
 						drawer: false,
@@ -55,12 +71,28 @@ const initialState = {
 						max: { x: 325, y: 325, z: 325 }
 					},
 					{
-						id: '',
+						id: '1',
 						totalDivQty: '',
 						cupboard: false,
 						drawer: false,
 						min: { x: 0, y: 0, z: 0 },
 						max: { x: 499, y: 499, z: 499 }
+					},
+					{
+						id: '2',
+						totalDivQty: '',
+						cupboard: false,
+						drawer: false,
+						min: { x: 0, y: 0, z: 0 },
+						max: { x: 570, y: 570, z: 570 }
+					},
+					{
+						id: '3',
+						totalDivQty: '',
+						cupboard: false,
+						drawer: false,
+						min: { x: 0, y: 0, z: 0 },
+						max: { x: 650, y: 650, z: 650 }
 					}
 				]
 			}
