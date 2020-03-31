@@ -111,4 +111,5 @@ I can get almost everything out of the initial state object now except the above
 
 next I want to get some reduxing done on the sliders to just display or log the desired values from the state. Then I can try figure how to scale everything accross.
 
-This is gonna mean i'm gonna need some logic to caluclate div and shelf positions - could just be as simple as height - (shelqty \* materialThicknes) / shelf QTY or whatever it is.
+This is gonna mean i'm gonna need some logic to caluclate div and shelf positions - could just be as simple as height - (shelfqty \* materialThicknes) / shelfqty
+or whatever it is.
