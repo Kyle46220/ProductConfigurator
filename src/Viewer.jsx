@@ -379,6 +379,8 @@ class Viewer extends React.Component {
 
 		shelves.forEach(item => {
 			console.log(item);
+			//need a get-by-id type function here.
+
 			const { height, min, max } = item;
 			this.addRandomMaterial(item);
 			const shelf = this.createShelf(
@@ -396,6 +398,7 @@ class Viewer extends React.Component {
 	}
 
 	createDividers(shelf) {
+		//this takes the shelf JSON object and creates dividers and positions them using shelf coords
 		console.log(shelf);
 		// const { height } = shelf;
 		const { divs: positionArr } = shelf;
@@ -403,15 +406,16 @@ class Viewer extends React.Component {
 		positionArr.forEach(item => {
 			this.addRandomMaterial(item);
 			const {
-				min: { x, y, z }
+				max: { x, y, z }
 			} = item;
 			const divGeom = new THREE.BoxGeometry(
-				this.props.config.materialThickness,
+				this.props.materialThickness,
 				280,
 				400
 			);
+			console.log('x', x);
 			const divMesh = new THREE.Mesh(divGeom, item.material);
-			divMesh.position.set(x, y, z);
+			divMesh.position.set(x, shelf.min.y + 140, 0);
 			this.scene.add(divMesh);
 			console.log(divMesh);
 		});

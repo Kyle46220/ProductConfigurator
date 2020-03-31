@@ -97,6 +97,47 @@ const initialState = {
 						max: { x: 650, y: 650, z: 650 }
 					}
 				]
+			},
+			{
+				id: '2',
+				totalShelfQty: '',
+				height: '550',
+				min: { x: 0, y: 760, z: 0 },
+				max: { x: 0, y: -200, z: 618 },
+				divs: [
+					{
+						id: '0',
+						totalDivQty: '',
+						cupboard: false,
+						drawer: false,
+						min: { x: 0, y: 0, z: 0 },
+						max: { x: 325, y: 325, z: 325 }
+					},
+					{
+						id: '1',
+						totalDivQty: '',
+						cupboard: false,
+						drawer: false,
+						min: { x: 0, y: 0, z: 0 },
+						max: { x: 499, y: 499, z: 499 }
+					},
+					{
+						id: '2',
+						totalDivQty: '',
+						cupboard: false,
+						drawer: false,
+						min: { x: 0, y: 0, z: 0 },
+						max: { x: 570, y: 570, z: 570 }
+					},
+					{
+						id: '3',
+						totalDivQty: '',
+						cupboard: false,
+						drawer: false,
+						min: { x: 0, y: 0, z: 0 },
+						max: { x: 650, y: 650, z: 650 }
+					}
+				]
 			}
 		]
 	}

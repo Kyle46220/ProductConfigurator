@@ -24,6 +24,8 @@ function setDepth(config) {
 function constraintMachine() {
   const shelfHeights = [180,280,380]
   const shelfDepths = [280, 380, 480, 580]
+  const materialThickness = 18;
+
   const shelfWidths = (min, max) => {
     result = []
     for ( let i = min; i <= max; i++)
@@ -32,12 +34,13 @@ function constraintMachine() {
   }
 
   const shelfHeights = () => {
-    //all combinations of shelfHeights that are less than 3m
-
+    // eventually this is all combinations of shelfHeights that are less than 3m. but for now lets just do one shelf height at 280
+    
+    
   }
 const [depth, setDepth] = useState(shelfDepths[0])
 const [width, setWidth] = useState(0)
-const [height, setHeight] = useState(0)
+const [height, setHeight] = useState(280)
 const[ shelfQTY, setShelfQTY] = useState(0)
 
 

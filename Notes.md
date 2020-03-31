@@ -92,6 +92,23 @@ I will still need some gltf models and transforms for the drawers and cupboard d
 
 how would the functions I have written be different if it was react components rather than three.js objects?
 
-if i load the objects as react comonenets, can i still put things between them? can i access their geometry still?
+if i load the objects as react componenets, can i still put things between them? can i access their geometry still?
 
 I'm going to use three.js normal first. Then maybe rebuild with react fiber after i reach MVP for the component. I will be able to reuse most of the redux stuff anyway.
+
+maybe I don't need such a complex config object.
+
+i just need
+
+shelvesY = [0, 280, 560, 840, 1120 ]
+divsX = [[0, 300, 600, 900],[0, 300, 600, 900], [0, 300, 600, 900], [0, 300, 600, 900], [0, 300, 600, 900] ]
+
+then i can just map them to each other by index.
+
+I just got the shelf and div creators working properyl.
+
+I can get almost everything out of the initial state object now except the above arrays.
+
+next I want to get some reduxing done on the sliders to just display or log the desired values from the state. Then I can try figure how to scale everything accross.
+
+This is gonna mean i'm gonna need some logic to caluclate div and shelf positions - could just be as simple as height - (shelqty \* materialThicknes) / shelf QTY or whatever it is.
