@@ -118,6 +118,7 @@ had a weird bug today when i added ray picking back in to the mix, it went into 
 
 when I get the redux going in a second. All the sliders need to connect to is the arrays in state. and they just need to update the values accordingly.
 
+so calculating the widths. gonna have to calculate these from overall width. this will be different than height because of the set heights. so this will mean that defaults load pre constrained div widths or it will jump. the slider handler function will take the width from the slider and the update the width and update the divs array from this and send it to the reducer. will need a thing like every 600 but no less than 300
 // addShelves(shelfMesh, divMesh, config) {
 // //this takes the whole config object. and clones the shelves based on this object.
 
@@ -326,3 +327,35 @@ when I get the redux going in a second. All the sliders need to connect to is th
 
     // 	cube.position.z = center.z;
     // }
+
+
+    console.log(e.target.value);
+
+    	const calcDiv = inputValue => {
+    		const values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    		let divQty;
+    		let i = 1;
+    		while (inputValue / values[i] > 400) {
+    			i++;
+    			divQty = values[i];
+    			console.log(divQty);
+    			console.log('i', i);
+    		}
+    		return divQty;
+    	};
+    	const divs = calcDiv(e.target.value);
+    	const dispatchDivPos = (divnum, width) => {
+    		const newWidthArray = [];
+    		let x = 0;
+    		let i = 0;
+    		let space = divnum / width;
+
+    		while (x < width) {
+    			x = space * i;
+    			newWidthArray.push(x);
+    			i++;
+    			console.log(x);
+    		}
+    	};
+
+    	dispatchDivPos(divs, e.target.value);

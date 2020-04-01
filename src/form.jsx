@@ -6,10 +6,11 @@ import Slider from './Slider';
 
 function mapStateToProps(state) {
 	return {
+		config: state.config,
 		height: state.height,
 		width: state.width,
 		depth: state.depth,
-		colour: state.colour
+		materialThickness: state.materialThickness
 	};
 }
 
@@ -32,9 +33,24 @@ class FormContainer extends React.Component {
 	};
 
 	handleOnChangeWidth = e => {
+		const divWidth = 400;
+		const divQty = Math.floor(e.target.value / divWidth);
+		const divGap = e.target.value / divQty;
+		const divPos = [];
+		let i = 0;
+		while (i < e.target.value) {
+			divPos.push(Math.floor(i));
+			i = i + divGap;
+		}
+		console.log(divPos);
+		this.props.dispatch({
+			type: 'UPDATE_WIDTH_ARRAY',
+			newArray: divPos
+		});
+
 		this.props.dispatch({
 			type: 'UPDATE_WIDTH',
-			newValue: e.target.value
+			newWidth: e.target.value
 			// valueType: e.target.parent.name
 		});
 	};
@@ -66,12 +82,12 @@ class FormContainer extends React.Component {
 					<Slider
 						type="range"
 						// min={this.props.min}
-						min={0.3}
+						min={600}
 						// max={this.props.max}
-						max={5}
+						max={2400}
 						value={this.props.width}
 						// step={this.props.step}
-						step={0.1}
+						step={1}
 						// onChange={e => {
 						// 	this.props.dispatch({
 						// 		type: 'UPDATE_HEIGHT',

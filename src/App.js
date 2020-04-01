@@ -183,7 +183,10 @@ class App extends React.Component {
 				newState = { ...state, height: action.newHeight };
 				break;
 			case 'UPDATE_WIDTH':
-				newState = { ...state, width: action.newValue };
+				newState = { ...state, width: action.newWidth };
+				break;
+			case 'UPDATE_WIDTH_ARRAY':
+				newState = { ...state, config: { divsX: action.newArray } };
 				break;
 			case 'UPDATE_DEPTH':
 				newState = { ...state, depth: action.newDepth };

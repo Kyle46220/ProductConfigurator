@@ -1,19 +1,11 @@
 import React from 'react';
-// import { render } from 'react-dom';
+
 import * as THREE from 'three';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 
-// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import PickHelper from './picker';
-// import { ObjectSpaceNormalMap } from 'three';
-// import Stats from 'three/examples/jsm/libs/stats.module.js';
-
-var initializeDomEvents = require('threex-domevents');
-var THREEx = {};
-
-initializeDomEvents(THREE, THREEx);
 
 const Canvas = styled.canvas`
 	border: 5px solid fuchsia;
@@ -42,16 +34,12 @@ class Viewer extends React.Component {
 		this.rayCasty();
 		this.sceneSetup();
 		this.addObjectsToScene();
-		// this.makeInvisibleCube(
-		// 	{ x: 0, y: 0, z: 0 },
-		// 	{ x: 100, y: 100, z: 100 }
-		// );
 
 		this.startAnimationLoop();
 	}
 
 	componentDidUpdate() {
-		this.removeLights();
+		this.updateMeshPositions();
 	}
 
 	addObjectsToScene = () => {
@@ -94,7 +82,7 @@ class Viewer extends React.Component {
 	randomColor() {
 		return `hsl(${this.rand(360) | 0}, ${this.rand(50, 100) | 0}%, 50%)`;
 	}
-	removeLights = () => {
+	isolateMeshes = () => {
 		// this.objects = this.scene.children.filter((item, index) => index > 3);
 		this.objects = this.scene.children.filter(item => item.type === 'Mesh');
 		// console.log(this.objects);
@@ -160,7 +148,6 @@ class Viewer extends React.Component {
 		this.canvas.addEventListener('mousemove', this.onMouseMove, false);
 	};
 	createShelf(width, depth, posY, materialThickness, scene) {
-		console.log('shelf make');
 		const shelfGeom = new THREE.BoxGeometry(
 			width,
 			materialThickness,
@@ -171,25 +158,17 @@ class Viewer extends React.Component {
 		});
 
 		const shelfMesh = new THREE.Mesh(shelfGeom, shelfMaterial);
-		console.log(shelfMesh);
 		const {
 			geometry: {
 				parameters: { width: x, height: y, depth: z }
 			}
 		} = shelfMesh;
-		console.log('testtt', x, y, z);
+
 		shelfMesh.position.setX(x / 2);
 		shelfMesh.position.setY(posY);
-		// const cube = new THREE.BoxGeometry(100, 100, 100);
-		// const material = new THREE.MeshStandardMaterial({
-		// 	color: this.randomColor(),
-		// 	transparent: true,
-		// 	opacity: 0.5
-		// });
-		// const box = new THREE.Mesh(cube, material);
-		// box.position.set(x, posY, z);
+
 		scene.add(shelfMesh);
-		console.log(shelfMesh);
+		return shelfMesh;
 	}
 	buildCabinet(config, width, depth, materialThickness) {
 		const { shelvesY } = config;
@@ -208,7 +187,8 @@ class Viewer extends React.Component {
 				this.props.materialThickness,
 				this.scene
 			);
-			console.log(shelf);
+			shelf.name = index;
+			console.log(shelf.name);
 			if (index < shelvesY.length - 1) {
 				this.createDividers(item, index);
 			}
@@ -241,16 +221,23 @@ class Viewer extends React.Component {
 			const divMesh = new THREE.Mesh(divGeom, material);
 			divMesh.position.setX(item);
 			divMesh.position.setY(shelfPosition + shelfHeight / 2);
-
+			divMesh.name = `div${index}` + `${i}`;
 			if (divs[index].length - 1 > i) {
 				const boxX = item + (divs[index][i + 1] - item) / 2;
-				const boxWidth = 500;
+				const boxWidth = divs[index][i + 1] - item;
+				console.log('BOX', boxWidth);
 				const boxPosition = {
 					x: boxX,
 					y: shelfPosition + shelfHeight / 2,
 					z: 0
 				};
-				this.createBoxes(200, 200, 200, boxPosition);
+				const box = this.createBoxes(
+					boxWidth,
+					200,
+					this.props.depth,
+					boxPosition
+				);
+				box.name = 'box name here';
 			}
 			this.scene.add(divMesh);
 			console.log(divMesh);
@@ -266,30 +253,45 @@ class Viewer extends React.Component {
 			opacity: 0.0
 		});
 		const box = new THREE.Mesh(cube, material);
+
 		console.log(box);
 		box.position.set(pos.x, pos.y, pos.z);
 		this.boxes.push(box);
 		this.scene.add(box);
+		return box;
+	};
+
+	updateMeshPositions = () => {
+		// i need to find each mesh by its name, and then update values fomr the state arrays using their index numbers.
+		const array = this.scene.children;
+		console.log(array);
+
+		function filterItems(query) {
+			return array.filter(el => {
+				console.log('el', el);
+				return el.name.indexOf(query) > -1;
+			});
+		}
+		const result = filterItems('div');
+		console.log(result);
+		const getName = query => {
+			// array.filter(item => {
+			// 	console.log(item.indexOf(query));
+			// 	return item.indexOf(query);
+			// });
+			console.log(array.indexOf(query));
+		};
+		// getName('div');
+		// divX.map(div => {
+		// 	dgetName('div');
+		// });
 	};
 
 	rayCasty = () => {
 		this.pickHelper = new PickHelper();
 	};
 
-	// rayCasty2() {
-	// 	const box = new THREE.BoxGeometry(1000, 1000, 1000, {
-	// 		wireframe: true
-	// 	});
-	// 	const material = new THREE.MeshBasicMaterial({ color: 0x00ffff });
-	// 	const cube = new THREE.Mesh(box, material);
-	// 	this.scene.add(cube);
-	// 	const raycaster2 = new THREE.Raycaster();
-	// 	raycaster2.setFromCamera(this.mouse, this.camera);
-	// 	const intersects = raycaster2.intersectObject(cube);
-	// }
-
 	startAnimationLoop = time => {
-		this.removeLights();
 		time *= 0.001;
 
 		this.pickHelper.pick(this.mouse, this.boxes, this.camera, time);
