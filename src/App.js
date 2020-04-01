@@ -177,6 +177,7 @@ class App extends React.Component {
 					...state,
 					shelves: state.shelves.push(action.newShelf)
 				};
+				break;
 			case 'UPDATE_HEIGHT':
 				console.log(action.whatever); // you can pass as many things through here in the action as you want.
 				newState = { ...state, height: action.newHeight };

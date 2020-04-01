@@ -114,6 +114,10 @@ next I want to get some reduxing done on the sliders to just display or log the 
 This is gonna mean i'm gonna need some logic to caluclate div and shelf positions - could just be as simple as height - (shelfqty \* materialThicknes) / shelfqty
 or whatever it is.
 
+had a weird bug today when i added ray picking back in to the mix, it went into debugging mode and opened up the sources devtools tab. it was almost like there was an active debugger in the three.js package. In the end i think it was because i had a variable named this.RayCast which maybe was fucking with the this.Raycast in the package because it openend up to a part of three js that was to do with raycasting. I changed the name to something normal like this.pickHelper with lower case 'p' and it seemed to work. i think this was a naming convention issue but who knows. Make sure not to name things with things that might be reserved!
+
+when I get the redux going in a second. All the sliders need to connect to is the arrays in state. and they just need to update the values accordingly.
+
 // addShelves(shelfMesh, divMesh, config) {
 // //this takes the whole config object. and clones the shelves based on this object.
 

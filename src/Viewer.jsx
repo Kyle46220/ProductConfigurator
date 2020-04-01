@@ -1,14 +1,14 @@
 import React from 'react';
-import { render } from 'react-dom';
+// import { render } from 'react-dom';
 import * as THREE from 'three';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import PickHelper from './picker';
 // import { ObjectSpaceNormalMap } from 'three';
-import Stats from 'three/examples/jsm/libs/stats.module.js';
+// import Stats from 'three/examples/jsm/libs/stats.module.js';
 
 var initializeDomEvents = require('threex-domevents');
 var THREEx = {};
@@ -50,7 +50,9 @@ class Viewer extends React.Component {
 		this.startAnimationLoop();
 	}
 
-	componentDidUpdate() {}
+	componentDidUpdate() {
+		this.removeLights();
+	}
 
 	addObjectsToScene = () => {
 		const lights = [];
@@ -92,6 +94,11 @@ class Viewer extends React.Component {
 	randomColor() {
 		return `hsl(${this.rand(360) | 0}, ${this.rand(50, 100) | 0}%, 50%)`;
 	}
+	removeLights = () => {
+		// this.objects = this.scene.children.filter((item, index) => index > 3);
+		this.objects = this.scene.children.filter(item => item.type === 'Mesh');
+		// console.log(this.objects);
+	};
 
 	addRandomMaterial(object) {
 		console.log(object);
@@ -128,6 +135,7 @@ class Viewer extends React.Component {
 		const width = 500;
 		const height = 500;
 		this.objects = [];
+		this.boxes = [];
 		this.id = 7;
 
 		this.scene = new THREE.Scene();
@@ -146,8 +154,8 @@ class Viewer extends React.Component {
 		this.canvas = this.renderer.domElement;
 		this.renderer.setSize(width, height);
 		this.el.appendChild(this.canvas);
-		this.stats = new Stats();
-		this.el.appendChild(this.stats.dom);
+		// this.stats = new Stats();
+		// this.el.appendChild(this.stats.dom);
 
 		this.canvas.addEventListener('mousemove', this.onMouseMove, false);
 	};
@@ -172,6 +180,14 @@ class Viewer extends React.Component {
 		console.log('testtt', x, y, z);
 		shelfMesh.position.setX(x / 2);
 		shelfMesh.position.setY(posY);
+		// const cube = new THREE.BoxGeometry(100, 100, 100);
+		// const material = new THREE.MeshStandardMaterial({
+		// 	color: this.randomColor(),
+		// 	transparent: true,
+		// 	opacity: 0.5
+		// });
+		// const box = new THREE.Mesh(cube, material);
+		// box.position.set(x, posY, z);
 		scene.add(shelfMesh);
 		console.log(shelfMesh);
 	}
@@ -210,7 +226,7 @@ class Viewer extends React.Component {
 		// const positionArr = () => {
 		// 	index
 		// }
-		divs[index].forEach(item => {
+		divs[index].forEach((item, i) => {
 			const divGeom = new THREE.BoxGeometry(
 				this.props.materialThickness,
 				this.props.config.divHeights[index] -
@@ -225,13 +241,39 @@ class Viewer extends React.Component {
 			const divMesh = new THREE.Mesh(divGeom, material);
 			divMesh.position.setX(item);
 			divMesh.position.setY(shelfPosition + shelfHeight / 2);
+
+			if (divs[index].length - 1 > i) {
+				const boxX = item + (divs[index][i + 1] - item) / 2;
+				const boxWidth = 500;
+				const boxPosition = {
+					x: boxX,
+					y: shelfPosition + shelfHeight / 2,
+					z: 0
+				};
+				this.createBoxes(200, 200, 200, boxPosition);
+			}
 			this.scene.add(divMesh);
 			console.log(divMesh);
 		});
 	}
 
-	rayCasty = time => {
-		this.rayCast = new PickHelper();
+	createBoxes = (width, height, depth, pos) => {
+		console.log('createBox');
+		const cube = new THREE.BoxGeometry(width, height, depth);
+		const material = new THREE.MeshStandardMaterial({
+			color: this.randomColor(),
+			transparent: true,
+			opacity: 0.0
+		});
+		const box = new THREE.Mesh(cube, material);
+		console.log(box);
+		box.position.set(pos.x, pos.y, pos.z);
+		this.boxes.push(box);
+		this.scene.add(box);
+	};
+
+	rayCasty = () => {
+		this.pickHelper = new PickHelper();
 	};
 
 	// rayCasty2() {
@@ -247,11 +289,12 @@ class Viewer extends React.Component {
 	// }
 
 	startAnimationLoop = time => {
+		this.removeLights();
 		time *= 0.001;
 
-		this.rayCast.pick(this.mouse, this.objects, this.camera, time);
+		this.pickHelper.pick(this.mouse, this.boxes, this.camera, time);
 
-		this.stats.update();
+		// this.stats.update();
 		// this.rayCasty2();
 
 		this.renderer.render(this.scene, this.camera);
