@@ -213,7 +213,8 @@ class Viewer extends React.Component {
 		divs[index].forEach(item => {
 			const divGeom = new THREE.BoxGeometry(
 				this.props.materialThickness,
-				this.props.config.divHeights[index],
+				this.props.config.divHeights[index] -
+					this.props.materialThickness * 2,
 				this.props.depth
 			);
 			const material = new THREE.MeshBasicMaterial({
