@@ -39,7 +39,8 @@ class Viewer extends React.Component {
 	}
 
 	componentDidUpdate() {
-		this.updateMeshPositions();
+		this.updateShelfMeshPosition();
+		// this.updateMeshPositions();
 	}
 
 	addObjectsToScene = () => {
@@ -187,7 +188,7 @@ class Viewer extends React.Component {
 				this.props.materialThickness,
 				this.scene
 			);
-			shelf.name = index;
+			shelf.name = `${shelf}index`;
 			console.log(shelf.name);
 			if (index < shelvesY.length - 1) {
 				this.createDividers(item, index);
@@ -261,31 +262,64 @@ class Viewer extends React.Component {
 		return box;
 	};
 
-	updateMeshPositions = () => {
-		// i need to find each mesh by its name, and then update values fomr the state arrays using their index numbers.
+	updateShelfMeshPosition = () => {
+		const shelfPos = this.props.config.shelvesY;
+		const divPos = this.props.config.divsX;
 		const array = this.scene.children;
-		console.log(array);
 
-		function filterItems(query) {
-			return array.filter(el => {
-				console.log('el', el);
-				return el.name.indexOf(query) > -1;
+		const filterItems = query => {
+			return array.filter(item => {
+				const { name } = item;
+
+				return name.toLowerCase().indexOf(query.toLowerCase()) > -1;
 			});
-		}
-		const result = filterItems('div');
-		console.log(result);
-		const getName = query => {
-			// array.filter(item => {
-			// 	console.log(item.indexOf(query));
-			// 	return item.indexOf(query);
-			// });
-			console.log(array.indexOf(query));
 		};
-		// getName('div');
-		// divX.map(div => {
-		// 	dgetName('div');
-		// });
+		console.log(filterItems('div'));
+		console.log(divPos);
+		const filtered = filterItems('div');
+		console.log(filtered.flat());
+		filtered.flat().forEach((item, index) => {
+			const { position } = item;
+			position.setX(divPos[index]);
+			console.log(position);
+		});
+		// var fruits = ['apple', 'banana', 'grapes', 'mango', 'orange'];
+
+		// function filterItems(query) {
+		// 	return fruits.filter(function(el) {
+		// 		return el.toLowerCase().indexOf(query.toLowerCase()) > -1;
+		// 	});
+		// }
+
+		// console.log(filterItems('ap'));
 	};
+
+	// updateMeshPositions = () => {
+	// 	const divPos = this.props.config.divsX;
+	// 	const shelfPos = this.props.config.shelvesY;
+
+	// 	const array = this.scene.children;
+	// 	console.log(array);
+	// 	array.forEach((item, index) => {
+	// 		item.position.setX;
+	// 	});
+
+	// 	shelfPos.forEach((shelfPosValue, shelfPosIndex) => {
+	// 		if (shelfPosIndex <= shelfPos.length) {
+	// 			divPos.forEach((divPosArray, divPosIndex) => {
+	// 				if (divPosIndex <= divPos.length) {
+	// 					const shelfMesh = array.find(item => {
+	// 						return item.name === `${shelfPosIndex}`;
+	// 					});
+	// 					console.log(shelfMesh);
+	// 					console.log(`div${shelfPosIndex}${divPosIndex}`);
+	// 					shelfMesh.position.setX(divPosArray);
+	// 					console.log(shelfMesh.position);
+	// 				}
+	// 			});
+	// 		}
+	// 	});
+	// };
 
 	rayCasty = () => {
 		this.pickHelper = new PickHelper();

@@ -37,17 +37,24 @@ class FormContainer extends React.Component {
 		const divQty = Math.floor(e.target.value / divWidth);
 		const divGap = e.target.value / divQty;
 		const divPos = [];
-		let i = 0;
-		while (i < e.target.value) {
-			divPos.push(Math.floor(i));
-			i = i + divGap;
-		}
-		console.log(divPos);
+		const shelfPos = this.props.config.shelvesY;
+
+		shelfPos.forEach(() => {
+			const result = [];
+			let i = 0;
+			while (i < e.target.value) {
+				result.push(Math.floor(i));
+				i = i + divGap;
+			}
+			divPos.push(result);
+		});
+		console.log(shelfPos);
+		console.log('divPos', divPos);
+
 		this.props.dispatch({
 			type: 'UPDATE_WIDTH_ARRAY',
 			newArray: divPos
 		});
-
 		this.props.dispatch({
 			type: 'UPDATE_WIDTH',
 			newWidth: e.target.value
