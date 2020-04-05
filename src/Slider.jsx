@@ -13,6 +13,7 @@ class Slider extends React.Component {
 				value={this.props.value}
 				step={this.props.step}
 				onChange={this.props.onChange}
+				name={this.props.name}
 			/>
 		);
 	}

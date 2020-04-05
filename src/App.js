@@ -201,7 +201,7 @@ class App extends React.Component {
 					...state,
 					config: {
 						...state.config,
-						divsX: action.newArray,
+						divsX: action.newWidthArray,
 						width: action.newWidth
 					}
 				};
@@ -209,6 +209,17 @@ class App extends React.Component {
 			case 'UPDATE_DEPTH':
 				newState = { ...state, depth: action.newDepth };
 				break;
+			case 'UPDATE':
+				newState = {
+					...state,
+					config: {
+						...state.config,
+						shelvesY: action.newHeightArray,
+						divsX: action.newWidthArray,
+						height: action.newHeight,
+						width: action.newWidth
+					}
+				};
 
 			default:
 				newState = { ...state };

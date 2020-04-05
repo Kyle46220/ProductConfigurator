@@ -72,11 +72,26 @@ class FormContainer extends React.Component {
 	};
 
 	handleOnChangeWidth = e => {
+		console.log(e);
+		console.log(e.target.name);
+		let heightValue;
+		let WidthValue;
 		const divWidth = 400;
 		const divQty = Math.floor(e.target.value / divWidth);
 		const divGap = e.target.value / divQty;
 		const divPos = [];
 		const shelfPos = this.props.config.shelvesY;
+		const shelfHeights = [180, 280, 380];
+
+		const getRandomInt = max => {
+			return Math.floor(Math.random() * Math.floor(max));
+		};
+
+		const { shelvesY } = this.props.config;
+
+		const newShelfPos = [];
+
+		let i = shelvesY[shelvesY.length - 1];
 
 		shelfPos.forEach(() => {
 			const result = [];
@@ -92,13 +107,107 @@ class FormContainer extends React.Component {
 
 		this.props.dispatch({
 			type: 'UPDATE_WIDTH_ARRAY',
-			newHeightArray: divPos,
+			newWidthArray: divPos,
 			newWidth: e.target.value
 		});
+		console.log('divsX', this.props.config.divsX);
 		// this.props.dispatch({
 		// 	type: 'UPDATE_WIDTH',
 		// 	newWidth: e.target.value
 		// 	// valueType: e.target.parent.name
+		// });
+	};
+	handleOnChange = e => {
+		console.log(this.props.config);
+		let heightValue;
+		let widthValue;
+		switch (e.target.name) {
+			case 'height':
+				heightValue = e.target.value;
+				widthValue = this.props.config.width;
+				break;
+			case 'width':
+				heightValue = this.props.config.height;
+				widthValue = e.target.value;
+				break;
+			default:
+				heightValue = this.props.config.height;
+				widthValue = this.props.config.width;
+		}
+		const divWidth = 400;
+		const divQty = Math.floor(widthValue / divWidth);
+		const divGap = widthValue / divQty;
+		const divPos = [];
+		const shelfPos = this.props.config.shelvesY;
+		const shelfHeights = [180, 280, 380];
+
+		const getRandomInt = max => {
+			return Math.floor(Math.random() * Math.floor(max));
+		};
+
+		const { shelvesY } = this.props.config;
+
+		const newShelfPos = [];
+
+		let i = shelvesY[shelvesY.length - 1];
+
+		console.log(e);
+		console.log(e.target.name);
+		console.log(heightValue, widthValue);
+
+		//this is for the width
+
+		shelfPos.forEach(() => {
+			const result = [];
+			let i = 0;
+			while (i < widthValue) {
+				result.push(Math.floor(i));
+				i = i + divGap;
+			}
+			divPos.push(result);
+		});
+
+		// this is for the height
+
+		if (heightValue > shelvesY[shelvesY.length - 1]) {
+			while (i < heightValue) {
+				const newShelf = shelfHeights[getRandomInt(2)];
+
+				newShelfPos.push(newShelf);
+
+				i = i + newShelf;
+			}
+		} else if (heightValue < shelvesY[shelvesY.length - 1]) {
+			shelvesY.pop();
+		}
+
+		let newArray = [];
+		newArray.push(shelvesY);
+		newArray = newArray.flat();
+		newShelfPos.forEach(item => {
+			const total = newArray[newArray.length - 1];
+
+			const newTotal = total + item;
+
+			newArray.push(newTotal);
+		});
+
+		const shelfSum = newArray[newArray.length - 1];
+
+		const constrainedHeight = shelfSum + newArray.length * 18 + 18;
+
+		this.props.dispatch({
+			type: 'UPDATE',
+			newHeight: constrainedHeight,
+			newHeightArray: newArray.flat(),
+			newWidth: widthValue,
+			newWidthArray: divPos
+		});
+
+		// this.props.dispatch({
+		// 	type: 'UPDATE_WIDTH_ARRAY',
+		// 	newWidth: widthValue,
+		// 	newWidthArray: divPos
 		// });
 	};
 
@@ -121,7 +230,8 @@ class FormContainer extends React.Component {
 						// 		newTest: e.target.value
 						// 	});
 						// }}
-						onChange={this.handleOnChangeHeight}
+						onChange={this.handleOnChange()}
+						name={'height'}
 					/>
 					TEST PARAM
 				</label>
@@ -132,7 +242,7 @@ class FormContainer extends React.Component {
 						min={600}
 						// max={this.props.max}
 						max={2400}
-						value={this.props.config.width}
+						// value={this.props.config.width}
 						// step={this.props.step}
 						step={1}
 						// onChange={e => {
@@ -141,7 +251,8 @@ class FormContainer extends React.Component {
 						// 		newTest: e.target.value
 						// 	});
 						// }}
-						onChange={this.handleOnChangeWidth}
+						onChange={this.handleOnChange()}
+						name={'width'}
 					/>
 					TEST PARAM
 				</label>

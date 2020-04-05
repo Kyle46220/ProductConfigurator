@@ -40,6 +40,7 @@ class Viewer extends React.Component {
 
 	componentDidUpdate() {
 		this.adjustShelves();
+		this.adjustDividers();
 		// this.updateShelfMeshPosition();
 		// this.buildCabinet(
 		// 	this.props.config,
@@ -160,16 +161,17 @@ class Viewer extends React.Component {
 	};
 	addShelf = shelfPos => {
 		const shelfMesh = this.meshStore.pop();
-		shelfMesh.name = 'shelf';
+		// shelfMesh.name = 'shelf';
 		this.shelfMeshes.push(shelfMesh);
 		// this.positionShelf(shelfMesh, shelfPos);
 		this.scene.add(shelfMesh);
+		this.divMeshes.push([]);
 	};
-	addDivider = (divPos, index) => {
+	addDivider = (divPos, shelfIndex) => {
 		console.log('divider added');
 		const divMesh = this.meshStore.pop();
 		divMesh.name = 'div';
-		this.divMeshes[index].push(divMesh);
+		this.divMeshes[shelfIndex].push(divMesh);
 		this.scene.add(divMesh);
 
 		// this.positionShelf(shelfMesh, shelfPos);
@@ -185,22 +187,22 @@ class Viewer extends React.Component {
 		const { divsX: divs, shelvesY: shelves } = this.props.config;
 		console.log('div init', divs);
 		shelves.forEach((shelf, index) => {
-			this.divMeshes.push([]);
-			console.log('divsIndex', divs[index]);
+			// this.divMeshes.push([]);
+			// console.log('divsIndex', divs[index]);
 			divs[index].forEach((divPos, i) => {
 				this.addDivider(divPos, index);
 				this.positionDivider(this.divMeshes[index][i], divPos, shelf);
-				console.log(
-					'divMeshIndex',
-					this.divMeshes[index][i],
-					divPos,
-					shelf
-				);
-				console.log(this.divMeshes);
+				// console.log(
+				// 	'divMeshIndex',
+				// 	this.divMeshes[index][i],
+				// 	divPos,
+				// 	shelf
+				// );
+				// console.log(this.divMeshes);
 			});
 		});
 		this.divMeshes.forEach(item => {
-			console.log(item.position);
+			// console.log(item.position);
 		});
 	};
 	//the problems is i can't use the index number of the mesh array to access the position array because its an array of arrays.
@@ -236,6 +238,7 @@ class Viewer extends React.Component {
 			while (shelves.length < this.shelfMeshes.length) {
 				const unNeededShelf = this.shelfMeshes.pop();
 				this.returnToStore(unNeededShelf);
+				this.divMeshes.pop();
 				// console.log('shelf removed', shelves, this.shelfMeshes.length);
 			}
 		}
@@ -257,25 +260,35 @@ class Viewer extends React.Component {
 			// );
 		});
 	};
+	// error from doing width adjust afer heigh adjust is because adjusting new shelves doesn't create anynew new dividers.
+	//error happens when divs adjust to have one less or more div from the slider handler and then when the shelves try to go lower it errors. i think this is from having the shelves and divs added separately. maybe all slider handlers need to be in one reducer thing.
 	adjustDividers = () => {
-		const { divsX: divsArray } = this.props.config;
+		const { shelvesY: shelves, divsX: divsArray } = this.props.config;
+		// console.log(this.props.config);
+		// console.log('divsArray', divsArray);
 		// console.log('before', shelves, this.shelfMeshes.length);
-
-		if (shelves.length > this.shelfMeshes.length) {
-			let num = shelves.length - this.shelfMeshes.length;
-			for (let i = 0; i < num; i++) {
-				const shelfPos = shelves[shelves.length - 1 - i];
-				this.addShelf(shelfPos);
+		divsArray.forEach((divs, index) => {
+			// console.log('divs', divs, index);
+			if (divs.length > this.divMeshes[index].length) {
+				let num = divs.length - this.divMeshes[index].length;
+				for (let i = 0; i < num; i++) {
+					const divPos = divs[divs.length - 1 - i];
+					this.addDivider(divPos, index);
+				}
+			} else {
+				while (divs.length < this.divMeshes[index].length) {
+					const unNeededDiv = this.divMeshes[index].pop();
+					this.returnToStore(unNeededDiv);
+				}
 			}
-		} else {
-			while (shelves.length < this.shelfMeshes.length) {
-				const unNeededShelf = this.shelfMeshes.pop();
-				this.returnToStore(unNeededShelf);
-			}
-		}
-
-		this.shelfMeshes.forEach((mesh, index) => {
-			this.positionShelf(mesh, shelves[index]);
+			this.divMeshes[index].forEach((mesh, i) => {
+				this.positionDivider(mesh, divs[i], shelves[index]);
+				// console.log(
+				// 	'positionDivider',
+				// 	mesh.position.x,
+				// 	mesh.position.y
+				// );
+			});
 		});
 	};
 
@@ -314,7 +327,7 @@ class Viewer extends React.Component {
 		mesh.scale.setX(18);
 		mesh.scale.setY(280);
 		mesh.scale.setZ(400);
-		console.log('divpos', mesh.position.x, mesh.position.y);
+		// console.log('divpos', mesh.position.x, mesh.position.y);
 	};
 
 	createShelf(width, depth, posY, materialThickness, scene) {
