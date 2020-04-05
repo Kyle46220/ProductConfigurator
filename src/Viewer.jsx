@@ -39,7 +39,7 @@ class Viewer extends React.Component {
 	}
 
 	componentDidUpdate() {
-		this.addShelves();
+		this.adjustShelves();
 		// this.updateShelfMeshPosition();
 		// this.buildCabinet(
 		// 	this.props.config,
@@ -68,7 +68,8 @@ class Viewer extends React.Component {
 		controls.height = 500;
 		controls.update();
 		this.initializeDefaultMeshes(70);
-		this.addShelves();
+		this.initializeShelves();
+		this.initializeDividers();
 		// this.buildCabinet(
 		// 	this.props.config,
 		// 	this.props.width,
@@ -115,6 +116,7 @@ class Viewer extends React.Component {
 		this.id = 7;
 		this.meshStore = [];
 		this.shelfMeshes = [];
+		this.divMeshes = [];
 
 		this.scene = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera(
@@ -137,21 +139,22 @@ class Viewer extends React.Component {
 
 		this.canvas.addEventListener('mousemove', this.onMouseMove, false);
 	};
-	createMesh = () => {
+	createMesh = geom => {
 		// create meshes, add to Mesh Store array, give default name
-		const geom = new THREE.BoxGeometry(1, 1, 1);
+
 		const material = new THREE.MeshStandardMaterial({
 			color: this.randomColor()
 		});
 		const mesh = new THREE.Mesh(geom, material);
 		mesh.name = 'default';
 		this.meshStore.push(mesh);
-		console.log('default mesh added', mesh);
+		// console.log('default mesh added', mesh);
 	};
 	initializeDefaultMeshes = num => {
 		let i = 0;
+		const geom = new THREE.BoxGeometry(1, 1, 1);
 		while (i < num) {
-			this.createMesh();
+			this.createMesh(geom);
 			i++;
 		}
 	};
@@ -159,33 +162,125 @@ class Viewer extends React.Component {
 		const shelfMesh = this.meshStore.pop();
 		shelfMesh.name = 'shelf';
 		this.shelfMeshes.push(shelfMesh);
-		this.positionShelf(shelfMesh, shelfPos);
+		// this.positionShelf(shelfMesh, shelfPos);
 		this.scene.add(shelfMesh);
 	};
+	addDivider = (divPos, index) => {
+		console.log('divider added');
+		const divMesh = this.meshStore.pop();
+		divMesh.name = 'div';
+		this.divMeshes[index].push(divMesh);
+		this.scene.add(divMesh);
 
-	addShelves = () => {
+		// this.positionShelf(shelfMesh, shelfPos);
+	};
+	initializeShelves = () => {
 		const { shelvesY: shelves } = this.props.config;
-		console.log('before', shelves, this.shelfMeshes.length);
+		shelves.forEach((shelfPos, index) => {
+			this.addShelf(shelfPos);
+			this.positionShelf(this.shelfMeshes[index], shelfPos);
+		});
+	};
+	initializeDividers = () => {
+		const { divsX: divs, shelvesY: shelves } = this.props.config;
+		console.log('div init', divs);
+		shelves.forEach((shelf, index) => {
+			this.divMeshes.push([]);
+			console.log('divsIndex', divs[index]);
+			divs[index].forEach((divPos, i) => {
+				this.addDivider(divPos, index);
+				this.positionDivider(this.divMeshes[index][i], divPos, shelf);
+				console.log(
+					'divMeshIndex',
+					this.divMeshes[index][i],
+					divPos,
+					shelf
+				);
+				console.log(this.divMeshes);
+			});
+		});
+		this.divMeshes.forEach(item => {
+			console.log(item.position);
+		});
+	};
+	//the problems is i can't use the index number of the mesh array to access the position array because its an array of arrays.
+
+	adjustShelves = () => {
+		const { shelvesY: shelves } = this.props.config;
+		// console.log('before', shelves, this.shelfMeshes.length);
+
 		if (shelves.length > this.shelfMeshes.length) {
 			let num = shelves.length - this.shelfMeshes.length;
 			for (let i = 0; i < num; i++) {
 				const shelfPos = shelves[shelves.length - 1 - i];
 				this.addShelf(shelfPos);
-				console.log(shelfPos);
-				console.log('shelf added', shelves, this.shelfMeshes.length);
+
+				// console.log(
+				// 	'shelf added',
+				// 	shelfPos,
+				// 	shelves,
+				// 	this.shelfMeshes.length
+				// );
+				// this.shelfMeshes.forEach((item, index) => {
+				// 	console.log(
+				// 		'meshpos',
+				// 		item.position.y,
+				// 		'meshIndex',
+				// 		index,
+				// 		'shelvesY[meshindex]',
+				// 		shelves[index]
+				// 	);
+				// });
 			}
-		} else if (shelves.length < this.shelfMeshes.length) {
+		} else {
 			while (shelves.length < this.shelfMeshes.length) {
 				const unNeededShelf = this.shelfMeshes.pop();
 				this.returnToStore(unNeededShelf);
-				console.log('shelf removed', shelves, this.shelfMeshes.length);
+				// console.log('shelf removed', shelves, this.shelfMeshes.length);
 			}
-		} else if ((shelves.length = this.shelfMeshes.length)) {
-			console.log('equal');
 		}
+		// } else if ((shelves.length = this.shelfMeshes.length)) {
+		// 	// console.log('equal');
+		// }
+		// console.log(this.shelfMeshes, shelves);
+		this.shelfMeshes.forEach((mesh, index) => {
+			// console.log(mesh, shelves[index]);
+
+			this.positionShelf(mesh, shelves[index]);
+			// console.log(
+			// 	'meshpos',
+			// 	mesh.position.y,
+			// 	'meshIndex',
+			// 	index,
+			// 	'shelvesY[meshindex]',
+			// 	shelves[index]
+			// );
+		});
+	};
+	adjustDividers = () => {
+		const { divsX: divsArray } = this.props.config;
+		// console.log('before', shelves, this.shelfMeshes.length);
+
+		if (shelves.length > this.shelfMeshes.length) {
+			let num = shelves.length - this.shelfMeshes.length;
+			for (let i = 0; i < num; i++) {
+				const shelfPos = shelves[shelves.length - 1 - i];
+				this.addShelf(shelfPos);
+			}
+		} else {
+			while (shelves.length < this.shelfMeshes.length) {
+				const unNeededShelf = this.shelfMeshes.pop();
+				this.returnToStore(unNeededShelf);
+			}
+		}
+
+		this.shelfMeshes.forEach((mesh, index) => {
+			this.positionShelf(mesh, shelves[index]);
+		});
 	};
 
 	returnToStore = mesh => {
+		// console.log('mesh removed');
 		this.scene.remove(mesh);
 		mesh.name = 'default';
 		mesh.scale.setX(1);
@@ -204,13 +299,22 @@ class Viewer extends React.Component {
 		mesh.position.setY(position);
 		mesh.position.setZ(0);
 
-		mesh.geometry.parameters.width = width;
 		mesh.scale.setX(1000);
 		mesh.scale.setY(18);
 		mesh.scale.setZ(400);
+	};
+	positionDivider = (mesh, position, shelfPos) => {
+		const width = this.props.materialThickness;
+		const height = 280;
+		const depth = this.props.depth;
+		mesh.position.setX(position);
+		mesh.position.setY(shelfPos);
+		mesh.position.setZ(0);
 
-		mesh.geometry.parameters.height = height;
-		mesh.geometry.parameters.depth = depth;
+		mesh.scale.setX(18);
+		mesh.scale.setY(280);
+		mesh.scale.setZ(400);
+		console.log('divpos', mesh.position.x, mesh.position.y);
 	};
 
 	createShelf(width, depth, posY, materialThickness, scene) {
