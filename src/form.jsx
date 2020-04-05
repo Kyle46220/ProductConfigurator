@@ -53,13 +53,14 @@ class FormContainer extends React.Component {
 
 		this.props.dispatch({
 			type: 'UPDATE_WIDTH_ARRAY',
-			newArray: divPos
-		});
-		this.props.dispatch({
-			type: 'UPDATE_WIDTH',
+			newArray: divPos,
 			newWidth: e.target.value
-			// valueType: e.target.parent.name
 		});
+		// this.props.dispatch({
+		// 	type: 'UPDATE_WIDTH',
+		// 	newWidth: e.target.value
+		// 	// valueType: e.target.parent.name
+		// });
 	};
 
 	render() {

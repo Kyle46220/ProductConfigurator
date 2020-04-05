@@ -40,7 +40,13 @@ class Viewer extends React.Component {
 
 	componentDidUpdate() {
 		this.updateShelfMeshPosition();
-		// this.updateMeshPositions();
+
+		// this.buildCabinet(
+		// 	this.props.config,
+		// 	this.props.width,
+		// 	this.props.depth,
+		// 	this.props.materialThickness
+		// );
 	}
 
 	addObjectsToScene = () => {
@@ -84,9 +90,7 @@ class Viewer extends React.Component {
 		return `hsl(${this.rand(360) | 0}, ${this.rand(50, 100) | 0}%, 50%)`;
 	}
 	isolateMeshes = () => {
-		// this.objects = this.scene.children.filter((item, index) => index > 3);
 		this.objects = this.scene.children.filter(item => item.type === 'Mesh');
-		// console.log(this.objects);
 	};
 
 	addRandomMaterial(object) {
@@ -184,11 +188,11 @@ class Viewer extends React.Component {
 				this.props.width,
 
 				this.props.depth,
-				item,
+				position,
 				this.props.materialThickness,
 				this.scene
 			);
-			shelf.name = `${shelf}index`;
+			shelf.name = `shelf${index}`;
 			console.log(shelf.name);
 			if (index < shelvesY.length - 1) {
 				this.createDividers(item, index);
@@ -197,16 +201,12 @@ class Viewer extends React.Component {
 	}
 
 	createDividers(shelf, index) {
-		//this takes the shelf JSON object and creates dividers and positions them using shelf coords
 		console.log('create div shelf', shelf);
 		console.log(this.props.config.shelvesY);
 
 		const divs = this.props.config.divsX;
 		console.log(divs);
 
-		// const positionArr = () => {
-		// 	index
-		// }
 		divs[index].forEach((item, i) => {
 			const divGeom = new THREE.BoxGeometry(
 				this.props.materialThickness,
@@ -275,12 +275,13 @@ class Viewer extends React.Component {
 			});
 		};
 		console.log(filterItems('div'));
+
 		console.log(divPos);
 		const filtered = filterItems('div');
-		console.log(filtered.flat());
-		filtered.flat().forEach((item, index) => {
+		console.log(filtered);
+		filtered.forEach((item, index) => {
 			const { position } = item;
-			position.setX(divPos[index]);
+			position.setX(divPos.flat()[index]);
 			console.log(position);
 		});
 		// var fruits = ['apple', 'banana', 'grapes', 'mango', 'orange'];

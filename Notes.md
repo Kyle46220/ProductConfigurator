@@ -119,6 +119,20 @@ had a weird bug today when i added ray picking back in to the mix, it went into 
 when I get the redux going in a second. All the sliders need to connect to is the arrays in state. and they just need to update the values accordingly.
 
 so calculating the widths. gonna have to calculate these from overall width. this will be different than height because of the set heights. so this will mean that defaults load pre constrained div widths or it will jump. the slider handler function will take the width from the slider and the update the width and update the divs array from this and send it to the reducer. will need a thing like every 600 but no less than 300
+
+i have got the div positioner vaguely working. the slider updates the divsX position array and then there is a function that maps all these values to the div X position.
+
+the problem is that this doesn't create or remove any divs if more are needed, so they are missing. I tried just rebuilding the cabinet on every move. This just creates more and more divs everytime.
+
+I think I need to refactor this into smaller modulart parts with functions for createSingleShelf. positionSingleShelf. createSingleDiv, and positionSingleDiv. then I can just run these functions once for every item in the divX array on component mount. and then run position functions for every update and run add or remove functions as needed. These will also need to be nested maybe so that shelves coordinates can be passed through to div coordinates.
+
+I also want each shelve roow to be somewhat individual because later I will want different styles. eg grid, random, gradient etc.
+
+order will go. create shelf. position shelf. create divs, position divs.
+on resize, create shelg, remove shelf, position shelf. create div, remove div, position div.
+
+where do I put scene add? Maybe I could Have maybe 30 or so meshes not added to the scene, and the functions just do the scene add. for each one. WE have a set up function that runs on mount and creates 30 Meshes. Then the other functions just assign dimensions, positions and names.
+
 // addShelves(shelfMesh, divMesh, config) {
 // //this takes the whole config object. and clones the shelves based on this object.
 
