@@ -25,10 +25,49 @@ const FormWrap = styled.form`
 
 class FormContainer extends React.Component {
 	handleOnChangeHeight = e => {
+		const shelfHeights = [180, 280, 380];
+
+		const getRandomInt = max => {
+			return Math.floor(Math.random() * Math.floor(max));
+		};
+
+		const { shelvesY } = this.props.config;
+
+		const newShelfPos = [];
+
+		let i = shelvesY[shelvesY.length - 1];
+
+		if (e.target.value > shelvesY[shelvesY.length - 1]) {
+			while (i < e.target.value) {
+				const newShelf = shelfHeights[getRandomInt(2)];
+
+				newShelfPos.push(newShelf);
+
+				i = i + newShelf;
+			}
+		} else if (e.target.value < shelvesY[shelvesY.length - 1]) {
+			shelvesY.pop();
+		}
+
+		let newArray = [];
+		newArray.push(shelvesY);
+		newArray = newArray.flat();
+		newShelfPos.forEach(item => {
+			const total = newArray[newArray.length - 1];
+
+			const newTotal = total + item;
+
+			newArray.push(newTotal);
+		});
+
+		const shelfSum = newArray[newArray.length - 1];
+
+		const constrainedHeight = shelfSum + newArray.length * 18 + 18;
+
 		this.props.dispatch({
-			type: 'UPDATE_HEIGHT',
-			newHeight: e.target.value,
-			whatever: 'something' //you can pass multiple values through to the reducer. maybe i pass the whole state through? nah that doesn't seem to make sense as its already in redux.
+			type: 'UPDATE_HEIGHT_ARRAY',
+			newHeight: constrainedHeight,
+			newHeightArray: newArray.flat() //you can pass multiple values through to the reducer. maybe i pass the whole state through? nah that doesn't seem to make sense as its already in redux.
 		});
 	};
 
@@ -48,12 +87,12 @@ class FormContainer extends React.Component {
 			}
 			divPos.push(result);
 		});
-		console.log(shelfPos);
+		console.log('shelfPos', shelfPos);
 		console.log('divPos', divPos);
 
 		this.props.dispatch({
 			type: 'UPDATE_WIDTH_ARRAY',
-			newArray: divPos,
+			newHeightArray: divPos,
 			newWidth: e.target.value
 		});
 		// this.props.dispatch({
@@ -70,12 +109,12 @@ class FormContainer extends React.Component {
 					<Slider
 						type="range"
 						// min={this.props.min}
-						min={1}
+						min={280 + 36}
 						// max={this.props.max}
-						max={10}
-						value={this.props.height}
+						max={2400}
+						// value={this.props.config.height}
 						// step={this.props.step}
-						step={0.1}
+						step={1}
 						// onChange={e => {
 						// 	this.props.dispatch({
 						// 		type: 'UPDATE_HEIGHT',
@@ -93,7 +132,7 @@ class FormContainer extends React.Component {
 						min={600}
 						// max={this.props.max}
 						max={2400}
-						value={this.props.width}
+						value={this.props.config.width}
 						// step={this.props.step}
 						step={1}
 						// onChange={e => {

@@ -179,13 +179,18 @@ class App extends React.Component {
 				};
 				break;
 			case 'UPDATE_HEIGHT':
-				console.log(action.whatever); // you can pass as many things through here in the action as you want.
 				newState = { ...state, height: action.newHeight };
 				break;
 
 			case 'UPDATE_HEIGHT_ARRAY':
-				console.log(action.whatever); // you can pass as many things through here in the action as you want.
-				newState = { ...state, shelvesY: action.newHeightArray };
+				newState = {
+					...state,
+					config: {
+						...state.config,
+						shelvesY: action.newHeightArray,
+						height: action.newHeight
+					}
+				};
 				break;
 
 			case 'UPDATE_WIDTH':

@@ -39,8 +39,8 @@ class Viewer extends React.Component {
 	}
 
 	componentDidUpdate() {
-		this.updateShelfMeshPosition();
-
+		this.addShelves();
+		// this.updateShelfMeshPosition();
 		// this.buildCabinet(
 		// 	this.props.config,
 		// 	this.props.width,
@@ -63,20 +63,18 @@ class Viewer extends React.Component {
 		this.scene.add(lights[1]);
 		this.scene.add(lights[2]);
 
-		// const cubeGeo = new THREE.BoxGeometry(1000, 1000, 1000);
-		// const material = new THREE.MeshBasicMaterial(0xffff00);
-		// const cube = new THREE.Mesh(cubeGeo, material);
-
 		let controls = new OrbitControls(this.camera, this.el);
 		controls.width = this.el.clientWidth;
 		controls.height = 500;
 		controls.update();
-		this.buildCabinet(
-			this.props.config,
-			this.props.width,
-			this.props.depth,
-			this.props.materialThickness
-		);
+		this.initializeDefaultMeshes(70);
+		this.addShelves();
+		// this.buildCabinet(
+		// 	this.props.config,
+		// 	this.props.width,
+		// 	this.props.depth,
+		// 	this.props.materialThickness
+		// );
 	};
 	rand(min, max) {
 		if (max === undefined) {
@@ -92,21 +90,6 @@ class Viewer extends React.Component {
 	isolateMeshes = () => {
 		this.objects = this.scene.children.filter(item => item.type === 'Mesh');
 	};
-
-	addRandomMaterial(object) {
-		console.log(object);
-		// if (array instanceof Array) {
-		// 	array.forEach(i => {
-		// 		i.material = new THREE.MeshStandardMaterial({
-		// 			color: `${this.randomColor()}`
-		// 		});
-		// 	});
-		// } else {
-		// 	array.geometry.material = new THREE.MeshStandardMaterial({
-		// 		color: this.randomColor()
-		// 	});
-		// }
-	}
 
 	getCanvasRelativePosition = event => {
 		const rect = this.canvas.getBoundingClientRect();
@@ -130,6 +113,8 @@ class Viewer extends React.Component {
 		this.objects = [];
 		this.boxes = [];
 		this.id = 7;
+		this.meshStore = [];
+		this.shelfMeshes = [];
 
 		this.scene = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera(
@@ -152,6 +137,82 @@ class Viewer extends React.Component {
 
 		this.canvas.addEventListener('mousemove', this.onMouseMove, false);
 	};
+	createMesh = () => {
+		// create meshes, add to Mesh Store array, give default name
+		const geom = new THREE.BoxGeometry(1, 1, 1);
+		const material = new THREE.MeshStandardMaterial({
+			color: this.randomColor()
+		});
+		const mesh = new THREE.Mesh(geom, material);
+		mesh.name = 'default';
+		this.meshStore.push(mesh);
+		console.log('default mesh added', mesh);
+	};
+	initializeDefaultMeshes = num => {
+		let i = 0;
+		while (i < num) {
+			this.createMesh();
+			i++;
+		}
+	};
+	addShelf = shelfPos => {
+		const shelfMesh = this.meshStore.pop();
+		shelfMesh.name = 'shelf';
+		this.shelfMeshes.push(shelfMesh);
+		this.positionShelf(shelfMesh, shelfPos);
+		this.scene.add(shelfMesh);
+	};
+
+	addShelves = () => {
+		const { shelvesY: shelves } = this.props.config;
+		console.log('before', shelves, this.shelfMeshes.length);
+		if (shelves.length > this.shelfMeshes.length) {
+			let num = shelves.length - this.shelfMeshes.length;
+			for (let i = 0; i < num; i++) {
+				const shelfPos = shelves[shelves.length - 1 - i];
+				this.addShelf(shelfPos);
+				console.log(shelfPos);
+				console.log('shelf added', shelves, this.shelfMeshes.length);
+			}
+		} else if (shelves.length < this.shelfMeshes.length) {
+			while (shelves.length < this.shelfMeshes.length) {
+				const unNeededShelf = this.shelfMeshes.pop();
+				this.returnToStore(unNeededShelf);
+				console.log('shelf removed', shelves, this.shelfMeshes.length);
+			}
+		} else if ((shelves.length = this.shelfMeshes.length)) {
+			console.log('equal');
+		}
+	};
+
+	returnToStore = mesh => {
+		this.scene.remove(mesh);
+		mesh.name = 'default';
+		mesh.scale.setX(1);
+		mesh.scale.setY(1);
+		mesh.scale.setZ(1);
+		mesh.position.setX(0);
+		mesh.position.setY(0);
+		mesh.position.setZ(0);
+		this.meshStore.push(mesh);
+	};
+	positionShelf = (mesh, position) => {
+		const width = this.props.width;
+		const height = this.props.materialThickness;
+		const depth = this.props.depth;
+		mesh.position.setX(width / 2);
+		mesh.position.setY(position);
+		mesh.position.setZ(0);
+
+		mesh.geometry.parameters.width = width;
+		mesh.scale.setX(1000);
+		mesh.scale.setY(18);
+		mesh.scale.setZ(400);
+
+		mesh.geometry.parameters.height = height;
+		mesh.geometry.parameters.depth = depth;
+	};
+
 	createShelf(width, depth, posY, materialThickness, scene) {
 		const shelfGeom = new THREE.BoxGeometry(
 			width,
@@ -294,33 +355,6 @@ class Viewer extends React.Component {
 
 		// console.log(filterItems('ap'));
 	};
-
-	// updateMeshPositions = () => {
-	// 	const divPos = this.props.config.divsX;
-	// 	const shelfPos = this.props.config.shelvesY;
-
-	// 	const array = this.scene.children;
-	// 	console.log(array);
-	// 	array.forEach((item, index) => {
-	// 		item.position.setX;
-	// 	});
-
-	// 	shelfPos.forEach((shelfPosValue, shelfPosIndex) => {
-	// 		if (shelfPosIndex <= shelfPos.length) {
-	// 			divPos.forEach((divPosArray, divPosIndex) => {
-	// 				if (divPosIndex <= divPos.length) {
-	// 					const shelfMesh = array.find(item => {
-	// 						return item.name === `${shelfPosIndex}`;
-	// 					});
-	// 					console.log(shelfMesh);
-	// 					console.log(`div${shelfPosIndex}${divPosIndex}`);
-	// 					shelfMesh.position.setX(divPosArray);
-	// 					console.log(shelfMesh.position);
-	// 				}
-	// 			});
-	// 		}
-	// 	});
-	// };
 
 	rayCasty = () => {
 		this.pickHelper = new PickHelper();
