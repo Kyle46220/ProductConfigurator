@@ -119,21 +119,41 @@ class FormContainer extends React.Component {
 	};
 	handleOnChange = e => {
 		console.log(this.props.config);
-		let heightValue;
-		let widthValue;
+		console.log(e.target.name);
+		const {
+			height,
+			width,
+			config: { shelvesY }
+		} = this.props;
+		let heightValue = height;
+		let widthValue = width;
+		console.log('hello', height, width);
+
 		switch (e.target.name) {
 			case 'height':
 				heightValue = e.target.value;
-				widthValue = this.props.config.width;
+				widthValue = width;
+				console.log(
+					'inside height case',
+					heightValue,
+					widthValue,
+					width
+				);
 				break;
 			case 'width':
-				heightValue = this.props.config.height;
+				heightValue = height;
 				widthValue = e.target.value;
 				break;
 			default:
 				heightValue = this.props.config.height;
 				widthValue = this.props.config.width;
 		}
+		// if (e.target.name === 'height') {
+		// 	heightValue = e.target.value;
+		// } else {
+		// 	widthValue = e.target.value;
+		// }
+
 		const divWidth = 400;
 		const divQty = Math.floor(widthValue / divWidth);
 		const divGap = widthValue / divQty;
@@ -144,8 +164,6 @@ class FormContainer extends React.Component {
 		const getRandomInt = max => {
 			return Math.floor(Math.random() * Math.floor(max));
 		};
-
-		const { shelvesY } = this.props.config;
 
 		const newShelfPos = [];
 
@@ -230,7 +248,7 @@ class FormContainer extends React.Component {
 						// 		newTest: e.target.value
 						// 	});
 						// }}
-						onChange={this.handleOnChange()}
+						onChange={this.handleOnChangeHeight}
 						name={'height'}
 					/>
 					TEST PARAM
@@ -251,7 +269,7 @@ class FormContainer extends React.Component {
 						// 		newTest: e.target.value
 						// 	});
 						// }}
-						onChange={this.handleOnChange()}
+						onChange={this.handleOnChangeWidth}
 						name={'width'}
 					/>
 					TEST PARAM

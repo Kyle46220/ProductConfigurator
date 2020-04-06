@@ -212,13 +212,10 @@ class App extends React.Component {
 			case 'UPDATE':
 				newState = {
 					...state,
-					config: {
-						...state.config,
-						shelvesY: action.newHeightArray,
-						divsX: action.newWidthArray,
-						height: action.newHeight,
-						width: action.newWidth
-					}
+					shelvesY: action.newHeightArray,
+					divsX: action.newWidthArray,
+					height: action.newHeight,
+					width: action.newWidth
 				};
 
 			default:
