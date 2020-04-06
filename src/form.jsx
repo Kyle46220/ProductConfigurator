@@ -31,24 +31,30 @@ class FormContainer extends React.Component {
 			return Math.floor(Math.random() * Math.floor(max));
 		};
 
-		const { shelvesY } = this.props.config;
-
+		const { shelvesY, divsX } = this.props.config;
+		const newDivArrays = [];
 		const newShelfPos = [];
 
 		let i = shelvesY[shelvesY.length - 1];
 
 		if (e.target.value > shelvesY[shelvesY.length - 1]) {
 			while (i < e.target.value) {
-				const newShelf = shelfHeights[getRandomInt(2)];
-
+				const newShelf = shelfHeights[1];
+				const newDivArray = divsX[divsX.length - 1];
 				newShelfPos.push(newShelf);
-
+				newDivArrays.push(newDivArray);
 				i = i + newShelf;
 			}
 		} else if (e.target.value < shelvesY[shelvesY.length - 1]) {
 			shelvesY.pop();
+			divsX.pop();
 		}
 
+		let newDivsX = [];
+		newDivsX.push(divsX);
+		newDivsX.push(newDivArrays);
+		newDivsX = newDivsX.flat();
+		console.log('new divs', newDivsX);
 		let newArray = [];
 		newArray.push(shelvesY);
 		newArray = newArray.flat();
@@ -67,7 +73,8 @@ class FormContainer extends React.Component {
 		this.props.dispatch({
 			type: 'UPDATE_HEIGHT_ARRAY',
 			newHeight: constrainedHeight,
-			newHeightArray: newArray.flat() //you can pass multiple values through to the reducer. maybe i pass the whole state through? nah that doesn't seem to make sense as its already in redux.
+			newHeightArray: newArray.flat(),
+			newDivsX: newDivsX //you can pass multiple values through to the reducer. maybe i pass the whole state through? nah that doesn't seem to make sense as its already in redux.
 		});
 	};
 
@@ -198,7 +205,7 @@ class FormContainer extends React.Component {
 		} else if (heightValue < shelvesY[shelvesY.length - 1]) {
 			shelvesY.pop();
 		}
-
+		//I have to put a thing in here that adds and extra row to the divsX array
 		let newArray = [];
 		newArray.push(shelvesY);
 		newArray = newArray.flat();

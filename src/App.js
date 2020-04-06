@@ -188,7 +188,8 @@ class App extends React.Component {
 					config: {
 						...state.config,
 						shelvesY: action.newHeightArray,
-						height: action.newHeight
+						height: action.newHeight,
+						divsX: action.newDivsX
 					}
 				};
 				break;
