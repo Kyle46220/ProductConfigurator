@@ -57,7 +57,6 @@ class FormContainer extends React.Component {
 			shelvesY.pop();
 			divsX.pop();
 		}
-		console.log('after', newShelvesY, newDivsX);
 
 		//i think the while loop is no helping and calculating something at this point is not good. trying to fix those jitters while adjusting
 		// i need to do nothing until e reaches the next marker, and then just do something once.
@@ -102,8 +101,6 @@ class FormContainer extends React.Component {
 	};
 
 	handleOnChangeWidth = e => {
-		console.log(e);
-		console.log(e.target.name);
 		let heightValue;
 		let WidthValue;
 		const divWidth = 400;
@@ -132,15 +129,13 @@ class FormContainer extends React.Component {
 			}
 			divPos.push(result);
 		});
-		console.log('shelfPos', shelfPos);
-		console.log('divPos', divPos);
 
 		this.props.dispatch({
 			type: 'UPDATE_WIDTH_ARRAY',
 			newWidthArray: divPos,
 			newWidth: e.target.value
 		});
-		console.log('divsX', this.props.divsX);
+
 		// this.props.dispatch({
 		// 	type: 'UPDATE_WIDTH',
 		// 	newWidth: e.target.value
@@ -286,7 +281,7 @@ class FormContainer extends React.Component {
 						min={600}
 						// max={this.props.max}
 						max={2400}
-						// value={this.props.config.width}
+						// value={this.props.width}
 						// step={this.props.step}
 						step={1}
 						// onChange={e => {

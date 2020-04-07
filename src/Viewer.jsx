@@ -42,7 +42,7 @@ class Viewer extends React.Component {
 
 	componentDidUpdate() {
 		// this.adjustShelves();
-		// this.adjustDividers();
+		this.adjustDividers();
 		this.adjustHeight(this.props);
 	}
 
@@ -185,20 +185,42 @@ class Viewer extends React.Component {
 		});
 	};
 
-	removeDividerRow = (divArr, shelfIndex) => {
+	removeDividerRow = meshArray => {
 		console.log('removeDividerRow');
-		this.divMeshes[shelfIndex].forEach((item, i) => {
-			console.log('divider removed');
-			this.removeSingleDivider(this.divMeshes[shelfIndex]);
-		});
+		this.returnArrayToStore(meshArray);
 		//this removes the empty array
 		this.divMeshes.pop();
 	};
 
+	// removeDividerRow = (divArr, shelfIndex) => {
+	// 	console.log('removeDividerRow');
+	// 	this.divMeshes[shelfIndex].forEach((item, i) => {
+	// 		console.log('divider removed');
+	// 		this.removeSingleDivider(this.divMeshes[shelfIndex]);
+	// 	});
+	// 	//this removes the empty array
+	// 	this.divMeshes.pop();
+	// };
+
 	removeSingleDivider = meshArray => {
-		console.log(meshArray);
+		console.log('single div removed from', meshArray);
 		const mesh = meshArray.pop();
 		this.returnToStore(mesh);
+	};
+
+	returnArrayToStore = meshArray => {
+		meshArray.forEach(mesh => {
+			this.scene.remove(mesh);
+			mesh.name = 'default';
+			mesh.scale.setX(1);
+			mesh.scale.setY(1);
+			mesh.scale.setZ(1);
+			mesh.position.setX(0);
+			mesh.position.setY(0);
+			mesh.position.setZ(0);
+			this.meshStore.push(mesh);
+			console.log('return to store', this.meshStore.length);
+		});
 	};
 
 	initializeShelves = () => {
@@ -249,13 +271,15 @@ class Viewer extends React.Component {
 
 		this.shelfMeshes.forEach((item, index) => {
 			if (shelvesY[index] === undefined) {
-				console.log(item);
+				// this.divMeshes[index].forEach(item => {
+				// 	this.removeSingleDivider(this.divMeshes[index]);
+				// });
+				this.removeDividerRow(this.divMeshes[index]);
 				this.removeShelf(this.shelfMeshes);
-				this.divMeshes[index].forEach(item => {
-					this.removeSingleDivider(this.divMeshes[index]);
-				});
 			}
 		});
+
+		// i'm forEach-ing and popping from the same thing. so its looping one less each time.
 
 		shelvesY.forEach((item, index) => {
 			if (this.shelfMeshes[index] === undefined) {
@@ -290,6 +314,7 @@ class Viewer extends React.Component {
 
 						this.addDivider(divPos, index);
 					} else if (divs.length < this.divMeshes[index].length) {
+						console.log('removing divs, from shelf', index);
 						this.removeSingleDivider(this.divMeshes[index]);
 					}
 				}
@@ -310,7 +335,7 @@ class Viewer extends React.Component {
 		mesh.position.setY(0);
 		mesh.position.setZ(0);
 		this.meshStore.push(mesh);
-		console.log('return to store', this.meshStore.length, mesh);
+		console.log('return to store', this.meshStore.length);
 	};
 	positionShelf = (mesh, position) => {
 		const width = this.props.width;
