@@ -46,7 +46,7 @@ class Viewer extends React.Component {
 		this.adjustHeight(this.props);
 		// this.camera.position.set(this.props.width, this.props.height, 2000);
 		// this.controls.update();
-		// this.addBoxes();
+		this.addBoxes();
 	}
 
 	addObjectsToScene = () => {
@@ -390,10 +390,10 @@ class Viewer extends React.Component {
 		mesh.scale.setZ(400);
 
 		if (shelfIndex === shelvesY.length - 1) {
-			mesh.scale.setY(0);
-			mesh.scale.setX(0);
+			mesh.scale.setY(1);
+			mesh.scale.setX(1);
 
-			mesh.scale.setZ(0);
+			mesh.scale.setZ(1);
 		} else {
 			const divHeight = shelvesY[shelfIndex + 1] - shelvesY[shelfIndex];
 			mesh.scale.setY(divHeight);
@@ -426,23 +426,31 @@ class Viewer extends React.Component {
 	addBoxes = () => {
 		const { shelvesY, divsX, width, height } = this.props;
 		const divMeshes = this.divMeshes.flat();
+		const boxPos = {};
 		function filterWidth(item) {
-			return item.position.x !== width;
+			return item.position.x !== width / 2;
 		}
 		console.log(divMeshes.filter(filterWidth));
-
+		console.log(shelvesY, divsX);
 		divsX.forEach((arr, index) => {
 			if (index === divsX.length - 1) {
 				return;
 			} else {
-				const centreY = shelvesY[index + 1] - shelvesY[index];
+				const centreY =
+					shelvesY[index] +
+					(shelvesY[index + 1] - shelvesY[index]) / 2;
 				console.log('indexY', index, centreY);
 				arr.forEach((pos, i) => {
 					if (i === arr.length - 1) {
 						return;
 					} else {
-						const centreX = arr[i + 1] - pos;
+						const centreX = pos + (arr[i + 1] - pos) / 2;
 						console.log(centreX);
+						boxPos.x = centreX;
+						boxPos.y = centreY;
+						boxPos.z = 0;
+						console.log(boxPos);
+						this.createBoxes(100, 100, 100, boxPos);
 					}
 				});
 			}
@@ -545,13 +553,13 @@ class Viewer extends React.Component {
 
 	createBoxes = (width, height, depth, pos) => {
 		console.log('createBox');
-		const cube = new THREE.BoxGeometry(width, height, depth);
-		const material = new THREE.MeshStandardMaterial({
-			color: this.randomColor(),
-			transparent: true,
-			opacity: 0.0
-		});
-		const box = new THREE.Mesh(cube, material);
+		const box = this.meshStore.pop();
+		// const material = new THREE.MeshStandardMaterial({
+		// 	color: this.randomColor(),
+		// 	transparent: true,
+		// 	opacity: 0.0
+		// });
+		// const box = new THREE.Mesh(cube, material);
 
 		console.log(box);
 		box.position.set(pos.x, pos.y, pos.z);
@@ -559,6 +567,23 @@ class Viewer extends React.Component {
 		this.scene.add(box);
 		return box;
 	};
+
+	// createBoxes = (width, height, depth, pos) => {
+	// 	console.log('createBox');
+	// 	const cube = new THREE.BoxGeometry(width, height, depth);
+	// 	const material = new THREE.MeshStandardMaterial({
+	// 		color: this.randomColor(),
+	// 		transparent: true,
+	// 		opacity: 0.0
+	// 	});
+	// 	const box = new THREE.Mesh(cube, material);
+
+	// 	console.log(box);
+	// 	box.position.set(pos.x, pos.y, pos.z);
+	// 	this.boxes.push(box);
+	// 	this.scene.add(box);
+	// 	return box;
+	// };
 
 	updateShelfMeshPosition = () => {
 		const shelfPos = this.props.shelvesY;
