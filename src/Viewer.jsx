@@ -42,8 +42,10 @@ class Viewer extends React.Component {
 
 	componentDidUpdate() {
 		// this.adjustShelves();
-		this.adjustDividers();
+		this.adjustWidth(this.props);
 		this.adjustHeight(this.props);
+		this.camera.position.set(this.props.width, this.props.height, 2000);
+		this.controls.update();
 	}
 
 	addObjectsToScene = () => {
@@ -60,10 +62,15 @@ class Viewer extends React.Component {
 		this.scene.add(lights[1]);
 		this.scene.add(lights[2]);
 
-		let controls = new OrbitControls(this.camera, this.el);
-		controls.width = this.el.clientWidth;
-		controls.height = 500;
-		controls.update();
+		this.controls = new OrbitControls(this.camera, this.el);
+		this.controls.width = this.el.clientWidth;
+		this.controls.height = 500;
+		this.camera.position.set(
+			this.props.width / 2,
+			this.props.height / 2,
+			2000
+		);
+		this.controls.update();
 		this.initializeDefaultMeshes(200);
 		this.initializeShelves();
 		this.initializeDividers(this.props);
@@ -117,7 +124,11 @@ class Viewer extends React.Component {
 			1000 * 10 // far plane
 		);
 
-		this.camera.position.setZ(2000);
+		this.camera.position.set(
+			this.props.width / 2,
+			this.props.height / 2,
+			2000
+		);
 
 		this.mouse = new THREE.Vector2(-1, -1);
 		this.renderer = new THREE.WebGLRenderer();
@@ -155,13 +166,17 @@ class Viewer extends React.Component {
 		this.shelfMeshes.push(shelfMesh);
 		// this.positionShelf(shelfMesh, shelfPos);
 		this.scene.add(shelfMesh);
+		shelfMesh.scale.setX(1000);
+		shelfMesh.scale.setY(18);
+		shelfMesh.scale.setZ(400);
 	};
 	removeShelf = meshArray => {
 		console.log('remove shelf');
 		this.returnToStore(meshArray.pop());
 	};
 
-	addDivider = (divPos, shelfIndex) => {
+	addDivider = (divPos, shelfIndex, height) => {
+		const { shelvesY } = this.props;
 		console.log('divider added');
 		const divMesh = this.meshStore.pop();
 		divMesh.name = 'div';
@@ -172,15 +187,23 @@ class Viewer extends React.Component {
 	};
 
 	addDividerRow = (divArr, shelfPos, shelfIndex) => {
+		const { shelvesY } = this.props;
 		this.divMeshes.push([]);
 		console.log('addDividerRow');
+		let divHeight;
 
 		divArr[shelfIndex].forEach((divPos, i) => {
-			this.addDivider(divPos, shelfIndex);
+			// if (shelfIndex === shelvesY.length - 1) {
+			// 	divHeight = 100;
+			// } else {
+			// 	divHeight = shelvesY[shelfIndex] - shelvesY[shelfIndex - 1];
+			// }
+			this.addDivider(divPos, shelfIndex, 180);
 			this.positionDivider(
 				this.divMeshes[shelfIndex][i],
 				divPos,
-				shelfPos
+				shelfPos,
+				shelfIndex
 			);
 		});
 	};
@@ -237,7 +260,9 @@ class Viewer extends React.Component {
 		shelves.forEach((shelf, index) => {
 			this.addDividerRow(divs, shelf, index);
 		});
-		this.divMeshes.forEach(item => {});
+		// this.divMeshes.forEach(item => {
+		// 	this.positionDivider(item);
+		// });
 	};
 	//the problems is i can't use the index number of the mesh array to access the position array because its an array of arrays.
 
@@ -271,9 +296,6 @@ class Viewer extends React.Component {
 
 		this.shelfMeshes.forEach((item, index) => {
 			if (shelvesY[index] === undefined) {
-				// this.divMeshes[index].forEach(item => {
-				// 	this.removeSingleDivider(this.divMeshes[index]);
-				// });
 				this.removeDividerRow(this.divMeshes[index]);
 				this.removeShelf(this.shelfMeshes);
 			}
@@ -291,6 +313,8 @@ class Viewer extends React.Component {
 		this.shelfMeshes.forEach((mesh, index) => {
 			this.positionShelf(mesh, shelvesY[index]);
 		});
+
+		// this.removeDividerRow(this.divMeshes[this.divMeshes.length - 1]);
 	};
 	// error from doing width adjust afer heigh adjust is because adjusting new shelves doesn't create anynew new dividers.
 	//error happens when divs adjust to have one less or more div from the slider handler and then when the shelves try to go lower it errors. i think this is from having the shelves and divs added separately. maybe all slider handlers need to be in one reducer thing. maybe making the divs added in a more closely coupled way with the shelves. I also want to have each shelves divs accesible seperately so i can change styles later. - actually I can just do this later in the form componenet or another component.
@@ -303,25 +327,30 @@ class Viewer extends React.Component {
 
 	// if i'm just adjusting height, I need to make sure I'm not adding divs where i Should be jsut positioning them
 
-	adjustDividers = () => {
-		const { shelvesY: shelves, divsX } = this.props;
+	adjustWidth = props => {
+		const { shelvesY: shelves, divsX, width } = props;
 
 		divsX.forEach((divs, index) => {
 			if (this.divMeshes[index]) {
-				while (divs.length != this.divMeshes[index].length) {
+				while (divs.length !== this.divMeshes[index].length) {
 					if (divs.length > this.divMeshes[index].length) {
 						const divPos = this.divMeshes[index].length;
 
-						this.addDivider(divPos, index);
+						this.addDivider(divPos, index, 280);
 					} else if (divs.length < this.divMeshes[index].length) {
 						console.log('removing divs, from shelf', index);
 						this.removeSingleDivider(this.divMeshes[index]);
 					}
 				}
 				this.divMeshes[index].forEach((mesh, i) => {
-					this.positionDivider(mesh, divs[i], shelves[index]);
+					this.positionDivider(mesh, divs[i], shelves[index], index);
 				});
 			}
+		});
+		this.shelfMeshes.forEach((mesh, index) => {
+			this.positionShelf(mesh, shelves[index]);
+			// const { x, y, z } = mesh.scale;
+			// mesh.matrix.makeScale(width, y, z);
 		});
 	};
 
@@ -344,23 +373,34 @@ class Viewer extends React.Component {
 		mesh.position.setX(width / 2);
 		mesh.position.setY(position);
 		mesh.position.setZ(0);
-
-		mesh.scale.setX(1000);
-		mesh.scale.setY(18);
-		mesh.scale.setZ(400);
+		mesh.scale.setX(width);
 	};
-	positionDivider = (mesh, position, shelfPos) => {
+	positionDivider = (mesh, position, shelfPos, shelfIndex) => {
+		const { shelvesY } = this.props;
 		const width = this.props.materialThickness;
 		const height = 100;
 		const depth = this.props.depth;
 		mesh.position.setX(position);
-		mesh.position.setY(shelfPos);
+
 		mesh.position.setZ(0);
 
 		mesh.scale.setX(18);
-		mesh.scale.setY(100);
+
 		mesh.scale.setZ(400);
+
+		if (shelfIndex === shelvesY.length - 1) {
+			mesh.scale.setY(0);
+			mesh.scale.setX(0);
+
+			mesh.scale.setZ(0);
+		} else {
+			const divHeight = shelvesY[shelfIndex + 1] - shelvesY[shelfIndex];
+			mesh.scale.setY(divHeight);
+			mesh.position.setY(shelfPos + divHeight / 2);
+		}
 	};
+	addLastDividers = () => {};
+	positionLastDividers = () => {};
 
 	createShelf(width, depth, posY, materialThickness, scene) {
 		const shelfGeom = new THREE.BoxGeometry(

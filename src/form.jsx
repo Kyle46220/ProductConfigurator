@@ -29,7 +29,7 @@ class FormContainer extends React.Component {
 	handleOnChangeHeight = e => {
 		console.log(this.props.height);
 		const shelfHeights = [180, 280, 380];
-
+		const randomShelfGap = [];
 		const getRandomInt = max => {
 			return Math.floor(Math.random() * Math.floor(max));
 		};
@@ -37,15 +37,14 @@ class FormContainer extends React.Component {
 		const { shelvesY, divsX } = this.props;
 
 		const newDivsX = divsX;
-		const newShelfPos = [];
+
 		const slider = e.target.value;
 		let highestShelf = shelvesY[shelvesY.length - 1];
-		const nextShelfGap = 280;
+		const nextShelfGap = shelfHeights[getRandomInt(3)];
+		console.log(nextShelfGap);
 		const nextShelf = highestShelf + nextShelfGap;
 
 		const newShelvesY = shelvesY;
-		// console.log('before', newShelvesY);
-		// when the slider passes next shelf, add this value to the array.
 
 		if (slider > highestShelf && slider < nextShelf) {
 			return;
@@ -58,35 +57,6 @@ class FormContainer extends React.Component {
 			divsX.pop();
 		}
 
-		//i think the while loop is no helping and calculating something at this point is not good. trying to fix those jitters while adjusting
-		// i need to do nothing until e reaches the next marker, and then just do something once.
-		// if (slider > highestShelf && slider === highestShelf + nextShelfGap) {
-		// 	// const newShelf = shelfHeights[1];
-		// 	const newDivArray = divsX[divsX.length - 1];
-		// 	newShelfPos.push(newShelf);
-		// 	newDivArrays.push(newDivArray);
-		// 	i = i + newShelf;
-		// } else if (e.target.value < shelvesY[shelvesY.length - 1]) {
-		// 	shelvesY.pop();
-		// 	divsX.pop();
-		// }
-
-		// let newDivsX = [];
-		// newDivsX.push(divsX);
-		// newDivsX.push(newDivArrays);
-		// newDivsX = newDivsX.flat();
-		// console.log('new divs', newDivsX);
-		// let newArray = [];
-		// newArray.push(newShelvesY);
-		// newArray = newArray.flat();
-		// newShelfPos.forEach(item => {
-		// 	const total = newArray[newArray.length - 1];
-
-		// 	const newTotal = total + item;
-
-		// 	newArray.push(newTotal);
-		// });
-
 		const shelfSum = newShelvesY[newShelvesY.length - 1];
 
 		const constrainedHeight = shelfSum + newShelvesY.length * 18 + 18;
@@ -96,7 +66,6 @@ class FormContainer extends React.Component {
 			newHeight: constrainedHeight,
 			newHeightArray: newShelvesY,
 			newDivsX: newDivsX
-			//you can pass multiple values through to the reducer. maybe i pass the whole state through? nah that doesn't seem to make sense as its already in redux.
 		});
 	};
 
@@ -110,9 +79,9 @@ class FormContainer extends React.Component {
 		const shelfPos = this.props.shelvesY;
 		const shelfHeights = [180, 280, 380];
 
-		const getRandomInt = max => {
-			return Math.floor(Math.random() * Math.floor(max));
-		};
+		// const getRandomInt = max => {
+		// 	return Math.floor(Math.random() * Math.floor(max));
+		// };
 
 		const { shelvesY } = this.props;
 
@@ -127,6 +96,7 @@ class FormContainer extends React.Component {
 				result.push(Math.floor(i));
 				i = i + divGap;
 			}
+			result.push(Math.floor(e.target.value));
 			divPos.push(result);
 		});
 

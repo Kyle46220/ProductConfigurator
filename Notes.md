@@ -133,6 +133,8 @@ on resize, create shelg, remove shelf, position shelf. create div, remove div, p
 
 where do I put scene add? Maybe I could Have maybe 30 or so meshes not added to the scene, and the functions just do the scene add. for each one. WE have a set up function that runs on mount and creates 30 Meshes. Then the other functions just assign dimensions, positions and names.
 
+when you use a forEach loop you can't .pop all items. the last one wont make it.
+
 // addShelves(shelfMesh, divMesh, config) {
 // //this takes the whole config object. and clones the shelves based on this object.
 
