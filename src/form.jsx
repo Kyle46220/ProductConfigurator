@@ -10,7 +10,9 @@ function mapStateToProps(state) {
 		height: state.height,
 		width: state.width,
 		depth: state.depth,
-		materialThickness: state.materialThickness
+		materialThickness: state.materialThickness,
+		shelvesY: state.shelvesY,
+		divsX: state.divsX
 	};
 }
 
@@ -25,56 +27,77 @@ const FormWrap = styled.form`
 
 class FormContainer extends React.Component {
 	handleOnChangeHeight = e => {
+		console.log(this.props.height);
 		const shelfHeights = [180, 280, 380];
 
 		const getRandomInt = max => {
 			return Math.floor(Math.random() * Math.floor(max));
 		};
 
-		const { shelvesY, divsX } = this.props.config;
-		const newDivArrays = [];
+		const { shelvesY, divsX } = this.props;
+
+		const newDivsX = divsX;
 		const newShelfPos = [];
+		const slider = e.target.value;
+		let highestShelf = shelvesY[shelvesY.length - 1];
+		const nextShelfGap = 280;
+		const nextShelf = highestShelf + nextShelfGap;
 
-		let i = shelvesY[shelvesY.length - 1];
+		const newShelvesY = shelvesY;
+		// console.log('before', newShelvesY);
+		// when the slider passes next shelf, add this value to the array.
 
-		if (e.target.value > shelvesY[shelvesY.length - 1]) {
-			while (i < e.target.value) {
-				const newShelf = shelfHeights[1];
-				const newDivArray = divsX[divsX.length - 1];
-				newShelfPos.push(newShelf);
-				newDivArrays.push(newDivArray);
-				i = i + newShelf;
-			}
-		} else if (e.target.value < shelvesY[shelvesY.length - 1]) {
+		if (slider > highestShelf && slider < nextShelf) {
+			return;
+		} else if (slider > nextShelf) {
+			newShelvesY.push(nextShelf);
+			const newDivRow = newDivsX[newDivsX.length - 1]; //copy last row
+			newDivsX.push(newDivRow);
+		} else {
 			shelvesY.pop();
 			divsX.pop();
 		}
+		console.log('after', newShelvesY, newDivsX);
 
-		let newDivsX = [];
-		newDivsX.push(divsX);
-		newDivsX.push(newDivArrays);
-		newDivsX = newDivsX.flat();
-		console.log('new divs', newDivsX);
-		let newArray = [];
-		newArray.push(shelvesY);
-		newArray = newArray.flat();
-		newShelfPos.forEach(item => {
-			const total = newArray[newArray.length - 1];
+		//i think the while loop is no helping and calculating something at this point is not good. trying to fix those jitters while adjusting
+		// i need to do nothing until e reaches the next marker, and then just do something once.
+		// if (slider > highestShelf && slider === highestShelf + nextShelfGap) {
+		// 	// const newShelf = shelfHeights[1];
+		// 	const newDivArray = divsX[divsX.length - 1];
+		// 	newShelfPos.push(newShelf);
+		// 	newDivArrays.push(newDivArray);
+		// 	i = i + newShelf;
+		// } else if (e.target.value < shelvesY[shelvesY.length - 1]) {
+		// 	shelvesY.pop();
+		// 	divsX.pop();
+		// }
 
-			const newTotal = total + item;
+		// let newDivsX = [];
+		// newDivsX.push(divsX);
+		// newDivsX.push(newDivArrays);
+		// newDivsX = newDivsX.flat();
+		// console.log('new divs', newDivsX);
+		// let newArray = [];
+		// newArray.push(newShelvesY);
+		// newArray = newArray.flat();
+		// newShelfPos.forEach(item => {
+		// 	const total = newArray[newArray.length - 1];
 
-			newArray.push(newTotal);
-		});
+		// 	const newTotal = total + item;
 
-		const shelfSum = newArray[newArray.length - 1];
+		// 	newArray.push(newTotal);
+		// });
 
-		const constrainedHeight = shelfSum + newArray.length * 18 + 18;
+		const shelfSum = newShelvesY[newShelvesY.length - 1];
+
+		const constrainedHeight = shelfSum + newShelvesY.length * 18 + 18;
 
 		this.props.dispatch({
 			type: 'UPDATE_HEIGHT_ARRAY',
 			newHeight: constrainedHeight,
-			newHeightArray: newArray.flat(),
-			newDivsX: newDivsX //you can pass multiple values through to the reducer. maybe i pass the whole state through? nah that doesn't seem to make sense as its already in redux.
+			newHeightArray: newShelvesY,
+			newDivsX: newDivsX
+			//you can pass multiple values through to the reducer. maybe i pass the whole state through? nah that doesn't seem to make sense as its already in redux.
 		});
 	};
 
@@ -87,14 +110,14 @@ class FormContainer extends React.Component {
 		const divQty = Math.floor(e.target.value / divWidth);
 		const divGap = e.target.value / divQty;
 		const divPos = [];
-		const shelfPos = this.props.config.shelvesY;
+		const shelfPos = this.props.shelvesY;
 		const shelfHeights = [180, 280, 380];
 
 		const getRandomInt = max => {
 			return Math.floor(Math.random() * Math.floor(max));
 		};
 
-		const { shelvesY } = this.props.config;
+		const { shelvesY } = this.props;
 
 		const newShelfPos = [];
 
@@ -117,7 +140,7 @@ class FormContainer extends React.Component {
 			newWidthArray: divPos,
 			newWidth: e.target.value
 		});
-		console.log('divsX', this.props.config.divsX);
+		console.log('divsX', this.props.divsX);
 		// this.props.dispatch({
 		// 	type: 'UPDATE_WIDTH',
 		// 	newWidth: e.target.value
@@ -125,13 +148,9 @@ class FormContainer extends React.Component {
 		// });
 	};
 	handleOnChange = e => {
-		console.log(this.props.config);
+		console.log(this.props);
 		console.log(e.target.name);
-		const {
-			height,
-			width,
-			config: { shelvesY }
-		} = this.props;
+		const { height, width, shelvesY } = this.props;
 		let heightValue = height;
 		let widthValue = width;
 		console.log('hello', height, width);
@@ -152,8 +171,8 @@ class FormContainer extends React.Component {
 				widthValue = e.target.value;
 				break;
 			default:
-				heightValue = this.props.config.height;
-				widthValue = this.props.config.width;
+				heightValue = this.props.height;
+				widthValue = this.props.width;
 		}
 		// if (e.target.name === 'height') {
 		// 	heightValue = e.target.value;
@@ -165,7 +184,7 @@ class FormContainer extends React.Component {
 		const divQty = Math.floor(widthValue / divWidth);
 		const divGap = widthValue / divQty;
 		const divPos = [];
-		const shelfPos = this.props.config.shelvesY;
+		const shelfPos = this.props.shelvesY;
 		const shelfHeights = [180, 280, 380];
 
 		const getRandomInt = max => {
@@ -246,7 +265,7 @@ class FormContainer extends React.Component {
 						min={280 + 36}
 						// max={this.props.max}
 						max={2400}
-						// value={this.props.config.height}
+						value={this.props.height}
 						// step={this.props.step}
 						step={1}
 						// onChange={e => {
@@ -258,7 +277,7 @@ class FormContainer extends React.Component {
 						onChange={this.handleOnChangeHeight}
 						name={'height'}
 					/>
-					TEST PARAM
+					HEIGHT
 				</label>
 				<label>
 					<Slider
@@ -279,7 +298,7 @@ class FormContainer extends React.Component {
 						onChange={this.handleOnChangeWidth}
 						name={'width'}
 					/>
-					TEST PARAM
+					WIDTH
 				</label>
 			</FormWrap>
 		);

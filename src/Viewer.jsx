@@ -25,7 +25,9 @@ function mapStateToProps(state) {
 		height: state.height,
 		width: state.width,
 		depth: state.depth,
-		materialThickness: state.materialThickness
+		materialThickness: state.materialThickness,
+		shelvesY: state.shelvesY,
+		divsX: state.divsX
 	};
 }
 
@@ -39,15 +41,9 @@ class Viewer extends React.Component {
 	}
 
 	componentDidUpdate() {
-		this.adjustShelves();
-		this.adjustDividers();
-		// this.updateShelfMeshPosition();
-		// this.buildCabinet(
-		// 	this.props.config,
-		// 	this.props.width,
-		// 	this.props.depth,
-		// 	this.props.materialThickness
-		// );
+		// this.adjustShelves();
+		// this.adjustDividers();
+		this.adjustHeight(this.props);
 	}
 
 	addObjectsToScene = () => {
@@ -70,13 +66,7 @@ class Viewer extends React.Component {
 		controls.update();
 		this.initializeDefaultMeshes(200);
 		this.initializeShelves();
-		this.initializeDividers(this.props.config);
-		// this.buildCabinet(
-		// 	this.props.config,
-		// 	this.props.width,
-		// 	this.props.depth,
-		// 	this.props.materialThickness
-		// );
+		this.initializeDividers(this.props);
 	};
 	rand(min, max) {
 		if (max === undefined) {
@@ -167,6 +157,7 @@ class Viewer extends React.Component {
 		this.scene.add(shelfMesh);
 	};
 	removeShelf = meshArray => {
+		console.log('remove shelf');
 		this.returnToStore(meshArray.pop());
 	};
 
@@ -182,7 +173,8 @@ class Viewer extends React.Component {
 
 	addDividerRow = (divArr, shelfPos, shelfIndex) => {
 		this.divMeshes.push([]);
-		console.log('divArr', divArr, shelfIndex, this.props.config.shelvesY);
+		console.log('addDividerRow');
+
 		divArr[shelfIndex].forEach((divPos, i) => {
 			this.addDivider(divPos, shelfIndex);
 			this.positionDivider(
@@ -194,9 +186,10 @@ class Viewer extends React.Component {
 	};
 
 	removeDividerRow = (divArr, shelfIndex) => {
+		console.log('removeDividerRow');
 		this.divMeshes[shelfIndex].forEach((item, i) => {
-			console.log('divider removed', item);
-			this.returnToStore(item);
+			console.log('divider removed');
+			this.removeSingleDivider(this.divMeshes[shelfIndex]);
 		});
 		//this removes the empty array
 		this.divMeshes.pop();
@@ -209,15 +202,15 @@ class Viewer extends React.Component {
 	};
 
 	initializeShelves = () => {
-		const { shelvesY: shelves } = this.props.config;
+		const { shelvesY: shelves } = this.props;
 		shelves.forEach((shelfPos, index) => {
 			this.addShelf(shelfPos);
 			this.positionShelf(this.shelfMeshes[index], shelfPos);
 		});
 	};
 
-	initializeDividers = config => {
-		const { divsX: divs, shelvesY: shelves } = config;
+	initializeDividers = props => {
+		const { divsX: divs, shelvesY: shelves } = props;
 		console.log('div init', divs);
 		shelves.forEach((shelf, index) => {
 			this.addDividerRow(divs, shelf, index);
@@ -231,40 +224,48 @@ class Viewer extends React.Component {
 	// the mesh array is being pushed in the add r9ow function, but the divsX array is not being added from the form side on handle change
 
 	adjustShelves = () => {
-		const { shelvesY: shelves, divsX } = this.props.config;
+		const { shelvesY: shelves, divsX } = this.props;
 
 		while (shelves.length != this.shelfMeshes.length) {
 			if (shelves.length > this.shelfMeshes.length) {
 				const calculatedIndex = this.shelfMeshes.length;
 				const shelfPos = shelves[calculatedIndex];
 				this.addShelf(shelfPos);
-				console.log('calculatedIndex', calculatedIndex);
+				console.log('ADD ROW');
 				this.addDividerRow(divsX, shelfPos, calculatedIndex);
-			} else if (shelves.length < this.shelfMeshes.length) {
+			} else {
+				console.log('REMOVE ROW');
 				this.removeShelf(this.shelfMeshes);
 				this.removeDividerRow(divsX, this.shelfMeshes.length - 1);
 			}
 		}
-		// this.adjustDividers();
-		// if (shelves.length > this.shelfMeshes.length) {
-		// 	let num = shelves.length - this.shelfMeshes.length;
-		// 	for (let i = 0; i < num; i++) {
-		// 		//this issue is somewhere in here with how the indexes are calculated. Maybe I rewrite?
-		// 		const calculatedIndex = this.shelfMeshes.length;
-		// 		const shelfPos = shelves[calculatedIndex];
-		// 		this.addShelf(shelfPos);
-		// 		console.log('calculatedIndex', calculatedIndex);
-		// 		this.addDividerRow(divsX, shelfPos, calculatedIndex);
-		// 	}
-		// } else {
-		// 	while (shelves.length < this.shelfMeshes.length) {
-		// 		this.removeShelf(this.shelfMeshes);
-		// 		this.removeDividerRow(divsX, this.shelfMeshes.length - 1);
-		// 	}
-		// }
 
 		this.shelfMeshes.forEach((mesh, index) => {
 			this.positionShelf(mesh, shelves[index]);
+		});
+	};
+	adjustHeight = props => {
+		const { shelvesY, divsX } = props;
+
+		this.shelfMeshes.forEach((item, index) => {
+			if (shelvesY[index] === undefined) {
+				console.log(item);
+				this.removeShelf(this.shelfMeshes);
+				this.divMeshes[index].forEach(item => {
+					this.removeSingleDivider(this.divMeshes[index]);
+				});
+			}
+		});
+
+		shelvesY.forEach((item, index) => {
+			if (this.shelfMeshes[index] === undefined) {
+				this.addShelf(item);
+				this.addDividerRow(divsX, item, index);
+			}
+		});
+
+		this.shelfMeshes.forEach((mesh, index) => {
+			this.positionShelf(mesh, shelvesY[index]);
 		});
 	};
 	// error from doing width adjust afer heigh adjust is because adjusting new shelves doesn't create anynew new dividers.
@@ -273,34 +274,20 @@ class Viewer extends React.Component {
 	// error is because the function that adds to  the divsX array, and the functions thats adds to the divs position array are out of sync. I think its cos they're in separate spots. I need to refactor to make a function that does both at the same time.
 
 	// now I'm gaving the issue of some dividers not being removed proplery. Its something to do with the remove, and add row function. Anything created the with addRow function, is not removed later. or like whether I go higher or lower,
+	// Maybe I will try with height and width rather than shelves and dividers.
+	// also, is there any benefit to not just re-creating the whole scene every frame? is the meshstore a good idea?
+
+	// if i'm just adjusting height, I need to make sure I'm not adding divs where i Should be jsut positioning them
 
 	adjustDividers = () => {
-		const { shelvesY: shelves, divsX } = this.props.config;
-		console.log(divsX, this.divMeshes);
+		const { shelvesY: shelves, divsX } = this.props;
 
 		divsX.forEach((divs, index) => {
-			console.log(
-				'length bit',
-				'divs',
-				divs,
-				'divsX',
-				divsX,
-				'shelvesY',
-				shelves,
-
-				'meshes',
-				this.divMeshes
-			);
 			if (this.divMeshes[index]) {
-				console.log(
-					this.divMeshes[index],
-					'Mesh Store',
-					this.meshStore.length
-				);
 				while (divs.length != this.divMeshes[index].length) {
 					if (divs.length > this.divMeshes[index].length) {
 						const divPos = this.divMeshes[index].length;
-						console.log('divPos', divPos);
+
 						this.addDivider(divPos, index);
 					} else if (divs.length < this.divMeshes[index].length) {
 						this.removeSingleDivider(this.divMeshes[index]);
@@ -310,18 +297,6 @@ class Viewer extends React.Component {
 					this.positionDivider(mesh, divs[i], shelves[index]);
 				});
 			}
-
-			// if (divs.length > this.divMeshes[index].length) {
-			// 	let num = divs.length - this.divMeshes[index].length;
-			// 	for (let i = 0; i < num; i++) {
-			// 		const divPos = divs[divs.length - 1 - i];
-			// 		this.addDivider(divPos, index);
-			// 	}
-			// } else {
-			// 	while (divs.length < this.divMeshes[index].length) {
-			// 		this.removeSingleDivider(this.divMeshes[index]);
-			// 	}
-			// }
 		});
 	};
 
@@ -335,7 +310,7 @@ class Viewer extends React.Component {
 		mesh.position.setY(0);
 		mesh.position.setZ(0);
 		this.meshStore.push(mesh);
-		console.log('return to store', this.meshStore.length);
+		console.log('return to store', this.meshStore.length, mesh);
 	};
 	positionShelf = (mesh, position) => {
 		const width = this.props.width;
@@ -412,9 +387,9 @@ class Viewer extends React.Component {
 
 	createDividers(shelf, index) {
 		console.log('create div shelf', shelf);
-		console.log(this.props.config.shelvesY);
+		console.log(this.props.shelvesY);
 
-		const divs = this.props.config.divsX;
+		const divs = this.props.divsX;
 		console.log(divs);
 
 		divs[index].forEach((item, i) => {
@@ -427,8 +402,8 @@ class Viewer extends React.Component {
 			const material = new THREE.MeshBasicMaterial({
 				color: this.randomColor()
 			});
-			const shelfPosition = this.props.config.shelvesY[index];
-			const shelfHeight = this.props.config.divHeights[index];
+			const shelfPosition = this.props.shelvesY[index];
+			const shelfHeight = this.props.divHeights[index];
 			const divMesh = new THREE.Mesh(divGeom, material);
 			divMesh.position.setX(item);
 			divMesh.position.setY(shelfPosition + shelfHeight / 2);
@@ -473,8 +448,8 @@ class Viewer extends React.Component {
 	};
 
 	updateShelfMeshPosition = () => {
-		const shelfPos = this.props.config.shelvesY;
-		const divPos = this.props.config.divsX;
+		const shelfPos = this.props.shelvesY;
+		const divPos = this.props.divsX;
 		const array = this.scene.children;
 
 		const filterItems = query => {
