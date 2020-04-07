@@ -44,8 +44,9 @@ class Viewer extends React.Component {
 		// this.adjustShelves();
 		this.adjustWidth(this.props);
 		this.adjustHeight(this.props);
-		this.camera.position.set(this.props.width, this.props.height, 2000);
-		this.controls.update();
+		// this.camera.position.set(this.props.width, this.props.height, 2000);
+		// this.controls.update();
+		// this.addBoxes();
 	}
 
 	addObjectsToScene = () => {
@@ -399,7 +400,54 @@ class Viewer extends React.Component {
 			mesh.position.setY(shelfPos + divHeight / 2);
 		}
 	};
-	addLastDividers = () => {};
+
+	// I can do this better by flattening and then filtering for values equal to width
+	// addBoxes = () => {
+	// 	const { shelvesY, divsX } = this.props;
+	// 	const divMeshes = this.divMeshes;
+	// 	divsX.forEach((arr, index) => {
+	// 		if (index === divsX.length - 1) {
+	// 			return;
+	// 		} else {
+	// 			const centreY = shelvesY[index + 1] - shelvesY[index];
+	// 			console.log('indexY', index, centreY);
+	// 			arr.forEach((pos, i) => {
+	// 				if (i === arr.length - 1) {
+	// 					return;
+	// 				} else {
+	// 					const centreX = arr[i + 1] - pos;
+	// 					console.log(centreX);
+	// 				}
+	// 			});
+	// 		}
+	// 	});
+	// };
+
+	addBoxes = () => {
+		const { shelvesY, divsX, width, height } = this.props;
+		const divMeshes = this.divMeshes.flat();
+		function filterWidth(item) {
+			return item.position.x !== width;
+		}
+		console.log(divMeshes.filter(filterWidth));
+
+		divsX.forEach((arr, index) => {
+			if (index === divsX.length - 1) {
+				return;
+			} else {
+				const centreY = shelvesY[index + 1] - shelvesY[index];
+				console.log('indexY', index, centreY);
+				arr.forEach((pos, i) => {
+					if (i === arr.length - 1) {
+						return;
+					} else {
+						const centreX = arr[i + 1] - pos;
+						console.log(centreX);
+					}
+				});
+			}
+		});
+	};
 	positionLastDividers = () => {};
 
 	createShelf(width, depth, posY, materialThickness, scene) {
