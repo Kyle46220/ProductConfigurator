@@ -46,7 +46,9 @@ class Viewer extends React.Component {
 		this.adjustHeight(this.props);
 		// this.camera.position.set(this.props.width, this.props.height, 2000);
 		// this.controls.update();
-		this.addBoxes();
+		this.resetBoxes();
+		this.createBoxPositions();
+		this.addBoxes(this.boxValueArray);
 	}
 
 	addObjectsToScene = () => {
@@ -75,6 +77,9 @@ class Viewer extends React.Component {
 		this.initializeDefaultMeshes(200);
 		this.initializeShelves();
 		this.initializeDividers(this.props);
+		this.resetBoxes();
+		this.createBoxPositions();
+		this.addBoxes(this.boxValueArray);
 	};
 	rand(min, max) {
 		if (max === undefined) {
@@ -116,7 +121,11 @@ class Viewer extends React.Component {
 		this.meshStore = [];
 		this.shelfMeshes = [];
 		this.divMeshes = [];
-
+		this.material = new THREE.MeshStandardMaterial({
+			color: this.randomColor(),
+			transparent: true,
+			opacity: 0.5
+		});
 		this.scene = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera(
 			75, // fov = field of view
@@ -132,7 +141,8 @@ class Viewer extends React.Component {
 		);
 
 		this.mouse = new THREE.Vector2(-1, -1);
-		this.renderer = new THREE.WebGLRenderer();
+		this.renderer = new THREE.WebGLRenderer({ alpha: true });
+		this.renderer.setClearColor(0x000000, 0);
 
 		this.canvas = this.renderer.domElement;
 		this.renderer.setSize(width, height);
@@ -141,6 +151,7 @@ class Viewer extends React.Component {
 		// this.el.appendChild(this.stats.dom);
 
 		this.canvas.addEventListener('mousemove', this.onMouseMove, false);
+		this.canvas.addEventListener('click', this.clickHandler);
 	};
 	createMesh = geom => {
 		// create meshes, add to Mesh Store array, give default name
@@ -422,11 +433,24 @@ class Viewer extends React.Component {
 	// 		}
 	// 	});
 	// };
+	resetBoxes = () => {
+		this.boxes.forEach(item => {
+			this.scene.remove(item);
+			this.returnToStore(item);
+			const material = new THREE.MeshStandardMaterial({
+				color: this.randomColor()
+			});
+			item.material = material;
+		});
 
-	addBoxes = () => {
-		const { shelvesY, divsX, width, height } = this.props;
+		this.boxes = [];
+	};
+
+	createBoxPositions = () => {
+		const { shelvesY, divsX, width, height, depth } = this.props;
 		const divMeshes = this.divMeshes.flat();
-		const boxPos = {};
+		this.boxValueArray = [];
+
 		function filterWidth(item) {
 			return item.position.x !== width / 2;
 		}
@@ -436,6 +460,7 @@ class Viewer extends React.Component {
 			if (index === divsX.length - 1) {
 				return;
 			} else {
+				const boxHeight = shelvesY[index + 1] - shelvesY[index];
 				const centreY =
 					shelvesY[index] +
 					(shelvesY[index + 1] - shelvesY[index]) / 2;
@@ -444,19 +469,56 @@ class Viewer extends React.Component {
 					if (i === arr.length - 1) {
 						return;
 					} else {
+						const boxValues = {};
+						const boxPos = {};
+						boxValues.boxHeight = boxHeight;
+						boxValues.boxWidth = arr[i + 1] - pos;
+						boxValues.boxDepth = depth;
 						const centreX = pos + (arr[i + 1] - pos) / 2;
 						console.log(centreX);
 						boxPos.x = centreX;
 						boxPos.y = centreY;
 						boxPos.z = 0;
-						console.log(boxPos);
-						this.createBoxes(100, 100, 100, boxPos);
+						boxValues.boxPos = boxPos;
+
+						console.log(boxValues);
+						this.boxValueArray.push(boxValues);
+						// this.createBoxes(100, 100, 100, boxPos);
 					}
 				});
 			}
 		});
+		console.log(this.boxValueArray);
 	};
-	positionLastDividers = () => {};
+	addBoxes = array => {
+		array.forEach(item => {
+			const material = new THREE.MeshStandardMaterial({
+				color: this.randomColor(),
+				transparent: true,
+				opacity: 0.0
+			});
+			const box = this.meshStore.pop();
+			// console.log(item);
+			const {
+				boxHeight,
+				boxWidth,
+				boxDepth,
+				boxPos: { x, y, z }
+			} = item;
+			// console.log(x, y, z);
+
+			box.position.setX(x);
+			box.position.setY(y);
+			box.position.setZ(z);
+
+			box.scale.set(boxWidth, boxHeight, boxDepth);
+			box.material = material;
+
+			this.boxes.push(box);
+			this.scene.add(box);
+		});
+		console.log(this.boxes);
+	};
 
 	createShelf(width, depth, posY, materialThickness, scene) {
 		const shelfGeom = new THREE.BoxGeometry(
@@ -584,7 +646,14 @@ class Viewer extends React.Component {
 	// 	this.scene.add(box);
 	// 	return box;
 	// };
+	clickHandler = event => {
+		// const pos = this.getCanvasRelativePosition(event);
 
+		// this.mouse.x = (pos.x / this.canvas.clientWidth) * 2 - 1;
+		// this.mouse.y = -(pos.y / this.canvas.clientHeight) * 2 + 1;
+
+		this.pickHelper.click(this.mouse, this.boxes, this.camera);
+	};
 	updateShelfMeshPosition = () => {
 		const shelfPos = this.props.shelvesY;
 		const divPos = this.props.divsX;

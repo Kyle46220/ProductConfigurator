@@ -1,10 +1,12 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/GLTFLoader.js';
 
 class PickHelper {
 	constructor() {
 		this.raycaster = new THREE.Raycaster();
 		this.pickedObject = null;
 		this.pickedObjectSavedColor = 0;
+		this.loader = new GLTFLoader();
 	}
 	pick(normalizedPosition, array, camera, time) {
 		// restore the color if there is a picked object
@@ -42,6 +44,15 @@ class PickHelper {
 			);
 			this.pickedObject.material.transparent = true;
 			this.pickedObject.material.opacity = 0.5;
+		}
+	}
+
+	click(normalizedPosition, array, camera) {
+		this.raycaster.setFromCamera(normalizedPosition, camera);
+		const intersectedObjects = this.raycaster.intersectObjects(array);
+		if (intersectedObjects.length > 0) {
+			console.log(intersectedObjects[0]);
+			alert(`${JSON.stringify(intersectedObjects[0].object.position)}`);
 		}
 	}
 }
