@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/GLTFLoader.js';
+
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 class PickHelper {
 	constructor() {

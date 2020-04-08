@@ -135,6 +135,16 @@ where do I put scene add? Maybe I could Have maybe 30 or so meshes not added to 
 
 when you use a forEach loop you can't .pop all items. the last one wont make it.
 
+so have easily added the hoverboxes. using the same mesh store idea. with these guys on every component update I reset, return to store, and re-calculate positions, and then re-add all the boxes to these new positions. it is runnning a bit sloweer now, but I think this is because of the nested loops. nest I want to flat the arrays and use a filter to pick out shelvesY and DIvsX values to calculate the box positions. I think it will nmake some difference cos i am doing a lot of IF checks on everything everytime at the moment.
+
+adding an event listener using the ray caster is super easy. I just added and extra method to the pick class called click and it just executes whatever. the event listener is on the renderer, and whenever there is a click in this canvas, the lickhandler function runs, which calls the pickhelper.click which setst raycaster and checks for intersects and if so, executes whatever the click result is.
+
+Now I am trying to add the GLTF loader so i can load a drawer. I'm thinking I will also have a cupboard and each click will just cycle through, cuoboard, drawer, openshelf. Will i have a store of GLTF Objects that i add to the scene here? I think this is prudent. I might try clone here as well.
+
+Where should I put the loading function? I might create a new method in base class to load the objects. and then the picker method will just toggle between cloning and adding drawers and cuoboards.
+
+I'm going to try to put them in separate files too
+
 // addShelves(shelfMesh, divMesh, config) {
 // //this takes the whole config object. and clones the shelves based on this object.
 

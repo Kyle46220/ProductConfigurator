@@ -3,9 +3,12 @@ import React from 'react';
 import * as THREE from 'three';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
+// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import GLTFLoader from 'three-gltf-loader';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import PickHelper from './picker';
+import Loader from './Loader.js';
 
 const Canvas = styled.canvas`
 	border: 5px solid fuchsia;
@@ -80,6 +83,10 @@ class Viewer extends React.Component {
 		this.resetBoxes();
 		this.createBoxPositions();
 		this.addBoxes(this.boxValueArray);
+		this.loadDrawer();
+		// this.loader = new Loader();
+		// this.drawer = this.loader.loadDrawer(this.scene);
+		// console.log(this.drawer);
 	};
 	rand(min, max) {
 		if (max === undefined) {
@@ -88,6 +95,12 @@ class Viewer extends React.Component {
 		}
 		return min + (max - min) * Math.random();
 	}
+	loadDrawer = () => {
+		const loader = new GLTFLoader();
+		loader.load('DrawerAssembly.gltf', gltf => {
+			console.log('gltf', gltf.scene);
+		});
+	};
 
 	randomColor() {
 		return `hsl(${this.rand(360) | 0}, ${this.rand(50, 100) | 0}%, 50%)`;
