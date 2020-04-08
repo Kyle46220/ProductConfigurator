@@ -83,7 +83,7 @@ class Viewer extends React.Component {
 		this.resetBoxes();
 		this.createBoxPositions();
 		this.addBoxes(this.boxValueArray);
-		this.loadDrawer();
+		// this.loadDrawer();
 		// this.loader = new Loader();
 		// this.drawer = this.loader.loadDrawer(this.scene);
 		// console.log(this.drawer);
@@ -97,16 +97,27 @@ class Viewer extends React.Component {
 	}
 	loadDrawer = () => {
 		const loader = new GLTFLoader();
-		loader.load('DrawerAssembly.gltf', gltf => {
+		const cab = '/cabinetTest1.gltf';
+		const drawer = '/drawer.gltf';
+		const test = '/newtest.gltf';
+		loader.load(cab, gltf => {
 			console.log('gltf', gltf.scene);
+			this.root = gltf.scene;
+			this.cabMeshes = this.isolateMeshes(this.scene.children);
 		});
 	};
 
 	randomColor() {
 		return `hsl(${this.rand(360) | 0}, ${this.rand(50, 100) | 0}%, 50%)`;
 	}
-	isolateMeshes = () => {
-		this.objects = this.scene.children.filter(item => item.type === 'Mesh');
+	isolateMeshes = array => {
+		// this.objects = this.scene.children.filter(item => item.type === 'Mesh');
+		const filterItems = query => {
+			return array.filter(
+				el => el.toLowerCase().indexOf(query.toLowerCase()) > -1
+			);
+		};
+		return filterItems('Solid');
 	};
 
 	getCanvasRelativePosition = event => {
