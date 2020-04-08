@@ -145,6 +145,11 @@ Where should I put the loading function? I might create a new method in base cla
 
 I'm going to try to put them in separate files too
 
+Ok so got a lot done. Loaded the GLTF drawer in and worked it with the click.
+
+these don't update with the sliders though.
+its confusing having react components and regular classes. can't alwsysd use redux, gottas pass things through in ndifferent ways. next step is to figure out how the update is gonna work. The update is all done with redux. but i can't connec the no react components with their constructor functions
+
 // addShelves(shelfMesh, divMesh, config) {
 // //this takes the whole config object. and clones the shelves based on this object.
 

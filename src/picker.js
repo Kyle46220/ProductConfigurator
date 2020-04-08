@@ -1,13 +1,14 @@
 import * as THREE from 'three';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import Loader from './Loader.js';
 
 class PickHelper {
 	constructor() {
 		this.raycaster = new THREE.Raycaster();
 		this.pickedObject = null;
 		this.pickedObjectSavedColor = 0;
-		this.loader = new GLTFLoader();
+		this.loader = new Loader();
 	}
 	pick(normalizedPosition, array, camera, time) {
 		// restore the color if there is a picked object
@@ -48,12 +49,20 @@ class PickHelper {
 		}
 	}
 
-	click(normalizedPosition, array, camera) {
+	click(normalizedPosition, array, camera, scene) {
 		this.raycaster.setFromCamera(normalizedPosition, camera);
 		const intersectedObjects = this.raycaster.intersectObjects(array);
 		if (intersectedObjects.length > 0) {
-			console.log(intersectedObjects[0]);
-			alert(`${JSON.stringify(intersectedObjects[0].object.position)}`);
+			const object = intersectedObjects[0].object;
+			console.log(object);
+			const { position } = object;
+			const matrix = object.matrix;
+			console.log(matrix);
+
+			this.loader.loadDrawer(scene, position, matrix);
+			console.log(position);
+
+			// alert(`${JSON.stringify(intersectedObjects[0].object.position)}`);
 		}
 	}
 }
