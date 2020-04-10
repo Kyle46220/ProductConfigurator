@@ -150,6 +150,23 @@ Ok so got a lot done. Loaded the GLTF drawer in and worked it with the click.
 these don't update with the sliders though.
 its confusing having react components and regular classes. can't alwsysd use redux, gottas pass things through in ndifferent ways. next step is to figure out how the update is gonna work. The update is all done with redux. but i can't connec the no react components with their constructor functions
 
+have started using the matrix transforms.
+
+Wanna start passing nobjects between functions as well I think this will make params less messy.
+
+how do I calculate the scale from the measurements.
+
+eg is something is 150mm tall and i want it to be 200mm tall, what is the scale?
+
+i think its just 200/1500 = 1.33 so scale by 1.33.
+Now i just need to make a neat way to do this with the matrix.
+
+to work the drawers in with redux. Load them everyframe like with the hover boxes.
+
+But when a box is clicked and loaded. This updates redux within array of drawer positions using dispatch and then the drawers are loaded independently in a different function in the main class.
+
+does this mean its easy to dispatch from a non-react class, but that you can't use the connect funcion from react-redux to access the state? tyhis would make sense becasue what use is react-redux if you're not using react. maybe just need to import the dispatch from redux only.
+
 // addShelves(shelfMesh, divMesh, config) {
 // //this takes the whole config object. and clones the shelves based on this object.
 

@@ -54,13 +54,14 @@ class PickHelper {
 		const intersectedObjects = this.raycaster.intersectObjects(array);
 		if (intersectedObjects.length > 0) {
 			const object = intersectedObjects[0].object;
-			console.log(object);
+			console.log('intersected object', object);
 			const { position } = object;
 			const matrix = object.matrix;
-			console.log(matrix);
+
+			console.log('matrix', matrix);
 
 			this.loader.loadDrawer(scene, position, matrix);
-			console.log(position);
+			console.log('position', position);
 
 			// alert(`${JSON.stringify(intersectedObjects[0].object.position)}`);
 		}
