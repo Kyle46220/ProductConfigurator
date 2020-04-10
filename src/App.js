@@ -222,6 +222,13 @@ class App extends React.Component {
 					height: action.newHeight,
 					width: action.newWidth
 				};
+				break;
+			case 'UPDATE_DRAWERS':
+				newState = {
+					...state,
+					drawers: action.newDrawers
+				};
+				break;
 
 			default:
 				newState = { ...state };

@@ -167,6 +167,25 @@ But when a box is clicked and loaded. This updates redux within array of drawer 
 
 does this mean its easy to dispatch from a non-react class, but that you can't use the connect funcion from react-redux to access the state? tyhis would make sense becasue what use is react-redux if you're not using react. maybe just need to import the dispatch from redux only.
 
+Ok I'm feeling like I might have hit a snag that requires a major refactor to reconcile redux, react and three js loaders.
+The gltfjsx part of fiber looks like the solution, but this is going to return the loaded object as a jsx object that will be fucked with in the render function of the main viewer component.
+
+Does this matter? I can just pass through the props that I need to the component. like the position and bounding box I get from the raycaster.
+
+HMMMM. where would i put the function that renders the gltf for each item in the store array? need a
+
+maybe I need to look up a raycasting component as well.
+
+ok raycasting happens automatically within react three fiber.
+
+it looks like I will be able to use my functions the same for positioning all the meshes from the state arrays.
+
+its just the way they are added into the scene thatis different.
+
+so i will write a function that generates however many meshes, then just chuck this in the render function or the return of the fuinctional component.
+
+I think it's time for a new branch.
+
 // addShelves(shelfMesh, divMesh, config) {
 // //this takes the whole config object. and clones the shelves based on this object.
 

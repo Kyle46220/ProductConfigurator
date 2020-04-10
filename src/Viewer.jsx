@@ -5,16 +5,17 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 // import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import GLTFLoader from 'three-gltf-loader';
+import { Canvas } from 'react-three-fiber';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import PickHelper from './picker';
 import Loader from './Loader.js';
 
-const Canvas = styled.canvas`
-	border: 5px solid fuchsia;
-	height: 50%;
-	display: inline;
-`;
+// const Canvas = styled.canvas`
+// 	border: 5px solid fuchsia;
+// 	height: 50%;
+// 	display: inline;
+// `;
 const Wrapper = styled.section`
 	height: 100%;
 	width: 100%;
@@ -490,7 +491,9 @@ class Viewer extends React.Component {
 	render() {
 		return (
 			<Wrapper>
-				<div className="viewer" ref={ref => (this.el = ref)} />
+				<Canvas>
+					<div className="viewer" ref={ref => (this.el = ref)} />
+				</Canvas>
 			</Wrapper>
 		);
 	}
