@@ -104,8 +104,8 @@ class App extends React.Component {
 			<Provider store={this.store}>
 				<Wrapper className="App">
 					<FiberViewer />
-					{/* <Viewer />
-				<FormContainer /> */}
+					<Viewer />
+					<FormContainer />
 				</Wrapper>
 			</Provider>
 		);

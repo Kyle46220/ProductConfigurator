@@ -96,38 +96,60 @@ const Vertical = (props) => {
 	);
 };
 const Row = ({ ...props }) => {
-	// const divsX = useSelector((state) => state.divsX);
 	const width = useSelector((state) => state.width);
-	const group = useRef();
-	// const width = 1200;
-	console.log('WIIIIIIDTH', width);
+
 	const shelvesY = useSelector((state) => state.shelvesY);
-	// const shelvesY = [0, 280, 560, 840, 1120];
-	console.log(shelvesY);
 
 	const shelves = shelvesY.map((pos, index) => {
-		console.log('mapppped', pos);
+		console.log('index', index);
 		return (
-			<Shelf key={index} position={[0, pos, 0]} size={[width, 18, 400]} />
-			// <Box position={[0, pos, 0]} />
+			<>
+				<Shelf
+					key={pos + index}
+					position={[width / 2, pos, 0]}
+					size={[width, 18, 400]}
+				/>
+				<Verts key={index} index={index} />
+			</>
 		);
 	});
-	console.log(shelves);
 
-	return (
-		<group {...props} ref={group}>
-			{shelves}
-		</group>
-	);
+	return <group {...props}>{shelves}</group>;
 };
 
-const Slider = (minSize, maxSize) => {
-	// const [size, setSize] = useState(initialSize);
+const Verts = ({ ...props }) => {
+	// const width = useSelector((state) => state.width);
+	console.log(props.key);
+	const divsX = useSelector((state) => state.divsX[props.index]);
+	const shelvesY = useSelector((state) => state.shelvesY);
+	const shelfYPos = shelvesY[props.index];
+	if (props.index === shelvesY.length) {
+		return;
+	} else {
+		// const height = shelvesY[props.key +1] - shelvesY[props.key];
+		const height = 180;
+
+		const verticals = divsX.map((pos, index) => {
+			return (
+				<Vertical
+					key={pos + index}
+					position={[pos, shelfYPos, 0]}
+					size={[18, height, 400]}
+				/>
+			);
+		});
+
+		return <group {...props}>{verticals}</group>;
+	}
+};
+
+const Slider = (props) => {
 	const dispatch = useDispatch();
 	const width = useSelector((state) => state.width);
+	const { minSize, maxSize } = props;
 
 	const handleChange = (e) => {
-		dispatch({ type: 'UPDATE_WIDTH', newWidth: e.target.value });
+		dispatch({ type: 'UPDATE_WIDTH_ARRAY', newWidth: e.target.value });
 	};
 
 	return (
@@ -137,6 +159,7 @@ const Slider = (minSize, maxSize) => {
 				min={minSize}
 				max={maxSize}
 				value={width}
+				step={1}
 				onChange={handleChange}
 			/>
 			SLIDER
@@ -153,21 +176,21 @@ export default () => {
 						<Provider store={store}>
 							<ambientLight />
 							<pointLight position={[10, 10, 10]} />
-							<Shelf
+							{/* <Shelf
 								position={[10, 10, 10]}
 								size={[2000, 18, 400]}
 							/>
 							<Vertical
 								size={[18, 280, 400]}
 								position={[1500, 280, 0]}
-							/>
+							/> */}
 							<Row position={[0, 0, 0]} />
 							<Controls />
 						</Provider>
 					</Canvas>
 				)}
 			</ReactReduxContext.Consumer>
-			<Slider minSize={600} maxsize={2400} />
+			<Slider minSize={600} maxSize={2400} />
 		</Wrapper>
 	);
 };
