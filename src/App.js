@@ -54,6 +54,7 @@ class App extends React.Component {
 				break;
 
 			case 'UPDATE_HEIGHT_ARRAY':
+				console.log('UPDATE_HEIGHT_ARRAY');
 				newState = {
 					...state,
 
@@ -104,7 +105,7 @@ class App extends React.Component {
 			<Provider store={this.store}>
 				<Wrapper className="App">
 					<FiberViewer />
-					<Viewer />
+					{/* <Viewer /> */}
 					<FormContainer />
 				</Wrapper>
 			</Provider>

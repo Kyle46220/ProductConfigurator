@@ -366,7 +366,7 @@ class Viewer extends React.Component {
 	};
 
 	adjustWidth = (props) => {
-		const { shelvesY: shelves, divsX, width } = props;
+		const { shelvesY: shelves, divsX } = props;
 
 		divsX.forEach((divs, index) => {
 			if (this.divMeshes[index]) {

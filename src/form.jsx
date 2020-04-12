@@ -27,7 +27,7 @@ const FormWrap = styled.form`
 
 class FormContainer extends React.Component {
 	handleOnChangeHeight = (e) => {
-		console.log(this.props.height);
+		// console.log(this.props.height);
 		const shelfHeights = [180, 280, 380];
 		const randomShelfGap = [];
 		const getRandomInt = (max) => {
@@ -41,13 +41,13 @@ class FormContainer extends React.Component {
 		const slider = e.target.value;
 		let highestShelf = shelvesY[shelvesY.length - 1];
 		const nextShelfGap = shelfHeights[getRandomInt(3)];
-		console.log(nextShelfGap);
+		// console.log(nextShelfGap);
 		const nextShelf = highestShelf + nextShelfGap;
 
 		const newShelvesY = shelvesY;
 
 		if (slider > highestShelf && slider < nextShelf) {
-			return;
+			return null;
 		} else if (slider > nextShelf) {
 			newShelvesY.push(nextShelf);
 			const newDivRow = newDivsX[newDivsX.length - 1]; //copy last row
@@ -67,6 +67,8 @@ class FormContainer extends React.Component {
 			newHeightArray: newShelvesY,
 			newDivsX: newDivsX,
 		});
+
+		// i wonder if I can also dispatch a gap array here too.
 	};
 
 	handleOnChangeWidth = (e) => {
@@ -218,7 +220,7 @@ class FormContainer extends React.Component {
 						type="range"
 						min={280 + 36}
 						max={2400}
-						value={this.props.height}
+						// value={this.props.height}
 						step={1}
 						onChange={this.handleOnChangeHeight}
 						name={'height'}
