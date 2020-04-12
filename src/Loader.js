@@ -3,7 +3,7 @@ import * as THREE from 'three';
 
 // import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import GLTFLoader from 'three-gltf-loader';
-import { connect } from 'react-redux';
+// import { connect } from 'react-redux';
 
 // function mapStateToProps(state) {
 // 	return {
@@ -13,7 +13,7 @@ import { connect } from 'react-redux';
 // 		depth: state.depth,
 // 		materialThickness: state.materialThickness,
 // 		shelvesY: state.shelvesY,
-// 		divsX: state.divsX
+// 		divsX: state.divsX,
 // 	};
 // }
 
@@ -26,7 +26,7 @@ class Loader {
 		const cab = '/cabinetTest1.gltf';
 		const drawer = '/drawer.gltf';
 		const test = '/newtest.gltf';
-		this.loader.load(drawer, gltf => {
+		this.loader.load(drawer, (gltf) => {
 			this.root = gltf.scene;
 			const drawerMesh = this.root.children[0];
 			this.positionDrawer(drawerMesh, position, matrix);

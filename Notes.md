@@ -182,9 +182,15 @@ it looks like I will be able to use my functions the same for positioning all th
 
 its just the way they are added into the scene thatis different.
 
-so i will write a function that generates however many meshes, then just chuck this in the render function or the return of the fuinctional component.
+so i will write a function that generates however many meshes, then just chuck this in the render function or the return of the functional component. so i can probs cannabalise the existing functions that create the divs and shelves.
 
 I think it's time for a new branch.
+
+ok so I think I will create a functional component that renders meshes from state arrays. like we did the hover boxes. this just creates and positions meshes from arrays and then updates on all changes.
+
+i think i can leave the redux form components as is for now.
+
+find the function here the key meshes are created.
 
 // addShelves(shelfMesh, divMesh, config) {
 // //this takes the whole config object. and clones the shelves based on this object.

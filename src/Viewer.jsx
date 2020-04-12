@@ -1,21 +1,24 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 
 import * as THREE from 'three';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 // import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import GLTFLoader from 'three-gltf-loader';
-import { Canvas } from 'react-three-fiber';
+import { Canvas, useFrame, extend, useThree } from 'react-three-fiber';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import PickHelper from './picker';
 import Loader from './Loader.js';
+import { Box3Helper } from 'three';
 
 // const Canvas = styled.canvas`
 // 	border: 5px solid fuchsia;
 // 	height: 50%;
 // 	display: inline;
 // `;
+extend({ OrbitControls });
+
 const Wrapper = styled.section`
 	height: 100%;
 	width: 100%;
@@ -31,8 +34,53 @@ function mapStateToProps(state) {
 		depth: state.depth,
 		materialThickness: state.materialThickness,
 		shelvesY: state.shelvesY,
-		divsX: state.divsX
+		divsX: state.divsX,
 	};
+}
+
+function Box(props) {
+	const mesh = useRef();
+	const [hovered, setHover] = useState(false);
+	const [active, setActive] = useState(false);
+
+	useFrame(() => (mesh.current.rotation.x = mesh.current.rotation.y += 0.01));
+
+	return (
+		<mesh
+			{...props}
+			ref={mesh}
+			scale={active ? [1.5, 1.5, 1.5] : [1, 1, 1]}
+			onClick={(e) => setActive(!active)}
+			onPointerOver={(e) => setHover(true)}
+			onPointerOut={(e) => setHover(false)}
+		>
+			<boxBufferGeometry attach="geometry" args={[1, 1, 1]} />
+			<meshStandardMaterial
+				attach="material"
+				color={hovered ? 'hotpink' : 'orange'}
+			/>
+		</mesh>
+	);
+}
+function OrbitCont() {
+	const {
+		camera,
+		gl: { domELement },
+	} = useThree();
+	return <orbitControls args={['camera, domElement']} />;
+}
+
+function Shelf(props) {
+	const mesh = useRef();
+	return (
+		<mesh>
+			<boxBufferGeometry
+				attach="gemoetry"
+				args={(props.x, props.y, props.z)}
+			/>
+			<meshStandardMaterial attach="material" color={'hotpink'} />
+		</mesh>
+	);
 }
 
 class Viewer extends React.Component {
@@ -95,7 +143,7 @@ class Viewer extends React.Component {
 		const cab = '/cabinetTest1.gltf';
 		const drawer = '/drawer.gltf';
 		const test = '/newtest.gltf';
-		loader.load(drawer, gltf => {
+		loader.load(drawer, (gltf) => {
 			console.log('drawer.gltf', gltf.scene);
 			this.root = gltf.scene;
 		});
@@ -108,13 +156,13 @@ class Viewer extends React.Component {
 		return min + (max - min) * Math.random();
 	}
 
-	positionDrawer = drawer => {};
+	positionDrawer = (drawer) => {};
 	loadDrawer = () => {
 		const loader = new GLTFLoader();
 		const cab = '/cabinetTest1.gltf';
 		const drawer = '/drawer.gltf';
 		const test = '/newtest.gltf';
-		loader.load(drawer, gltf => {
+		loader.load(drawer, (gltf) => {
 			console.log('drawer.gltf', gltf.scene);
 			this.root = gltf.scene;
 		});
@@ -123,25 +171,25 @@ class Viewer extends React.Component {
 	randomColor() {
 		return `hsl(${this.rand(360) | 0}, ${this.rand(50, 100) | 0}%, 50%)`;
 	}
-	isolateMeshes = array => {
+	isolateMeshes = (array) => {
 		// this.objects = this.scene.children.filter(item => item.type === 'Mesh');
-		const filterItems = query => {
+		const filterItems = (query) => {
 			return array.filter(
-				el => el.toLowerCase().indexOf(query.toLowerCase()) > -1
+				(el) => el.toLowerCase().indexOf(query.toLowerCase()) > -1
 			);
 		};
 		return filterItems('Solid');
 	};
 
-	getCanvasRelativePosition = event => {
+	getCanvasRelativePosition = (event) => {
 		const rect = this.canvas.getBoundingClientRect();
 		//
 		return {
 			x: event.clientX - rect.left,
-			y: event.clientY - rect.top
+			y: event.clientY - rect.top,
 		};
 	};
-	onMouseMove = event => {
+	onMouseMove = (event) => {
 		event.preventDefault();
 
 		const pos = this.getCanvasRelativePosition(event);
@@ -161,7 +209,7 @@ class Viewer extends React.Component {
 		this.material = new THREE.MeshStandardMaterial({
 			color: this.randomColor(),
 			transparent: true,
-			opacity: 0.5
+			opacity: 0.5,
 		});
 		this.drawers = [];
 		this.scene = new THREE.Scene();
@@ -191,18 +239,18 @@ class Viewer extends React.Component {
 		this.canvas.addEventListener('mousemove', this.onMouseMove, false);
 		this.canvas.addEventListener('click', this.clickHandler);
 	};
-	createMesh = geom => {
+	createMesh = (geom) => {
 		// create meshes, add to Mesh Store array, give default name
 
 		const material = new THREE.MeshStandardMaterial({
-			color: this.randomColor()
+			color: this.randomColor(),
 		});
 		const mesh = new THREE.Mesh(geom, material);
 		mesh.name = 'default';
 		this.meshStore.push(mesh);
 		// console.log('default mesh added', mesh);
 	};
-	initializeDefaultMeshes = num => {
+	initializeDefaultMeshes = (num) => {
 		let i = 0;
 		const geom = new THREE.BoxGeometry(1, 1, 1);
 		while (i < num) {
@@ -210,7 +258,7 @@ class Viewer extends React.Component {
 			i++;
 		}
 	};
-	addShelf = shelfPos => {
+	addShelf = (shelfPos) => {
 		const shelfMesh = this.meshStore.pop();
 		// shelfMesh.name = 'shelf';
 		this.shelfMeshes.push(shelfMesh);
@@ -220,7 +268,7 @@ class Viewer extends React.Component {
 		shelfMesh.scale.setY(18);
 		shelfMesh.scale.setZ(400);
 	};
-	removeShelf = meshArray => {
+	removeShelf = (meshArray) => {
 		console.log('remove shelf');
 		this.returnToStore(meshArray.pop());
 	};
@@ -253,20 +301,20 @@ class Viewer extends React.Component {
 		});
 	};
 
-	removeDividerRow = meshArray => {
+	removeDividerRow = (meshArray) => {
 		this.returnArrayToStore(meshArray);
 
 		this.divMeshes.pop();
 	};
 
-	removeSingleDivider = meshArray => {
+	removeSingleDivider = (meshArray) => {
 		console.log('single div removed from', meshArray);
 		const mesh = meshArray.pop();
 		this.returnToStore(mesh);
 	};
 
-	returnArrayToStore = meshArray => {
-		meshArray.forEach(mesh => {
+	returnArrayToStore = (meshArray) => {
+		meshArray.forEach((mesh) => {
 			this.scene.remove(mesh);
 			mesh.name = 'default';
 			mesh.scale.setX(1);
@@ -287,7 +335,7 @@ class Viewer extends React.Component {
 		});
 	};
 
-	initializeDividers = props => {
+	initializeDividers = (props) => {
 		const { divsX: divs, shelvesY: shelves } = props;
 
 		shelves.forEach((shelf, index) => {
@@ -295,7 +343,7 @@ class Viewer extends React.Component {
 		});
 	};
 
-	adjustHeight = props => {
+	adjustHeight = (props) => {
 		const { shelvesY, divsX } = props;
 
 		this.shelfMeshes.forEach((item, index) => {
@@ -317,7 +365,7 @@ class Viewer extends React.Component {
 		});
 	};
 
-	adjustWidth = props => {
+	adjustWidth = (props) => {
 		const { shelvesY: shelves, divsX, width } = props;
 
 		divsX.forEach((divs, index) => {
@@ -341,7 +389,7 @@ class Viewer extends React.Component {
 		});
 	};
 
-	returnToStore = mesh => {
+	returnToStore = (mesh) => {
 		this.scene.remove(mesh);
 		mesh.name = 'default';
 		mesh.scale.setX(1);
@@ -387,11 +435,11 @@ class Viewer extends React.Component {
 	};
 
 	resetBoxes = () => {
-		this.boxes.forEach(item => {
+		this.boxes.forEach((item) => {
 			this.scene.remove(item);
 			this.returnToStore(item);
 			const material = new THREE.MeshStandardMaterial({
-				color: this.randomColor()
+				color: this.randomColor(),
 			});
 			item.material = material;
 		});
@@ -442,12 +490,12 @@ class Viewer extends React.Component {
 		});
 		console.log(this.boxValueArray);
 	};
-	addBoxes = array => {
-		array.forEach(item => {
+	addBoxes = (array) => {
+		array.forEach((item) => {
 			const material = new THREE.MeshStandardMaterial({
 				color: this.randomColor(),
 				transparent: true,
-				opacity: 0.0
+				opacity: 0.0,
 			});
 			const box = this.meshStore.pop();
 
@@ -455,7 +503,7 @@ class Viewer extends React.Component {
 				boxHeight,
 				boxWidth,
 				boxDepth,
-				boxPos: { x, y, z }
+				boxPos: { x, y, z },
 			} = item;
 
 			box.position.setX(x);
@@ -471,7 +519,7 @@ class Viewer extends React.Component {
 		console.log(this.boxes);
 	};
 
-	clickHandler = event => {
+	clickHandler = (event) => {
 		this.pickHelper.click(this.mouse, this.boxes, this.camera, this.scene);
 	};
 
@@ -479,7 +527,7 @@ class Viewer extends React.Component {
 		this.pickHelper = new PickHelper();
 	};
 
-	startAnimationLoop = time => {
+	startAnimationLoop = (time) => {
 		time *= 0.001;
 		// this.clickHandler();
 
@@ -492,8 +540,14 @@ class Viewer extends React.Component {
 		return (
 			<Wrapper>
 				<Canvas>
-					<div className="viewer" ref={ref => (this.el = ref)} />
+					<ambientLight />
+					<pointLight position={[10, 10, 10]} />
+					<Box position={[-1.2, 0, 0]} />
+					<Shelf position={[0, this.props.shelvesY[0], 0]} />
+					<Box position={[1.2, 0, 0]} />
+					{/* <OrbitCont /> */}
 				</Canvas>
+				<div className="viewer" ref={(ref) => (this.el = ref)} />
 			</Wrapper>
 		);
 	}

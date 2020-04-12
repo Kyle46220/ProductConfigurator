@@ -12,7 +12,7 @@ function mapStateToProps(state) {
 		depth: state.depth,
 		materialThickness: state.materialThickness,
 		shelvesY: state.shelvesY,
-		divsX: state.divsX
+		divsX: state.divsX,
 	};
 }
 
@@ -26,11 +26,11 @@ const FormWrap = styled.form`
 `;
 
 class FormContainer extends React.Component {
-	handleOnChangeHeight = e => {
+	handleOnChangeHeight = (e) => {
 		console.log(this.props.height);
 		const shelfHeights = [180, 280, 380];
 		const randomShelfGap = [];
-		const getRandomInt = max => {
+		const getRandomInt = (max) => {
 			return Math.floor(Math.random() * Math.floor(max));
 		};
 
@@ -65,11 +65,11 @@ class FormContainer extends React.Component {
 			type: 'UPDATE_HEIGHT_ARRAY',
 			newHeight: constrainedHeight,
 			newHeightArray: newShelvesY,
-			newDivsX: newDivsX
+			newDivsX: newDivsX,
 		});
 	};
 
-	handleOnChangeWidth = e => {
+	handleOnChangeWidth = (e) => {
 		let heightValue;
 		let WidthValue;
 		const divWidth = 400;
@@ -78,10 +78,6 @@ class FormContainer extends React.Component {
 		const divPos = [];
 		const shelfPos = this.props.shelvesY;
 		const shelfHeights = [180, 280, 380];
-
-		// const getRandomInt = max => {
-		// 	return Math.floor(Math.random() * Math.floor(max));
-		// };
 
 		const { shelvesY } = this.props;
 
@@ -103,16 +99,10 @@ class FormContainer extends React.Component {
 		this.props.dispatch({
 			type: 'UPDATE_WIDTH_ARRAY',
 			newWidthArray: divPos,
-			newWidth: e.target.value
+			newWidth: e.target.value,
 		});
-
-		// this.props.dispatch({
-		// 	type: 'UPDATE_WIDTH',
-		// 	newWidth: e.target.value
-		// 	// valueType: e.target.parent.name
-		// });
 	};
-	handleOnChange = e => {
+	handleOnChange = (e) => {
 		console.log(this.props);
 		console.log(e.target.name);
 		const { height, width, shelvesY } = this.props;
@@ -152,7 +142,7 @@ class FormContainer extends React.Component {
 		const shelfPos = this.props.shelvesY;
 		const shelfHeights = [180, 280, 380];
 
-		const getRandomInt = max => {
+		const getRandomInt = (max) => {
 			return Math.floor(Math.random() * Math.floor(max));
 		};
 
@@ -193,7 +183,7 @@ class FormContainer extends React.Component {
 		let newArray = [];
 		newArray.push(shelvesY);
 		newArray = newArray.flat();
-		newShelfPos.forEach(item => {
+		newShelfPos.forEach((item) => {
 			const total = newArray[newArray.length - 1];
 
 			const newTotal = total + item;
@@ -210,7 +200,7 @@ class FormContainer extends React.Component {
 			newHeight: constrainedHeight,
 			newHeightArray: newArray.flat(),
 			newWidth: widthValue,
-			newWidthArray: divPos
+			newWidthArray: divPos,
 		});
 
 		// this.props.dispatch({
@@ -226,19 +216,10 @@ class FormContainer extends React.Component {
 				<label>
 					<Slider
 						type="range"
-						// min={this.props.min}
 						min={280 + 36}
-						// max={this.props.max}
 						max={2400}
 						value={this.props.height}
-						// step={this.props.step}
 						step={1}
-						// onChange={e => {
-						// 	this.props.dispatch({
-						// 		type: 'UPDATE_HEIGHT',
-						// 		newTest: e.target.value
-						// 	});
-						// }}
 						onChange={this.handleOnChangeHeight}
 						name={'height'}
 					/>
@@ -247,19 +228,9 @@ class FormContainer extends React.Component {
 				<label>
 					<Slider
 						type="range"
-						// min={this.props.min}
 						min={600}
-						// max={this.props.max}
 						max={2400}
-						// value={this.props.width}
-						// step={this.props.step}
 						step={1}
-						// onChange={e => {
-						// 	this.props.dispatch({
-						// 		type: 'UPDATE_HEIGHT',
-						// 		newTest: e.target.value
-						// 	});
-						// }}
 						onChange={this.handleOnChangeWidth}
 						name={'width'}
 					/>
