@@ -1,6 +1,8 @@
 import React from 'react';
 import { render } from 'react-dom';
 import Viewer from './Viewer';
+import Width from './width';
+import Height from './height';
 import FiberViewer from './fiberViewer';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
@@ -106,7 +108,9 @@ class App extends React.Component {
 				<Wrapper className="App">
 					<FiberViewer />
 					{/* <Viewer /> */}
-					<FormContainer />
+					{/* <FormContainer /> */}
+					<Width />
+					<Height />
 				</Wrapper>
 			</Provider>
 		);

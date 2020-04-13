@@ -1,16 +1,19 @@
-import React, { useRef, useState } from 'react';
-
+import React, { useRef, useState, useEffect } from 'react';
+import create from 'zustand';
 import * as THREE from 'three';
 import styled from 'styled-components';
-import {
-	useSelector,
-	ReactReduxContext,
-	Provider,
-	useDispatch,
-} from 'react-redux';
+import { useSelector, ReactReduxContext, Provider } from 'react-redux';
+import ZusHeight from './zusHeight';
+import ZusWidth from './zusWidth';
 
 import GLTFLoader from 'three-gltf-loader';
-import { Canvas, useFrame, useThree, extend } from 'react-three-fiber';
+import {
+	Canvas,
+	useFrame,
+	useThree,
+	extend,
+	useUpdate,
+} from 'react-three-fiber';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { BoxGeometry } from 'three';
@@ -36,7 +39,7 @@ const Controls = () => {
 
 	return (
 		<orbitControls
-			autoRotate
+			// autoRotate
 			// maxPolarAngle={Math.PI / 3}
 			// minPolarAngle={Math.PI / 3}
 			args={[camera, gl.domElement]}
@@ -50,28 +53,20 @@ const Shelf = (props) => {
 		position,
 		size: [x, y, z],
 	} = props;
-	console.log(props);
-	const shelvesY = useSelector((state) => state.shelvesY);
-	if (props.index === shelvesY.length - 1) {
-		return null;
-	} else {
-		return (
-			<mesh position={position}>
-				<boxGeometry attach="geometry" args={[x, y, z]}></boxGeometry>
-				<meshStandardMaterial
-					attach="material"
-					color="hotpink"
-				></meshStandardMaterial>
-			</mesh>
-		);
-	}
+
+	// const ref = useUpdate(() => {}, [position, x, y, z]);
+	return (
+		<mesh position={position}>
+			<boxGeometry attach="geometry" args={[x, y, z]}></boxGeometry>
+			<meshStandardMaterial
+				attach="material"
+				color="hotpink"
+			></meshStandardMaterial>
+		</mesh>
+	);
 };
+
 const Box = (props) => {
-	// console.log(props.position);
-	// const {
-	// 	position,
-	// 	size: [x, y, z],
-	// } = props;
 	return (
 		<mesh position={props.position}>
 			<boxGeometry attach="geometry" args={[100, 100, 100]}></boxGeometry>
@@ -81,6 +76,10 @@ const Box = (props) => {
 			></meshStandardMaterial>
 		</mesh>
 	);
+};
+
+const BoxBuilder = (props) => {
+	return null;
 };
 
 const Vertical = (props) => {
@@ -99,15 +98,44 @@ const Vertical = (props) => {
 		</mesh>
 	);
 };
+const UpdateBuild = () => {
+	return useEffect(() => {
+		return <Build />;
+	});
+};
+
+const ResetBuild = () => {
+	return null;
+};
 
 const Build = ({ ...props }) => {
 	const width = useSelector((state) => state.width);
 
 	const shelvesY = useSelector((state) => state.shelvesY);
+	const topIndex = shelvesY.length - 1;
+	const topShelf = shelvesY[topIndex];
+
+	console.log(shelvesY.slice(0, -1));
+
+	const builder = shelvesY.slice(0, -1).map((pos, index) => {
+		return (
+			<Row
+				position={[0, pos, 0]}
+				index={index}
+				key={'row' + pos + index}
+			/>
+		);
+	});
 
 	return (
-		<group {...props}>
-			<Row position={[0, 0, 0]} shelvesY={shelvesY} width={width} />
+		<group>
+			<Shelf
+				position={[width / 2, topShelf, 0]}
+				size={[width, 18, 400]}
+				key={'shelf' + topShelf + topIndex}
+				index={topIndex}
+			/>
+			{builder}
 		</group>
 	);
 };
@@ -119,40 +147,31 @@ const Build = ({ ...props }) => {
 // like it just stays there and doesn't go all the way back to the start of the component and loops through the return of each cnoditional part as long as its there.
 // i'm quitting for the night bu i think its going to be somehitng to do with how the divs a renderseed every fram but the shelves areent'
 
+// the difference is adjusting the items that are already there vs creating/deleting new ones. I need to make it so that all shapes are loaded on every frame.
+
 const Row = ({ ...props }) => {
-	// const width = useSelector((state) => state.width);
-	const width = props.width;
+	const width = useSelector((state) => state.width);
+	const shelvesY = useSelector((state) => state.shelvesY);
 
-	const shelvesY = props.shelvesY;
-	console.log('shelvesY', shelvesY);
+	// const width = props.width;
 
-	const shelves = shelvesY.map((pos, index) => {
-		console.log('index', index);
-		// if (props.index === shelvesY.length - 1) {
-		// 	const topPos = shelvesY[props.index];
+	// const shelvesY = props.shelvesY;
 
-		// 	return (
-		// 		// <Shelf
-		// 		// 	key={topPos + props.index}
-		// 		// 	index={index}
-		// 		// 	position={(width / 2, topPos, 0)}
-		// 		// 	size={[width, 18, 400]}
-		// 		// />
-		// 		null
-		// 	);
-		// } else {
-		console.log('if', index);
-		return (
-			<>
-				<Shelves key={pos + index} />
+	const index = props.index;
+	const pos = shelvesY[props.index];
 
-				<Verts key={index} index={index} />
-			</>
-		);
-		// }
-	});
+	return (
+		<group>
+			<Shelf
+				key={'shelf' + pos + index}
+				index={index}
+				position={[width / 2, pos, 0]}
+				size={[width, 18, 400]}
+			/>
 
-	return <group {...props}>{shelves}</group>;
+			<Verts key={'verts' + pos + index} index={index} />
+		</group>
+	);
 };
 
 const Shelves = ({ ...props }) => {
@@ -161,14 +180,12 @@ const Shelves = ({ ...props }) => {
 	if (props.index === shelvesY.length) {
 		return null;
 	} else {
-		// const height = shelvesY[props.key +1] - shelvesY[props.key];
-		const height = 180;
-
 		const shelves = shelvesY.map((pos, index) => {
+			console.log(pos);
 			return (
 				<Shelf
-					key={pos + index}
-					position={[width / 2, pos, 0]}
+					key={'shelf' + pos + index}
+					position={[0, pos, 0]}
 					size={[width, 18, 400]}
 				/>
 			);
@@ -179,55 +196,27 @@ const Shelves = ({ ...props }) => {
 };
 
 const Verts = ({ ...props }) => {
-	// const width = useSelector((state) => state.width);
 	console.log('divs pos', props.index);
 	const divsX = useSelector((state) => state.divsX[props.index]);
 	const shelvesY = useSelector((state) => state.shelvesY);
 	const shelfYPos = shelvesY[props.index];
-	console.log('H E L L O', shelfYPos, divsX);
-	if (props.index === shelvesY.length) {
-		return null;
-	} else {
-		// const height = shelvesY[props.key +1] - shelvesY[props.key];
-		const height = 180;
+	console.log('shelvesY, divsX', shelfYPos, divsX);
 
-		const verticals = divsX.map((pos, index) => {
-			return (
-				<Vertical
-					key={pos + index}
-					position={[pos, shelfYPos, 0]}
-					size={[18, height, 400]}
-				/>
-			);
-		});
+	const height = 180;
 
-		return <group {...props}>{verticals}</group>;
-	}
-};
-
-const Slider = (props) => {
-	const dispatch = useDispatch();
-	const width = useSelector((state) => state.width);
-	const { minSize, maxSize } = props;
-
-	const handleChange = (e) => {
-		dispatch({ type: 'UPDATE_WIDTH_ARRAY', newWidth: e.target.value });
-	};
-
-	return (
-		<>
-			<input
-				type="range"
-				min={minSize}
-				max={maxSize}
-				value={width}
-				step={1}
-				onChange={handleChange}
+	const verticals = divsX.map((pos, index) => {
+		return (
+			<Vertical
+				key={'vertical' + pos + index}
+				position={[pos, shelfYPos, 0]}
+				size={[18, height, 400]}
 			/>
-			SLIDER
-		</>
-	);
+		);
+	});
+
+	return <group {...props}>{verticals}</group>;
 };
+
 export default () => {
 	return (
 		<Wrapper>
@@ -238,15 +227,10 @@ export default () => {
 						<Provider store={store}>
 							<ambientLight />
 							<pointLight position={[10, 10, 10]} />
-							{/* <Shelf
-								position={[10, 10, 10]}
-								size={[2000, 18, 400]}
-							/>
-							<Vertical
-								size={[18, 280, 400]}
-								position={[1500, 280, 0]}
-							/> */}
+
 							<Build position={[0, 0, 0]} />
+
+							<BoxBuilder />
 							<Controls />
 						</Provider>
 					</Canvas>

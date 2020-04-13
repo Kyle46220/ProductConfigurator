@@ -452,11 +452,11 @@ class Viewer extends React.Component {
 		const divMeshes = this.divMeshes.flat();
 		this.boxValueArray = [];
 
-		function filterWidth(item) {
-			return item.position.x !== width / 2;
-		}
-		console.log(divMeshes.filter(filterWidth));
-		console.log(shelvesY, divsX);
+		// function filterWidth(item) {
+		// 	return item.position.x !== width / 2;
+		// }
+		// console.log(divMeshes.filter(filterWidth));
+		// console.log(shelvesY, divsX);
 		divsX.forEach((arr, index) => {
 			if (index === divsX.length - 1) {
 				return;

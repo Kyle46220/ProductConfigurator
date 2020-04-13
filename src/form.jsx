@@ -1,4 +1,4 @@
-import { connect } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import { render } from 'react-dom';
 import styled from 'styled-components';
@@ -26,22 +26,35 @@ const FormWrap = styled.form`
 `;
 
 class FormContainer extends React.Component {
+	// componentDidMount() {
+	// 	const shelvesY = useSelector((state) => state.shelvesY);
+	// 	const divsX = useSelector((state) => state.divsX);
+
+	// 	const dispatch = useDispatch();
+	// }
+
 	handleOnChangeHeight = (e) => {
 		// console.log(this.props.height);
 		const shelfHeights = [180, 280, 380];
-		const randomShelfGap = [];
+
 		const getRandomInt = (max) => {
 			return Math.floor(Math.random() * Math.floor(max));
 		};
+		// const shelvesY = useSelector((state) => state.shelvesY);
+		// const divsX = useSelector((state) => state.divsX);
+
+		// const dispatch = useDispatch();
 
 		const { shelvesY, divsX } = this.props;
 
 		const newDivsX = divsX;
 
 		const slider = e.target.value;
+
 		let highestShelf = shelvesY[shelvesY.length - 1];
+
 		const nextShelfGap = shelfHeights[getRandomInt(3)];
-		// console.log(nextShelfGap);
+
 		const nextShelf = highestShelf + nextShelfGap;
 
 		const newShelvesY = shelvesY;
@@ -72,22 +85,20 @@ class FormContainer extends React.Component {
 	};
 
 	handleOnChangeWidth = (e) => {
-		let heightValue;
-		let WidthValue;
 		const divWidth = 400;
 		const divQty = Math.floor(e.target.value / divWidth);
 		const divGap = e.target.value / divQty;
 		const divPos = [];
-		const shelfPos = this.props.shelvesY;
-		const shelfHeights = [180, 280, 380];
+
+		// const shelvesY = useSelector((state) => state.shelvesY);
+		// const divsX = useSelector((state) => state.divsX);
+
+		// const dispatch = useDispatch();
+		// const shelfPos = this.props.shelvesY;
 
 		const { shelvesY } = this.props;
 
-		const newShelfPos = [];
-
-		let i = shelvesY[shelvesY.length - 1];
-
-		shelfPos.forEach(() => {
+		shelvesY.forEach(() => {
 			const result = [];
 			let i = 0;
 			while (i < e.target.value) {
@@ -104,6 +115,7 @@ class FormContainer extends React.Component {
 			newWidth: e.target.value,
 		});
 	};
+
 	handleOnChange = (e) => {
 		console.log(this.props);
 		console.log(e.target.name);
