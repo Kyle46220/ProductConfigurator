@@ -4,6 +4,7 @@ import Viewer from './Viewer';
 import Width from './width';
 import Height from './height';
 import FiberViewer from './fiberViewer';
+import ZusViewer from './zustandViewer';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import FormContainer from './form';
@@ -107,6 +108,7 @@ class App extends React.Component {
 			<Provider store={this.store}>
 				<Wrapper className="App">
 					<FiberViewer />
+					<ZusViewer />
 					{/* <Viewer /> */}
 					{/* <FormContainer /> */}
 					<Width />

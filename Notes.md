@@ -209,3 +209,5 @@ MAYYYYBE i keep running in to issues because i'm using 2 different state arrays?
 i can use an object, because, if all the valuse are in there, then it won't matter if they stay in order.
 
 config = {height: 900, width: 900, depth: 400, 0:[0,300,600,900], 1:[0,300,600,900], 2:[0, 300, 600, 900], 3:[0, 300, 600, 900]}
+
+i tried nearly alll day to get zustand to work and i finally did! when creating a function in the state, you need to make suyre when you call use Store hook, that you assign it to a variable, and then call this variable if it needs to go inside a function. because hooks have to stay inside a component, and can't be in a regular JS function.
