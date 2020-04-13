@@ -107,12 +107,12 @@ class App extends React.Component {
 		return (
 			<Provider store={this.store}>
 				<Wrapper className="App">
-					<FiberViewer />
+					{/* <FiberViewer /> */}
 					<ZusViewer />
 					{/* <Viewer /> */}
 					{/* <FormContainer /> */}
-					<Width />
-					<Height />
+					{/* <Width />
+					<Height /> */}
 				</Wrapper>
 			</Provider>
 		);

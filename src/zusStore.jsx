@@ -4,6 +4,7 @@ import { changeWidth } from './zusWidth';
 import React from 'react';
 
 import Slider from './Slider';
+import getWidth from './zusWidth';
 
 // const [useStore] = create(set => ({
 //   count: 0,
@@ -21,7 +22,7 @@ import Slider from './Slider';
 //   return <button onClick={increase}>up</button>
 // }
 
-const [useStore] = create((set) => ({
+export const [useStore] = create((set) => ({
 	height: 900,
 	width: 900,
 	depth: 400,
@@ -35,9 +36,20 @@ const [useStore] = create((set) => ({
 		set((state) => {
 			return { height: e };
 		}),
+
 	adjustWidth: (e) =>
 		set((state) => {
 			return { width: e };
+		}),
+
+	changeShelvesY: (e) =>
+		set((state) => {
+			return { shelvesY: e };
+		}),
+
+	changeDivsX: (e) =>
+		set((state) => {
+			return { divsX: e };
 		}),
 
 	divsX: [
@@ -47,36 +59,31 @@ const [useStore] = create((set) => ({
 		[0, 300, 600, 900],
 		[0, 300, 600, 900],
 	],
+
+	shelvesY: [0, 280, 560, 840, 1120],
 }));
-
-const getEventValue = (e) => {
-	return e.target.value;
-};
-
-const [useStoreCounter] = create((set) => ({
-	count: 1,
-	inc: () => set((state) => ({ count: state.count + 1 })),
-	dec: () => set((state) => ({ count: state.count - 1 })),
-}));
-
-export function Counter() {
-	const { count, inc, dec } = useStoreCounter();
-
-	return (
-		<div class="counter">
-			<span>{count}</span>
-			<button onClick={inc}>up</button>
-			<button onClick={dec}>down</button>
-		</div>
-	);
-}
 
 export function WidthControls() {
-	const widthDisplay = useStore((state) => state.width);
-	const newWidth = useStore((state) => state.adjustWidth);
+	// const width = useStore((state) => state.width);
+	// const shelvesY = useStore((state) => state.shelvesY);
+	// const newWidth = useStore((state) => state.adjustWidth);
+	// const newDivsX = useStore((state) => state.changeDivsX);
+	const state = useStore();
+	const {
+		shelvesY,
+		divsX,
+		width,
+		adjustWidth: newWidth,
+		changeDivsX: newDivsX,
+	} = state;
+	console.log(shelvesY, divsX, width);
 	const handleChange = (e) => {
+		const result = getWidth(e.target.value, shelvesY);
 		newWidth(e.target.value);
+		newDivsX(result);
+		console.log(result, shelvesY);
 	};
+
 	return (
 		<label>
 			<Slider
@@ -86,9 +93,9 @@ export function WidthControls() {
 				step={1}
 				onChange={handleChange}
 				name={'width'}
-				value={widthDisplay}
+				value={width}
 			/>
-			<h1>WIDTH:{widthDisplay}</h1>
+			<h1>WIDTH:{width}</h1>
 		</label>
 	);
 }

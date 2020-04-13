@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useSelector, ReactReduxContext, Provider } from 'react-redux';
 import ZusHeight from './zusHeight';
 import ZusWidth from './zusWidth';
-import { useStore, WidthControls, Counter, HeightControls } from './zusStore';
+import { useStore, WidthControls, HeightControls } from './zusStore';
 
 import GLTFLoader from 'three-gltf-loader';
 import {
@@ -89,9 +89,10 @@ const Vertical = (props) => {
 };
 
 const Build = ({ ...props }) => {
-	const width = useSelector((state) => state.width);
+	const width = useStore((state) => state.width);
 
-	const shelvesY = useSelector((state) => state.shelvesY);
+	const shelvesY = useStore((state) => state.shelvesY);
+
 	const topIndex = shelvesY.length - 1;
 	const topShelf = shelvesY[topIndex];
 
@@ -130,12 +131,9 @@ const Build = ({ ...props }) => {
 // the difference is adjusting the items that are already there vs creating/deleting new ones. I need to make it so that all shapes are loaded on every frame.
 
 const Row = ({ ...props }) => {
-	const width = useSelector((state) => state.width);
-	const shelvesY = useSelector((state) => state.shelvesY);
+	const width = useStore((state) => state.width);
 
-	// const width = props.width;
-
-	// const shelvesY = props.shelvesY;
+	const shelvesY = useStore((state) => state.shelvesY);
 
 	const index = props.index;
 	const pos = shelvesY[props.index];
@@ -154,33 +152,11 @@ const Row = ({ ...props }) => {
 	);
 };
 
-const Shelves = ({ ...props }) => {
-	const width = useSelector((state) => state.width);
-	const shelvesY = useSelector((state) => state.shelvesY);
-	if (props.index === shelvesY.length) {
-		return null;
-	} else {
-		const shelves = shelvesY.map((pos, index) => {
-			console.log(pos);
-			return (
-				<Shelf
-					key={'shelf' + pos + index}
-					position={[0, pos, 0]}
-					size={[width, 18, 400]}
-				/>
-			);
-		});
-
-		return <group {...props}>{shelves}</group>;
-	}
-};
-
 const Verts = ({ ...props }) => {
-	console.log('divs pos', props.index);
-	const divsX = useSelector((state) => state.divsX[props.index]);
-	const shelvesY = useSelector((state) => state.shelvesY);
+	const width = useStore((state) => state.width);
+	const divsX = useStore((state) => state.divsX);
+	const shelvesY = useStore((state) => state.shelvesY);
 	const shelfYPos = shelvesY[props.index];
-	console.log('shelvesY, divsX', shelfYPos, divsX);
 
 	const height = 180;
 
@@ -210,7 +186,7 @@ export default () => {
 
 							<Build position={[0, 0, 0]} />
 
-							<BoxBuilder />
+							{/* <BoxBuilder /> */}
 							<Controls />
 						</Provider>
 					</Canvas>
@@ -219,7 +195,6 @@ export default () => {
 			{/* <Slider minSize={600} maxSize={2400} /> */}
 			<WidthControls />
 			<HeightControls />
-			<Counter />
 		</Wrapper>
 	);
 };
