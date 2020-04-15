@@ -1,82 +1,45 @@
-// import Slider from './Slider';
+export default ({ ...props }, e) => {
+	const { shelvesY, divsX, shelfHeights } = props;
+	let newShelvesY = shelvesY;
+	const getRandomInt = (max) => {
+		return Math.floor(Math.random() * Math.floor(max));
+	};
 
-// import React from 'react';
-// import { useStore } from 'zusStore';
+	let newDivsX = divsX;
 
-// import { useDispatch, useSelector } from 'react-redux';
+	const slider = e;
 
-// const ZusHeight = ({ ...props }) => {
-// 	// const shelvesY = useSelector((state) => state.shelvesY);
-// 	// const divsX = useSelector((state) => state.divsX);
-// 	// const height = useSelector((state) => state.height);
-// 	const { shelvesY, divsX, height } = useStore(); // this goes where you want to access the store values.
-// 	console.log('zustand', divsX);
-// 	// const state = useStore();
-// 	const shelfHeights = [180, 280, 380];
-// 	// const dispatch = useDispatch();
-// 	const getRandomInt = (max) => {
-// 		return Math.floor(Math.random() * Math.floor(max));
-// 	};
+	const nextShelfGap = shelfHeights[getRandomInt(3)];
 
-// 	const handleOnChangeHeight = (e) => {
-// 		const newDivsX = divsX;
+	const addShelf = (array, value) => {
+		array.push(array[array.length - 1] + value);
+	};
 
-// 		const slider = e.target.value;
+	const addDividers = (array, value) => {
+		array.push(array[array.length - 1]);
+	};
 
-// 		let highestShelf = shelvesY[shelvesY.length - 1];
+	const predicate = (x) => {
+		return x < slider;
+	};
 
-// 		const nextShelfGap = shelfHeights[getRandomInt(3)];
+	while (newShelvesY[newShelvesY.length - 1] < slider) {
+		addShelf(newShelvesY, nextShelfGap);
+		addDividers(newDivsX, newDivsX[newDivsX.length - 1]);
+	}
+	newShelvesY = newShelvesY.filter(predicate);
 
-// 		const nextShelf = highestShelf + nextShelfGap;
+	newDivsX = newDivsX.slice(0, newShelvesY.length);
 
-// 		const newShelvesY = shelvesY;
+	const shelfSum = newShelvesY[newShelvesY.length - 1];
 
-// 		if (slider > highestShelf && slider < nextShelf) {
-// 			return null;
-// 		} else if (slider > nextShelf) {
-// 			newShelvesY.push(nextShelf);
-// 			const newDivRow = newDivsX[newDivsX.length - 1]; //copy last row
-// 			newDivsX.push(newDivRow);
-// 		} else {
-// 			shelvesY.pop();
-// 			divsX.pop();
-// 		}
+	const constrainedHeight = shelfSum + newShelvesY.length * 18 + 18;
+	console.log(newShelvesY, newDivsX);
+	return {
+		shelvesY: newShelvesY,
+		height: constrainedHeight,
+		divsX: newDivsX,
+	};
 
-// 		const shelfSum = newShelvesY[newShelvesY.length - 1];
-
-// 		const constrainedHeight = shelfSum + newShelvesY.length * 18 + 18;
-
-// 		// dispatch({
-// 		// 	type: 'UPDATE_HEIGHT_ARRAY',
-// 		// 	newHeight: constrainedHeight,
-// 		// 	newHeightArray: newShelvesY,
-// 		// 	newDivsX: newDivsX,
-// 		// });
-// 		// console.log(height, newShelvesY);
-
-// 		return {
-// 			shelvesY: newShelvesY,
-// 			height: constrainedHeight,
-// 			divsX: newDivsX,
-// 		};
-
-// 		// i wonder if I can also dispatch a gap array here too.
-// 	};
-
-// 	return (
-// 		<label>
-// 			<Slider
-// 				type="range"
-// 				min={280 + 36}
-// 				max={2400}
-// 				// value={this.props.height}
-// 				step={1}
-// 				onChange={handleOnChangeHeight}
-// 				name={'height'}
-// 			/>
-// 			HEIGHT
-// 		</label>
-// 	);
-// };
-
-// export default ZusHeight;
+	// i wonder if I can also dispatch a gap array here too.
+};

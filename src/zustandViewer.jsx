@@ -6,6 +6,7 @@ import { useSelector, ReactReduxContext, Provider } from 'react-redux';
 import ZusHeight from './zusHeight';
 import ZusWidth from './zusWidth';
 import { useStore, WidthControls, HeightControls } from './zusStore';
+import shallow from 'zustand/shallow';
 
 import GLTFLoader from 'three-gltf-loader';
 import {
@@ -89,14 +90,13 @@ const Vertical = (props) => {
 };
 
 const Build = ({ ...props }) => {
+	// const state = useStore();
+	// const { width, shelvesY } = state;
 	const width = useStore((state) => state.width);
-
 	const shelvesY = useStore((state) => state.shelvesY);
 
 	const topIndex = shelvesY.length - 1;
 	const topShelf = shelvesY[topIndex];
-
-	console.log(shelvesY.slice(0, -1));
 
 	const builder = shelvesY.slice(0, -1).map((pos, index) => {
 		return (
@@ -131,36 +131,60 @@ const Build = ({ ...props }) => {
 // the difference is adjusting the items that are already there vs creating/deleting new ones. I need to make it so that all shapes are loaded on every frame.
 
 const Row = ({ ...props }) => {
+	console.log(props);
+	// const { width, shelvesY, divsX } = props.state;
+	const divsX = useStore((state) => state.divsX);
 	const width = useStore((state) => state.width);
-
 	const shelvesY = useStore((state) => state.shelvesY);
+	const height = shelvesY[props.index + 1] - shelvesY[props.index];
 
+	const shelfYPos = shelvesY[props.index];
 	const index = props.index;
-	const pos = shelvesY[props.index];
-
+	// const pos = shelvesY[props.index];
+	const verticals = divsX[props.index].map((pos, index) => {
+		console.log('POS', pos);
+		return (
+			<Vertical
+				key={'vertical' + pos + index}
+				position={[pos, shelfYPos + height / 2, 0]}
+				size={[18, height, 400]}
+			/>
+		);
+	});
 	return (
 		<group>
 			<Shelf
-				key={'shelf' + pos + index}
+				key={'shelf' + shelfYPos + index}
 				index={index}
-				position={[width / 2, pos, 0]}
+				position={[width / 2, shelfYPos, 0]}
 				size={[width, 18, 400]}
 			/>
-
-			<Verts key={'verts' + pos + index} index={index} />
+			{verticals}
+			{/* <Verts
+				key={'verts' + pos + index}
+				index={index}
+				state={props.state}
+			/> */}
 		</group>
 	);
 };
 
 const Verts = ({ ...props }) => {
-	const width = useStore((state) => state.width);
-	const divsX = useStore((state) => state.divsX);
-	const shelvesY = useStore((state) => state.shelvesY);
+	console.log(props);
+	const { width, shelvesY, divsX } = props.state;
+	// const width = useStore((state) => state.width);
+	// const divsX = useStore((state) => state.divsX);
+	// const shelvesY = useStore((state) => state.shelvesY);
 	const shelfYPos = shelvesY[props.index];
+	console.log('hello', props.index, divsX);
+	console.log(divsX);
 
 	const height = 180;
-
+	// if (props.index > divsX[divsX.length - 2]) {
+	// 	return null;
+	// } else {
 	const verticals = divsX.map((pos, index) => {
+		console.log('POS', pos);
 		return (
 			<Vertical
 				key={'vertical' + pos + index}
@@ -169,8 +193,11 @@ const Verts = ({ ...props }) => {
 			/>
 		);
 	});
+	// const { scene } = useThree();
+	// console.log(scene.children);
 
 	return <group {...props}>{verticals}</group>;
+	// }
 };
 
 export default () => {

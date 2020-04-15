@@ -1,36 +1,32 @@
 import create from 'zustand';
-import { changeWidth } from './zusWidth';
+// import { changeWidth } from './zusWidth';
 
 import React from 'react';
 
 import Slider from './Slider';
 import getWidth from './zusWidth';
-
-// const [useStore] = create(set => ({
-//   count: 0,
-//   increase: () => set(state => ({ count: state.count + 1 })),
-//   reset: () => set({ count: 0 })
-// }))
-
-// function Counter() {
-//   const count = useStore(state => state.count)
-//   return <h1>{count}</h1>
-// }
-
-// function Controls() {
-//   const increase = useStore(state => state.increase)
-//   return <button onClick={increase}>up</button>
-// }
+import getHeight from './zusHeight';
 
 export const [useStore] = create((set) => ({
 	height: 900,
 	width: 900,
 	depth: 400,
 	config: [
-		{ shelf: 0, divs: [0, 300, 600, 900] },
-		{ shelf: 300, divs: [0, 300, 600, 900] },
-		{ shelf: 600, divs: [0, 300, 600, 900] },
+		{ y: 0, x: [0, 300, 600, 900] },
+		{ y: 300, x: [0, 300, 600, 900] },
+		{ y: 600, x: [0, 300, 600, 900] },
 	],
+	divsX: [
+		[0, 300, 600, 900],
+		[0, 300, 600, 900],
+		[0, 300, 600, 900],
+		[0, 300, 600, 900],
+		[0, 300, 600, 900],
+	],
+
+	shelvesY: [0, 280, 560, 840, 1120],
+
+	shelfHeights: [180, 280, 380],
 
 	adjustHeight: (e) =>
 		set((state) => {
@@ -51,16 +47,6 @@ export const [useStore] = create((set) => ({
 		set((state) => {
 			return { divsX: e };
 		}),
-
-	divsX: [
-		[0, 300, 600, 900],
-		[0, 300, 600, 900],
-		[0, 300, 600, 900],
-		[0, 300, 600, 900],
-		[0, 300, 600, 900],
-	],
-
-	shelvesY: [0, 280, 560, 840, 1120],
 }));
 
 export function WidthControls() {
@@ -76,12 +62,13 @@ export function WidthControls() {
 		adjustWidth: newWidth,
 		changeDivsX: newDivsX,
 	} = state;
-	console.log(shelvesY, divsX, width);
+	// console.log(state);
+
 	const handleChange = (e) => {
-		const result = getWidth(e.target.value, shelvesY);
+		const result = getWidth(width, shelvesY);
 		newWidth(e.target.value);
 		newDivsX(result);
-		console.log(result, shelvesY);
+		console.log(result[0]);
 	};
 
 	return (
@@ -101,10 +88,22 @@ export function WidthControls() {
 }
 
 export function HeightControls() {
-	const value = useStore((state) => state.height);
-	const newValue = useStore((state) => state.adjustHeight);
+	const state = useStore();
+	const {
+		height,
+		adjustHeight: newHeight,
+		changeDivsX: newDivsX,
+		changeShelvesY: newShelvesY,
+	} = state;
+	const value = height;
+
 	const handleChange = (e) => {
-		newValue(e.target.value);
+		const result = getHeight(state, e.target.value);
+		// console.log(result);
+		const { shelvesY: resultShelvesY, divsX: resultDivsX, height } = result;
+		newHeight(height);
+		newDivsX(resultDivsX);
+		newShelvesY(resultShelvesY);
 	};
 	return (
 		<label>
@@ -115,9 +114,9 @@ export function HeightControls() {
 				step={1}
 				onChange={handleChange}
 				name={'height'}
-				value={value}
+				// value={height}
 			/>
-			<h1>HEIGHT:{value}</h1>
+			<h1>HEIGHT:{height}</h1>
 		</label>
 	);
 }

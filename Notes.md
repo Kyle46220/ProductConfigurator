@@ -202,6 +202,8 @@ find the function here the key meshes are created.
 
 // the difference is adjusting the items that are already there vs creating/deleting new ones. I need to make it so that all shapes are loaded on every frame.
 
+### April 13 2020
+
 I'm going to try using zustand instead of react-redux for this specific issue.
 
 MAYYYYBE i keep running in to issues because i'm using 2 different state arrays? could I have a better way of doing this?
@@ -211,3 +213,59 @@ i can use an object, because, if all the valuse are in there, then it won't matt
 config = {height: 900, width: 900, depth: 400, 0:[0,300,600,900], 1:[0,300,600,900], 2:[0, 300, 600, 900], 3:[0, 300, 600, 900]}
 
 i tried nearly alll day to get zustand to work and i finally did! when creating a function in the state, you need to make suyre when you call use Store hook, that you assign it to a variable, and then call this variable if it needs to go inside a function. because hooks have to stay inside a component, and can't be in a regular JS function.
+
+seem to finally be working things out.
+
+have just done the slider handler, and all the updaters for the state with zustand. its good, you don't even need the reducer at all. you just call the function from the store and then you can put whatever in there.
+
+it seems to be that all the imperative code is getting isolated inside a few functions and only receiving props. I jsut di this with the heigth handler, and next I will do it with the height as well.
+maybe this has something to do with useEffect
+
+i will try to remember that only some components will need to be rerendered if i change the way i access the state. if i acess all and then destructure, everything gets rerenders, if i just useStore the specific things, I think everything else doesn't get rendered.
+
+for animations react-spring will be the nex thing. I'm very glad to have found this group o libraries and peter henschel .
+
+### April 15
+
+doing height controls
+
+found out that if you can't calla fcuntiondirectly because of hooks reuls or something, you can just assign it to a variabvle and then call the variable.
+
+trying now to write a function, that takes an array, and a value, sums bvalue andf last array value, and adds it to array and then repeats.
+
+ok got the height and width functions owkring apart from the same issue i've had a million times of not trying to create divs beyond the last shelf when the slider goes dow, or in this case, up or down.
+
+ok i think the problems is not necessarily that iyts trying to iterate over an array that i've jsut removed - but what they are sayuin is a memory leak. I need to useEffect because I'm changing things after render but no doing the componentDidMount thing.
+
+useRef and useEffect I think have the answer, useEffect runs everytime the component is updated. COuld is use this to calculate the position array?
+
+useRef seems to be sort of like what i was using 'this' for earlier. to launch into some imperative wangjangling.
+
+ok calling setState after a component has unmounted will give the warning I have seen. i need to do a cleanup it seems like?
+Use effect can return cleanups,.
+
+r3F is supposed to dispaose of objexcts autmativcally. Is it then jsut that I am calling state on an unmounted component?
+its gotta be something to do without how before I had the store array adn managed all that, whereas now I don't. it works with the shelves though? ???
+
+it could be because when i delete the shelf and the array, its just one componenyt and one state update, wheras when i remove an array of divs, the state only updates once, to remove the array, but multiple components need to be removed.
+
+This could be it. I would need to think about how the component unmounts. maybe there needs to be a function in the width height controller?
+
+there's something wrong with the order of state setting and mounting components. it couls havew something to do with trying to use a single array and then an array of arrays.
+
+If i used this state object
+
+config: [
+{ y: 0, x: [0, 300, 600, 900] },
+{ y: 300, x: [0, 300, 600, 900] },
+{ y: 600, x: [0, 300, 600, 900] },
+
+     i have a feeling the problem would go away.
+
+there's a way to do it with the 2 arrays but i'm not smart enough.
+
+ok i figured it out. just had the wrong index in a slice function doh.
+
+now I want to put the first value of every Divs array as the shelf height value
+
+its very slow at the moment, This could be because I am having all components update on every state change> this will be a about the way i've used useStore hook.
