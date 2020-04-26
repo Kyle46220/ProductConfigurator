@@ -539,14 +539,6 @@ class Viewer extends React.Component {
 	render() {
 		return (
 			<Wrapper>
-				<Canvas>
-					<ambientLight />
-					<pointLight position={[10, 10, 10]} />
-					<Box position={[-1.2, 0, 0]} />
-					<Shelf position={[0, this.props.shelvesY[0], 0]} />
-					<Box position={[1.2, 0, 0]} />
-					{/* <OrbitCont /> */}
-				</Canvas>
 				<div className="viewer" ref={(ref) => (this.el = ref)} />
 			</Wrapper>
 		);

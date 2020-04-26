@@ -268,4 +268,43 @@ ok i figured it out. just had the wrong index in a slice function doh.
 
 now I want to put the first value of every Divs array as the shelf height value
 
-its very slow at the moment, This could be because I am having all components update on every state change> this will be a about the way i've used useStore hook.
+its very slow at the moment, This could be because I am having all components update on every state change> this will be a about the way i've used useStore hook?
+
+why did I want to put the first value of the ddivs array as the shelfY height?
+
+I think because having separate functions that manipulate an object in an array vs the array in an array thing.
+
+Could i also use a giant object? hmmmmm not sure. Popping off the end of the array seemsz pretty smooth for now
+
+The problem is rerendering rather than just updating.
+
+its use effect. so with useeffect, whatever is in the callback will get called everytime the componenet updates. the second param afer the callback will define what to listen to for changes. - so could I put the slider values here?
+Maybe. doesn't necessaril help though. cos fast slider still might screw it up.
+I need to change position rather than rerender.
+So i can make a use effect to rerenders the whole component when something changes and only change position when something else changes. So can I change the position of the meshes on the screen without rerendering the component and just by adding a listener to ....?
+For example for a row of divs,
+
+If the <mesh> JSX tag is new THREE.mesh . then perhaps I should have separate position and create functions? would thes eboth be components?
+
+its about passing data through vs re-rendering.
+
+https://github.com/react-spring/react-three-fiber/issues/126
+
+https://spectrum.chat/react-three-fiber/general/optimising-performance~03cf08f1-5d42-411a-8b42-9199b49c831b
+
+HOw would I update a property of an object without rerendering?
+
+use ref i think is like 'this
+
+```
+javascript
+const [useStore, api] = create(set => ({ "0": [-10, 0], "1": [10, 5], ... })) // this creates the store object.
+
+function Component({ id }) {
+  // Fetch initial state --- use ref and fetch state to add to component
+  const xy = useRef(api.getState()[id])
+  // Connect to the store on mount, disconnect on unmount, catch state-changes in a callback
+  useEffect(() => api.subscribe(coords => (xy.current = coords), state => state[id]), [id])
+```
+
+now that i've got the useeffect with the console log of render. If I can make the box size change without the console log render appearing I win. I will make a custome hook for this.

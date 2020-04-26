@@ -1,5 +1,6 @@
 export default ({ ...props }, e) => {
 	const { shelvesY, divsX, shelfHeights } = props;
+
 	let newShelvesY = shelvesY;
 	const getRandomInt = (max) => {
 		return Math.floor(Math.random() * Math.floor(max));
@@ -34,7 +35,7 @@ export default ({ ...props }, e) => {
 	const shelfSum = newShelvesY[newShelvesY.length - 1];
 
 	const constrainedHeight = shelfSum + newShelvesY.length * 18 + 18;
-	console.log(newShelvesY, newDivsX);
+
 	return {
 		shelvesY: newShelvesY,
 		height: constrainedHeight,

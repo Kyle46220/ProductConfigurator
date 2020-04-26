@@ -7,7 +7,7 @@ import Slider from './Slider';
 import getWidth from './zusWidth';
 import getHeight from './zusHeight';
 
-export const [useStore] = create((set) => ({
+export const [useStore, api] = create((set) => ({
 	height: 900,
 	width: 900,
 	depth: 400,
@@ -68,7 +68,6 @@ export function WidthControls() {
 		const result = getWidth(width, shelvesY);
 		newWidth(e.target.value);
 		newDivsX(result);
-		console.log(result[0]);
 	};
 
 	return (
@@ -88,16 +87,27 @@ export function WidthControls() {
 }
 
 export function HeightControls() {
-	const state = useStore();
-	const {
-		height,
-		adjustHeight: newHeight,
-		changeDivsX: newDivsX,
-		changeShelvesY: newShelvesY,
-	} = state;
-	const value = height;
+	const newHeight = useStore((state) => state.adjustHeight);
+	const newDivsX = useStore((state) => state.changeDivsX);
+	const newShelvesY = useStore((state) => state.changeShelvesY);
+	const height = useStore((state) => state.height);
+	const shelfHeights = useStore((state) => state.shelfHeights);
+	const shelvesY = useStore((state) => state.shelvesY);
+	const divsX = useStore((state) => state.divsX);
+	// const {
+	// 	height,
+	// 	adjustHeight: newHeight,
+	// 	changeDivsX: newDivsX,
+	// 	changeShelvesY: newShelvesY,
+	// } = state;
+	// const value = height;
 
 	const handleChange = (e) => {
+		const state = {
+			divsX,
+			shelvesY,
+			shelfHeights,
+		};
 		const result = getHeight(state, e.target.value);
 		// console.log(result);
 		const { shelvesY: resultShelvesY, divsX: resultDivsX, height } = result;

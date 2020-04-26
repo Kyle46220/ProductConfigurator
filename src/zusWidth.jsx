@@ -10,7 +10,7 @@ export default (width, shelvesY) => {
 	const divQty = Math.floor(width / divWidth);
 	const divGap = width / divQty;
 	const divPos = [];
-	console.log(divsX);
+	// console.log(divsX);
 	// const shelfPos = this.props.shelvesY;
 
 	shelvesY.forEach(() => {

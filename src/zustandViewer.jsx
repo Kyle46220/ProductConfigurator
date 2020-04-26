@@ -2,19 +2,19 @@ import React, { useRef, useState, useEffect } from 'react';
 // import create from 'zustand';
 import * as THREE from 'three';
 import styled from 'styled-components';
-import { useSelector, ReactReduxContext, Provider } from 'react-redux';
-import ZusHeight from './zusHeight';
-import ZusWidth from './zusWidth';
-import { useStore, WidthControls, HeightControls } from './zusStore';
+// import { useSelector, ReactReduxContext, Provider } from 'react-redux';
+
+import { useStore, WidthControls, HeightControls, api } from './zusStore';
 import shallow from 'zustand/shallow';
 
-import GLTFLoader from 'three-gltf-loader';
+// import GLTFLoader from 'three-gltf-loader';
 import {
 	Canvas,
 	useFrame,
 	useThree,
 	extend,
 	useUpdate,
+	applyProps,
 } from 'react-three-fiber';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -30,7 +30,7 @@ const Wrapper = styled.section`
 	align-items: center;
 `;
 
-const Controls = () => {
+const ControlOrbit = () => {
 	const orbitRef = useRef();
 	const { camera, gl } = useThree();
 
@@ -200,28 +200,85 @@ const Verts = ({ ...props }) => {
 	// }
 };
 
+function usePosition(source) {
+	const bind = useRef();
+	console.log(bind.current);
+	useFrame(() => bind.current.position.set(source[0], source[1], 0));
+	// console.log('pos', bind.current.position);
+	return bind;
+}
+
+function useTransientData(source) {
+	const bind = useRef();
+	useFrame(() => applyProps(bind.current, source));
+	console.log(source, bind);
+	return bind;
+}
+
+const TestBox = ({ ...props }) => {
+	const { position } = props;
+	console.log(api.getState().width);
+	// const width = useStore((state) => state.width);
+	const height = useStore((state) => state.height);
+	// const widthStore = useStore((state) => state.width);
+	// const bind = usePosition(position);
+	// const mesh = useRef(bind);
+	// useEffect(() => {
+	// 	console.log('render');
+	// });
+	// const xy = useRef(api.getState()[id])
+	const width = useRef(api.getState().width);
+	console.log(width);
+	useEffect(() => {
+		console.log('render', width);
+		api.subscribe(
+			(value) => {
+				width.current = value;
+				console.log(value, useStore);
+				//what i want to update goes in this callback.
+			},
+			(state) => state.width
+		);
+	}, [width]);
+	// console.log(width, widthStore);
+	return (
+		<mesh ref={usePosition(position)} position={position}>
+			<boxGeometry
+				attach="geometry"
+				args={[height, width, 400]}
+			></boxGeometry>
+			<meshStandardMaterial
+				attach="material"
+				color="hotpink"
+			></meshStandardMaterial>
+		</mesh>
+	);
+};
+
 export default () => {
 	return (
 		<Wrapper>
 			<h1>Hello</h1>
-			<ReactReduxContext.Consumer>
-				{({ store }) => (
-					<Canvas camera={{ position: [200, 500, 1000], far: 11000 }}>
-						<Provider store={store}>
-							<ambientLight />
-							<pointLight position={[10, 10, 10]} />
+			{/* <ReactReduxContext.Consumer>
+				{({ store }) => ( */}
+			<Canvas camera={{ position: [200, 500, 1000], far: 11000 }}>
+				{/* <Provider store={store}> */}
+				<ambientLight />
+				<pointLight position={[10, 10, 10]} />
 
-							<Build position={[0, 0, 0]} />
+				{/* <Build position={[0, 0, 0]} /> */}
 
-							{/* <BoxBuilder /> */}
-							<Controls />
-						</Provider>
-					</Canvas>
-				)}
-			</ReactReduxContext.Consumer>
-			{/* <Slider minSize={600} maxSize={2400} /> */}
-			<WidthControls />
+				<TestBox position={[2000, 500, 0]} />
+
+				{/* <BoxBuilder /> */}
+				<ControlOrbit />
+				{/* </Provider> */}
+			</Canvas>
+			{/* )}
+			</ReactReduxContext.Consumer> */}
 			<HeightControls />
+			<WidthControls />
+			{/* <Slider minSize={600} maxSize={2400} /> */}
 		</Wrapper>
 	);
 };

@@ -9,6 +9,8 @@ import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import FormContainer from './form';
 import styled from 'styled-components';
+import WidthControls from './zusWidth';
+import HeightControls from './zusHeight';
 const initialState = {
 	shelvesY: [0, 280, 560, 840, 1120],
 	divsX: [
@@ -109,8 +111,10 @@ class App extends React.Component {
 				<Wrapper className="App">
 					{/* <FiberViewer /> */}
 					<ZusViewer />
-					{/* <Viewer /> */}
-					{/* <FormContainer /> */}
+					<Viewer />
+					<FormContainer />
+					{/* <WidthControls />
+					<HeightControls /> */}
 					{/* <Width />
 					<Height /> */}
 				</Wrapper>
