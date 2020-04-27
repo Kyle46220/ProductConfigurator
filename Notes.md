@@ -308,3 +308,20 @@ function Component({ id }) {
 ```
 
 now that i've got the useeffect with the console log of render. If I can make the box size change without the console log render appearing I win. I will make a custome hook for this.
+
+made some good progress with use effect and subscribe. it's sort of like nested listeners.
+
+https://codesandbox.io/s/peaceful-johnson-txtws?file=/src/store.js
+
+This just shows an example of transient updates.
+
+So in the shelf model, what is getting updated tranisently, and what is getting re-rendered?
+
+Everytime a piece gets added or removed, we do a re-render from state.
+
+I think the issue is for every change of any component in the whole tree, all the component sget re-rendered and built again. So we want to keep the rerendering to the parts that require it.
+
+Maybe rather than having components that call components, inside the canvas the different shelves are called spearately. Thes don't need to be all contained in the one component do they? Then for simple width changes of the shelves, for example, only the divs would need to re-render.
+
+Would this still have the same 'map of undefined' problem?
+Maybe not if the components weren't so nested. because they'd be independent.

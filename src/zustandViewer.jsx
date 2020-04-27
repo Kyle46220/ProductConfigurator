@@ -92,7 +92,8 @@ const Vertical = (props) => {
 const Build = ({ ...props }) => {
 	// const state = useStore();
 	// const { width, shelvesY } = state;
-	const width = useStore((state) => state.width);
+	// const width = useStore((state) => state.width);
+	const width = useRef(api.getState((state) => state.width));
 	const shelvesY = useStore((state) => state.shelvesY);
 
 	const topIndex = shelvesY.length - 1;
@@ -217,35 +218,41 @@ function useTransientData(source) {
 
 const TestBox = ({ ...props }) => {
 	const { position } = props;
-	console.log(api.getState().width);
-	// const width = useStore((state) => state.width);
-	const height = useStore((state) => state.height);
-	// const widthStore = useStore((state) => state.width);
-	// const bind = usePosition(position);
-	// const mesh = useRef(bind);
-	// useEffect(() => {
-	// 	console.log('render');
-	// });
-	// const xy = useRef(api.getState()[id])
+	console.log('Box Rendered', api.getState().width);
+
 	const width = useRef(api.getState().width);
+	const height = useRef(api.getState().height);
+	console.log(width, height);
+	const mesh = useRef();
 	console.log(width);
 	useEffect(() => {
-		console.log('render', width);
+		console.log('render', width, height);
 		api.subscribe(
 			(value) => {
 				width.current = value;
-				console.log(value, useStore);
-				//what i want to update goes in this callback.
+				// console.log(mesh);
+				mesh.current.scale.x = value;
+				// mesh.current.scale.y = value;
+				//what i want to update goes in this callback. this is almost just like a nested useEffect. I cant call hooks from in here, but if I call a variable that was assigned with useStore it will triger a component re-render. I think it's no rendering because we are stuck listening inside this callback and never get to the return.
 			},
 			(state) => state.width
 		);
-	}, [width]);
-	// console.log(width, widthStore);
+		api.subscribe(
+			(value) => {
+				width.current = value;
+
+				mesh.current.scale.y = value;
+			},
+			(state) => state.height
+		);
+	}, [width, height]);
+
 	return (
-		<mesh ref={usePosition(position)} position={position}>
+		<mesh ref={mesh} position={position}>
 			<boxGeometry
 				attach="geometry"
-				args={[height, width, 400]}
+				args={[1, 1, 400]}
+				// you can't set these with the api.getstate
 			></boxGeometry>
 			<meshStandardMaterial
 				attach="material"
@@ -259,23 +266,18 @@ export default () => {
 	return (
 		<Wrapper>
 			<h1>Hello</h1>
-			{/* <ReactReduxContext.Consumer>
-				{({ store }) => ( */}
+
 			<Canvas camera={{ position: [200, 500, 1000], far: 11000 }}>
-				{/* <Provider store={store}> */}
 				<ambientLight />
 				<pointLight position={[10, 10, 10]} />
 
-				{/* <Build position={[0, 0, 0]} /> */}
+				<Build position={[0, 0, 0]} />
 
-				<TestBox position={[2000, 500, 0]} />
+				<TestBox position={[0, 0, 0]} />
 
-				{/* <BoxBuilder /> */}
 				<ControlOrbit />
-				{/* </Provider> */}
 			</Canvas>
-			{/* )}
-			</ReactReduxContext.Consumer> */}
+
 			<HeightControls />
 			<WidthControls />
 			{/* <Slider minSize={600} maxSize={2400} /> */}
