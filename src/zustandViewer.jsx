@@ -77,6 +77,15 @@ const Vertical = (props) => {
 		position,
 		size: [x, y, z],
 	} = props;
+	// const mesh = useRef();
+	// const shelvesY = useRef(api.getState().shelvesY);
+	// // I can put a transient update in here.
+	// useEffect(() => {
+	// 	api.subscribe(
+	// 		(value) => (shelvesY.current = value),
+	// 		(state) => state.shelvesY
+	// 	);
+	// }, [shelvesY]);
 
 	return (
 		<mesh position={position}>
@@ -134,6 +143,7 @@ const Build = ({ ...props }) => {
 const Row = ({ ...props }) => {
 	console.log(props);
 	// const { width, shelvesY, divsX } = props.state;
+	// these useStores will cause update re-render. we only want a re-render when another one is added?
 	const divsX = useStore((state) => state.divsX);
 	const width = useStore((state) => state.width);
 	const shelvesY = useStore((state) => state.shelvesY);
@@ -169,6 +179,42 @@ const Row = ({ ...props }) => {
 		</group>
 	);
 };
+const ShelvesOnly = ({ ...props }) => {
+	// these useStores will cause update re-render. we only want a re-render when another one is added?
+	const divsX = useStore((state) => state.divsX);
+	// const width = useStore((state) => state.width);
+	const shelvesY = useStore((state) => state.shelvesY);
+	const height = shelvesY[props.index + 1] - shelvesY[props.index];
+	const width = useRef(api.getState().width);
+	const shelfYPos = shelvesY[props.index];
+	const index = props.index;
+	const pos = shelvesY[props.index];
+	const mesh = useRef();
+	const shelves = shelvesY.map((pos, index) => {
+		console.log('POS', pos);
+		return (
+			<Shelf
+				ref={mesh}
+				key={'shelf' + pos + index}
+				index={index}
+				position={[width / 2, pos, 0]}
+				size={[width, 18, 400]}
+			/>
+		);
+	});
+	useEffect(() => {
+		api.subscribe(
+			(value) => {
+				width.current = value;
+
+				mesh.current.scale.x = value;
+			},
+			(state) => state.height
+		);
+	}, [width]);
+
+	return <group>{shelves}</group>;
+};
 
 const Verts = ({ ...props }) => {
 	console.log(props);
@@ -181,9 +227,7 @@ const Verts = ({ ...props }) => {
 	console.log(divsX);
 
 	const height = 180;
-	// if (props.index > divsX[divsX.length - 2]) {
-	// 	return null;
-	// } else {
+
 	const verticals = divsX.map((pos, index) => {
 		console.log('POS', pos);
 		return (
@@ -194,8 +238,6 @@ const Verts = ({ ...props }) => {
 			/>
 		);
 	});
-	// const { scene } = useThree();
-	// console.log(scene.children);
 
 	return <group {...props}>{verticals}</group>;
 	// }
@@ -239,7 +281,7 @@ const TestBox = ({ ...props }) => {
 		);
 		api.subscribe(
 			(value) => {
-				width.current = value;
+				height.current = value;
 
 				mesh.current.scale.y = value;
 			},
@@ -271,8 +313,9 @@ export default () => {
 				<ambientLight />
 				<pointLight position={[10, 10, 10]} />
 
-				<Build position={[0, 0, 0]} />
-
+				{/* <Build position={[0, 0, 0]} /> */}
+				{/* <Row position={[0, 0, 0]} index={1} /> */}
+				<ShelvesOnly />
 				<TestBox position={[0, 0, 0]} />
 
 				<ControlOrbit />

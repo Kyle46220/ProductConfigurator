@@ -325,3 +325,27 @@ Maybe rather than having components that call components, inside the canvas the 
 
 Would this still have the same 'map of undefined' problem?
 Maybe not if the components weren't so nested. because they'd be independent.
+
+Make each Type of part an independent component that works in basically the same way as the test box.
+Namely - set an initial component to render, use the effect and subscribe nest to make transient changes. Each component just calls from state directly. We use listeners to make the changes that are needed to already rendered components.
+
+i need to make an example of a transiently updated height adjustment with creation and deletion of components. Could I do this by having adding a visible = true attribute to some stuff?
+Or maybe just having separate component that render-render individually and less frequently won't be as bad.
+
+I think I need to have it so that the xy coords only need to be calculated once in state when the sliders are changed, then when rendering, I just pass these coords transiently to the componenet meshes. Could also put a visible=false in the subscribe callback as well to transiently add/remove.
+
+maybe i put a use effect on the arry length of the divs that will trigger to add another. The transient positions of the divs can be updated until this trigger is called.
+
+subscribe listens for div positions and updates meshes positions. This is inside a useEffect triggered by the divs array.
+another useEffect that is triggered by the length of the array ads components.
+
+I think the main issue is that the quick slider movement re-renders too many components too quickly at once. what if it was just one component per slider?
+I wanna avoid having the visible=true option for some reason. this seems too hackey.
+a new divs component would be div = state.divs.
+
+return divs.map return <mesh>
+
+if the divs state had all the coords in it that would be good.
+
+it would need to re-render on both height and width changes.
+maybe using transient update when only the positions change, and then re-rendering when some are added would be enough to allow it to catch up?
