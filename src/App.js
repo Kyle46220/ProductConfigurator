@@ -111,8 +111,8 @@ class App extends React.Component {
 				<Wrapper className="App">
 					{/* <FiberViewer /> */}
 					<ZusViewer />
-					<Viewer />
-					<FormContainer />
+					{/* <Viewer /> */}
+					{/* <FormContainer /> */}
 					{/* <WidthControls />
 					<HeightControls /> */}
 					{/* <Width />

@@ -349,3 +349,7 @@ if the divs state had all the coords in it that would be good.
 
 it would need to re-render on both height and width changes.
 maybe using transient update when only the positions change, and then re-rendering when some are added would be enough to allow it to catch up?
+
+Can we listen for changes in the stores elements. Like when the qty of shelves changes, re-render, but the position just do transient update?
+
+The error just happens when you do the slider really quickly.

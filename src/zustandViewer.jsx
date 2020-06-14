@@ -68,9 +68,9 @@ const Shelf = (props) => {
 	);
 };
 
-const BoxBuilder = (props) => {
-	return null;
-};
+// const BoxBuilder = (props) => {
+// 	return null;
+// };
 
 const Vertical = (props) => {
 	const {
@@ -152,8 +152,16 @@ const Row = ({ ...props }) => {
 	const shelfYPos = shelvesY[props.index];
 	const index = props.index;
 	// const pos = shelvesY[props.index];
+	console.log(
+		'DIVSX',
+		'height:',
+		divsX.length,
+		'width:',
+		divsX[0].length,
+		divsX
+	);
 	const verticals = divsX[props.index].map((pos, index) => {
-		console.log('POS', pos);
+		console.log('POS', pos, index);
 		return (
 			<Vertical
 				key={'vertical' + pos + index}
@@ -191,7 +199,6 @@ const ShelvesOnly = ({ ...props }) => {
 	const pos = shelvesY[props.index];
 	const mesh = useRef();
 	const shelves = shelvesY.map((pos, index) => {
-		console.log('POS', pos);
 		return (
 			<Shelf
 				ref={mesh}
@@ -202,6 +209,7 @@ const ShelvesOnly = ({ ...props }) => {
 			/>
 		);
 	});
+
 	useEffect(() => {
 		api.subscribe(
 			(value) => {
@@ -217,19 +225,13 @@ const ShelvesOnly = ({ ...props }) => {
 };
 
 const Verts = ({ ...props }) => {
-	console.log(props);
 	const { width, shelvesY, divsX } = props.state;
-	// const width = useStore((state) => state.width);
-	// const divsX = useStore((state) => state.divsX);
-	// const shelvesY = useStore((state) => state.shelvesY);
+
 	const shelfYPos = shelvesY[props.index];
-	console.log('hello', props.index, divsX);
-	console.log(divsX);
 
 	const height = 180;
 
 	const verticals = divsX.map((pos, index) => {
-		console.log('POS', pos);
 		return (
 			<Vertical
 				key={'vertical' + pos + index}
@@ -245,16 +247,16 @@ const Verts = ({ ...props }) => {
 
 function usePosition(source) {
 	const bind = useRef();
-	console.log(bind.current);
+
 	useFrame(() => bind.current.position.set(source[0], source[1], 0));
-	// console.log('pos', bind.current.position);
+
 	return bind;
 }
 
 function useTransientData(source) {
 	const bind = useRef();
 	useFrame(() => applyProps(bind.current, source));
-	console.log(source, bind);
+
 	return bind;
 }
 
@@ -272,9 +274,9 @@ const TestBox = ({ ...props }) => {
 		api.subscribe(
 			(value) => {
 				width.current = value;
-				// console.log(mesh);
+
 				mesh.current.scale.x = value;
-				// mesh.current.scale.y = value;
+
 				//what i want to update goes in this callback. this is almost just like a nested useEffect. I cant call hooks from in here, but if I call a variable that was assigned with useStore it will triger a component re-render. I think it's no rendering because we are stuck listening inside this callback and never get to the return.
 			},
 			(state) => state.width
@@ -309,21 +311,20 @@ export default () => {
 		<Wrapper>
 			<h1>Hello</h1>
 
-			<Canvas camera={{ position: [200, 500, 1000], far: 11000 }}>
+			<Canvas camera={{ position: [400, 1000, 3000], far: 11000 }}>
 				<ambientLight />
 				<pointLight position={[10, 10, 10]} />
 
 				{/* <Build position={[0, 0, 0]} /> */}
 				{/* <Row position={[0, 0, 0]} index={1} /> */}
-				<ShelvesOnly />
-				<TestBox position={[0, 0, 0]} />
+				{/* <ShelvesOnly /> */}
+				{/* <TestBox position={[0, 0, 0]} /> */}
 
 				<ControlOrbit />
 			</Canvas>
 
 			<HeightControls />
 			<WidthControls />
-			{/* <Slider minSize={600} maxSize={2400} /> */}
 		</Wrapper>
 	);
 };
