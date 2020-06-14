@@ -28,6 +28,7 @@ const Wrapper = styled.section`
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	flex-direction: column;
 `;
 
 const ControlOrbit = () => {
@@ -152,13 +153,16 @@ const Row = ({ ...props }) => {
 	const shelfYPos = shelvesY[props.index];
 	const index = props.index;
 	// const pos = shelvesY[props.index];
+
 	console.log(
 		'DIVSX',
 		'height:',
 		divsX.length,
 		'width:',
 		divsX[0].length,
-		divsX
+		divsX,
+		'shelvesY:',
+		shelvesY
 	);
 	const verticals = divsX[props.index].map((pos, index) => {
 		console.log('POS', pos, index);
@@ -311,20 +315,21 @@ export default () => {
 		<Wrapper>
 			<h1>Hello</h1>
 
-			<Canvas camera={{ position: [400, 1000, 3000], far: 11000 }}>
+			<Canvas camera={{ position: [700, 1000, 2500], far: 11000 }}>
 				<ambientLight />
 				<pointLight position={[10, 10, 10]} />
 
-				{/* <Build position={[0, 0, 0]} /> */}
+				<Build position={[0, 0, 0]} />
 				{/* <Row position={[0, 0, 0]} index={1} /> */}
 				{/* <ShelvesOnly /> */}
 				{/* <TestBox position={[0, 0, 0]} /> */}
 
 				<ControlOrbit />
 			</Canvas>
-
-			<HeightControls />
-			<WidthControls />
+			<div style={{ display: 'flex' }}>
+				<HeightControls />
+				<WidthControls />
+			</div>
 		</Wrapper>
 	);
 };

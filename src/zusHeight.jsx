@@ -30,7 +30,7 @@ export default ({ ...props }, e) => {
 	}
 	newShelvesY = newShelvesY.filter(predicate);
 
-	newDivsX = newDivsX.slice(0, newShelvesY.length);
+	// newDivsX = newDivsX.slice(0, newShelvesY.length);
 
 	const shelfSum = newShelvesY[newShelvesY.length - 1];
 

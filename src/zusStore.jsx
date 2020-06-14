@@ -124,7 +124,7 @@ export function HeightControls() {
 				step={1}
 				onChange={handleChange}
 				name={'height'}
-				// value={height}
+				value={height}
 			/>
 			<h1>HEIGHT:{height}</h1>
 		</label>

@@ -38,7 +38,7 @@ const Wrapper = styled.section`
 	width: 100vw;
 	display: flex;
 	justify-content: center;
-	flex-direction: column;
+	flex-direction: row;
 	align-items: center;
 `;
 class App extends React.Component {
@@ -111,8 +111,10 @@ class App extends React.Component {
 				<Wrapper className="App">
 					{/* <FiberViewer /> */}
 					<ZusViewer />
-					{/* <Viewer /> */}
-					{/* <FormContainer /> */}
+					<div style={{ display: 'flex', flexDirection: 'column' }}>
+						<Viewer />
+						<FormContainer />
+					</div>
 					{/* <WidthControls />
 					<HeightControls /> */}
 					{/* <Width />
