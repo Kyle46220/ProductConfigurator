@@ -1,13 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
-// import create from 'zustand';
 import * as THREE from 'three';
 import styled from 'styled-components';
-// import { useSelector, ReactReduxContext, Provider } from 'react-redux';
 
 import { useStore, WidthControls, HeightControls, api } from './zusStore';
 import shallow from 'zustand/shallow';
 
-// import GLTFLoader from 'three-gltf-loader';
 import {
 	Canvas,
 	useFrame,
@@ -40,15 +37,7 @@ const ControlOrbit = () => {
 		orbitRef.current.update();
 	});
 
-	return (
-		<orbitControls
-			// autoRotate
-			// maxPolarAngle={Math.PI / 3}
-			// minPolarAngle={Math.PI / 3}
-			args={[camera, gl.domElement]}
-			ref={orbitRef}
-		/>
-	);
+	return <orbitControls args={[camera, gl.domElement]} ref={orbitRef} />;
 };
 
 const Shelf = (props) => {
@@ -57,7 +46,6 @@ const Shelf = (props) => {
 		size: [x, y, z],
 	} = props;
 
-	// const ref = useUpdate(() => {}, [position, x, y, z]);
 	return (
 		<mesh position={position}>
 			<boxGeometry attach="geometry" args={[x, y, z]}></boxGeometry>
@@ -69,24 +57,11 @@ const Shelf = (props) => {
 	);
 };
 
-// const BoxBuilder = (props) => {
-// 	return null;
-// };
-
 const Vertical = (props) => {
 	const {
 		position,
 		size: [x, y, z],
 	} = props;
-	// const mesh = useRef();
-	// const shelvesY = useRef(api.getState().shelvesY);
-	// // I can put a transient update in here.
-	// useEffect(() => {
-	// 	api.subscribe(
-	// 		(value) => (shelvesY.current = value),
-	// 		(state) => state.shelvesY
-	// 	);
-	// }, [shelvesY]);
 
 	return (
 		<mesh position={position}>
@@ -100,9 +75,6 @@ const Vertical = (props) => {
 };
 
 const Build = ({ ...props }) => {
-	// const state = useStore();
-	// const { width, shelvesY } = state;
-	// const width = useStore((state) => state.width);
 	const width = useRef(api.getState((state) => state.width));
 	const shelvesY = useStore((state) => state.shelvesY);
 
@@ -143,8 +115,7 @@ const Build = ({ ...props }) => {
 
 const Row = ({ ...props }) => {
 	console.log(props);
-	// const { width, shelvesY, divsX } = props.state;
-	// these useStores will cause update re-render. we only want a re-render when another one is added?
+	// these useStores will cause component re-render.
 	const divsX = useStore((state) => state.divsX);
 	const width = useStore((state) => state.width);
 	const shelvesY = useStore((state) => state.shelvesY);
@@ -152,7 +123,6 @@ const Row = ({ ...props }) => {
 
 	const shelfYPos = shelvesY[props.index];
 	const index = props.index;
-	// const pos = shelvesY[props.index];
 
 	console.log(
 		'DIVSX',
@@ -183,18 +153,12 @@ const Row = ({ ...props }) => {
 				size={[width, 18, 400]}
 			/>
 			{verticals}
-			{/* <Verts
-				key={'verts' + pos + index}
-				index={index}
-				state={props.state}
-			/> */}
 		</group>
 	);
 };
 const ShelvesOnly = ({ ...props }) => {
-	// these useStores will cause update re-render. we only want a re-render when another one is added?
+	// these useStores will cause update re-render. we only want a re-render when another shelf is added?
 	const divsX = useStore((state) => state.divsX);
-	// const width = useStore((state) => state.width);
 	const shelvesY = useStore((state) => state.shelvesY);
 	const height = shelvesY[props.index + 1] - shelvesY[props.index];
 	const width = useRef(api.getState().width);
@@ -313,7 +277,7 @@ const TestBox = ({ ...props }) => {
 export default () => {
 	return (
 		<Wrapper>
-			<h1>Hello</h1>
+			<h1>Built with React-Three-Fiber and Zustand</h1>
 
 			<Canvas camera={{ position: [700, 1000, 2500], far: 11000 }}>
 				<ambientLight />
@@ -323,7 +287,6 @@ export default () => {
 				{/* <Row position={[0, 0, 0]} index={1} /> */}
 				{/* <ShelvesOnly /> */}
 				{/* <TestBox position={[0, 0, 0]} /> */}
-
 				<ControlOrbit />
 			</Canvas>
 			<div style={{ display: 'flex' }}>

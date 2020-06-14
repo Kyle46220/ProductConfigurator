@@ -1,3 +1,5 @@
+// this calculates the position of the horizontal shelves realtive to the height
+
 export default ({ ...props }, e) => {
 	const { shelvesY, divsX, shelfHeights } = props;
 
@@ -29,8 +31,6 @@ export default ({ ...props }, e) => {
 		addDividers(newDivsX, newDivsX[newDivsX.length - 1]);
 	}
 	newShelvesY = newShelvesY.filter(predicate);
-
-	// newDivsX = newDivsX.slice(0, newShelvesY.length);
 
 	const shelfSum = newShelvesY[newShelvesY.length - 1];
 

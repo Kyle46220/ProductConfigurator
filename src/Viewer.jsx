@@ -1,22 +1,13 @@
 import React, { useRef, useState } from 'react';
-
-import * as THREE from 'three';
-import styled from 'styled-components';
 import { connect } from 'react-redux';
-// import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
-import GLTFLoader from 'three-gltf-loader';
-import { Canvas, useFrame, extend, useThree } from 'react-three-fiber';
+import { extend, useFrame, useThree } from 'react-three-fiber';
+import styled from 'styled-components';
+import * as THREE from 'three';
 
+import GLTFLoader from 'three-gltf-loader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import PickHelper from './picker';
-import Loader from './Loader.js';
-import { Box3Helper } from 'three';
 
-// const Canvas = styled.canvas`
-// 	border: 5px solid fuchsia;
-// 	height: 50%;
-// 	display: inline;
-// `;
 extend({ OrbitControls });
 
 const Wrapper = styled.section`
@@ -38,51 +29,6 @@ function mapStateToProps(state) {
 	};
 }
 
-function Box(props) {
-	const mesh = useRef();
-	const [hovered, setHover] = useState(false);
-	const [active, setActive] = useState(false);
-
-	useFrame(() => (mesh.current.rotation.x = mesh.current.rotation.y += 0.01));
-
-	return (
-		<mesh
-			{...props}
-			ref={mesh}
-			scale={active ? [1.5, 1.5, 1.5] : [1, 1, 1]}
-			onClick={(e) => setActive(!active)}
-			onPointerOver={(e) => setHover(true)}
-			onPointerOut={(e) => setHover(false)}
-		>
-			<boxBufferGeometry attach="geometry" args={[1, 1, 1]} />
-			<meshStandardMaterial
-				attach="material"
-				color={hovered ? 'hotpink' : 'orange'}
-			/>
-		</mesh>
-	);
-}
-function OrbitCont() {
-	const {
-		camera,
-		gl: { domELement },
-	} = useThree();
-	return <orbitControls args={['camera, domElement']} />;
-}
-
-function Shelf(props) {
-	const mesh = useRef();
-	return (
-		<mesh>
-			<boxBufferGeometry
-				attach="gemoetry"
-				args={(props.x, props.y, props.z)}
-			/>
-			<meshStandardMaterial attach="material" color={'hotpink'} />
-		</mesh>
-	);
-}
-
 class Viewer extends React.Component {
 	componentDidMount() {
 		this.sceneSetup();
@@ -93,11 +39,8 @@ class Viewer extends React.Component {
 	}
 
 	componentDidUpdate() {
-		// this.adjustShelves();
 		this.adjustWidth(this.props);
 		this.adjustHeight(this.props);
-		// this.camera.position.set(this.props.width, this.props.height, 2000);
-		// this.controls.update();
 		this.resetBoxes();
 		this.createBoxPositions();
 		this.addBoxes(this.boxValueArray);
@@ -132,11 +75,6 @@ class Viewer extends React.Component {
 		this.resetBoxes();
 		this.createBoxPositions();
 		this.addBoxes(this.boxValueArray);
-
-		console.log(this.drawers);
-		// this.loader = new Loader();
-		// this.drawer = this.loader.loadDrawer(this.scene);
-		// console.log(this.drawer);
 	};
 	loadDrawer = () => {
 		const loader = new GLTFLoader();
@@ -144,7 +82,6 @@ class Viewer extends React.Component {
 		const drawer = '/drawer.gltf';
 		const test = '/newtest.gltf';
 		loader.load(drawer, (gltf) => {
-			console.log('drawer.gltf', gltf.scene);
 			this.root = gltf.scene;
 		});
 	};
@@ -157,22 +94,11 @@ class Viewer extends React.Component {
 	}
 
 	positionDrawer = (drawer) => {};
-	loadDrawer = () => {
-		const loader = new GLTFLoader();
-		const cab = '/cabinetTest1.gltf';
-		const drawer = '/drawer.gltf';
-		const test = '/newtest.gltf';
-		loader.load(drawer, (gltf) => {
-			console.log('drawer.gltf', gltf.scene);
-			this.root = gltf.scene;
-		});
-	};
 
 	randomColor() {
 		return `hsl(${this.rand(360) | 0}, ${this.rand(50, 100) | 0}%, 50%)`;
 	}
 	isolateMeshes = (array) => {
-		// this.objects = this.scene.children.filter(item => item.type === 'Mesh');
 		const filterItems = (query) => {
 			return array.filter(
 				(el) => el.toLowerCase().indexOf(query.toLowerCase()) > -1
@@ -221,8 +147,8 @@ class Viewer extends React.Component {
 		);
 
 		this.camera.position.set(
-			this.props.width / 2,
-			this.props.height / 2,
+			this.props.width / 2 + 1000,
+			this.props.height / 2 + 1000,
 			2000
 		);
 
@@ -233,8 +159,6 @@ class Viewer extends React.Component {
 		this.canvas = this.renderer.domElement;
 		this.renderer.setSize(width, height);
 		this.el.appendChild(this.canvas);
-		// this.stats = new Stats();
-		// this.el.appendChild(this.stats.dom);
 
 		this.canvas.addEventListener('mousemove', this.onMouseMove, false);
 		this.canvas.addEventListener('click', this.clickHandler);
@@ -248,7 +172,7 @@ class Viewer extends React.Component {
 		const mesh = new THREE.Mesh(geom, material);
 		mesh.name = 'default';
 		this.meshStore.push(mesh);
-		// console.log('default mesh added', mesh);
+		// ;
 	};
 	initializeDefaultMeshes = (num) => {
 		let i = 0;
@@ -260,28 +184,22 @@ class Viewer extends React.Component {
 	};
 	addShelf = (shelfPos) => {
 		const shelfMesh = this.meshStore.pop();
-		// shelfMesh.name = 'shelf';
 		this.shelfMeshes.push(shelfMesh);
-		// this.positionShelf(shelfMesh, shelfPos);
 		this.scene.add(shelfMesh);
 		shelfMesh.scale.setX(1000);
 		shelfMesh.scale.setY(18);
 		shelfMesh.scale.setZ(400);
 	};
 	removeShelf = (meshArray) => {
-		console.log('remove shelf');
 		this.returnToStore(meshArray.pop());
 	};
 
 	addDivider = (divPos, shelfIndex, height) => {
 		const { shelvesY } = this.props;
-		console.log('divider added');
 		const divMesh = this.meshStore.pop();
 		divMesh.name = 'div';
 		this.divMeshes[shelfIndex].push(divMesh);
 		this.scene.add(divMesh);
-
-		// this.positionShelf(shelfMesh, shelfPos);
 	};
 
 	addDividerRow = (divArr, shelfPos, shelfIndex) => {
@@ -308,7 +226,6 @@ class Viewer extends React.Component {
 	};
 
 	removeSingleDivider = (meshArray) => {
-		console.log('single div removed from', meshArray);
 		const mesh = meshArray.pop();
 		this.returnToStore(mesh);
 	};
@@ -452,11 +369,6 @@ class Viewer extends React.Component {
 		const divMeshes = this.divMeshes.flat();
 		this.boxValueArray = [];
 
-		// function filterWidth(item) {
-		// 	return item.position.x !== width / 2;
-		// }
-		// console.log(divMeshes.filter(filterWidth));
-		// console.log(shelvesY, divsX);
 		divsX.forEach((arr, index) => {
 			if (index === divsX.length - 1) {
 				return;
@@ -476,19 +388,16 @@ class Viewer extends React.Component {
 						boxValues.boxWidth = arr[i + 1] - pos;
 						boxValues.boxDepth = depth;
 						const centreX = pos + (arr[i + 1] - pos) / 2;
-						console.log(centreX);
 						boxPos.x = centreX;
 						boxPos.y = centreY;
 						boxPos.z = 0;
 						boxValues.boxPos = boxPos;
 
-						console.log(boxValues);
 						this.boxValueArray.push(boxValues);
 					}
 				});
 			}
 		});
-		console.log(this.boxValueArray);
 	};
 	addBoxes = (array) => {
 		array.forEach((item) => {
@@ -516,7 +425,6 @@ class Viewer extends React.Component {
 			this.boxes.push(box);
 			this.scene.add(box);
 		});
-		console.log(this.boxes);
 	};
 
 	clickHandler = (event) => {

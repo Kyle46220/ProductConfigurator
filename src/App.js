@@ -109,16 +109,19 @@ class App extends React.Component {
 		return (
 			<Provider store={this.store}>
 				<Wrapper className="App">
-					{/* <FiberViewer /> */}
 					<ZusViewer />
-					<div style={{ display: 'flex', flexDirection: 'column' }}>
+					<div
+						style={{
+							display: 'flex',
+							flexDirection: 'column',
+							border: '1px solid black',
+							width: '50vw',
+						}}
+					>
+						<h3>built with normal three.js and redux</h3>
 						<Viewer />
 						<FormContainer />
 					</div>
-					{/* <WidthControls />
-					<HeightControls /> */}
-					{/* <Width />
-					<Height /> */}
 				</Wrapper>
 			</Provider>
 		);

@@ -1,11 +1,12 @@
 import create from 'zustand';
-// import { changeWidth } from './zusWidth';
 
 import React from 'react';
 
 import Slider from './Slider';
 import getWidth from './zusWidth';
 import getHeight from './zusHeight';
+
+// this sets the state object in zustand and has functions to handle the sliders.
 
 export const [useStore, api] = create((set) => ({
 	height: 900,
