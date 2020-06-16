@@ -10,12 +10,11 @@ import {
 	useFrame,
 	useThree,
 	extend,
-	useUpdate,
 	applyProps,
 } from 'react-three-fiber';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { BoxGeometry } from 'three';
+i;
 
 extend({ OrbitControls });
 
@@ -111,7 +110,6 @@ const Build = ({ ...props }) => {
 
 // it looks like it just re-renders from within the conditional if else
 // like it just stays there and doesn't go all the way back to the start of the component and loops through the return of each cnoditional part as long as its there.
-// i'm quitting for the night bu i think its going to be somehitng to do with how the divs a renderseed every fram but the shelves areent'
 
 // the difference is adjusting the items that are already there vs creating/deleting new ones. I need to make it so that all shapes are loaded on every frame.
 
@@ -164,7 +162,7 @@ const ShelvesOnly = ({ ...props }) => {
 	const shelvesY = useStore((state) => state.shelvesY);
 	const height = shelvesY[props.index + 1] - shelvesY[props.index];
 	const width = useRef(api.getState().width);
-	const shelfYPos = shelvesY[props.index];
+	// const shelfYPos = shelvesY[props.index];
 	const index = props.index;
 	const pos = shelvesY[props.index];
 	const mesh = useRef();
@@ -179,7 +177,11 @@ const ShelvesOnly = ({ ...props }) => {
 			/>
 		);
 	});
+	// I think this is the idea with the transient updating. Is this important?
 
+	// docs https://github.com/react-spring/zustand/
+
+	// example https://codesandbox.io/s/peaceful-johnson-txtws?file=/src/store.js
 	useEffect(() => {
 		api.subscribe(
 			(value) => {
