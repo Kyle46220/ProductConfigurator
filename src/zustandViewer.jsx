@@ -26,6 +26,7 @@ const Wrapper = styled.section`
 	justify-content: center;
 	align-items: center;
 	flex-direction: column;
+	margin: 3em;
 `;
 
 const ControlOrbit = () => {
@@ -75,7 +76,8 @@ const Vertical = (props) => {
 };
 
 const Build = ({ ...props }) => {
-	const width = useRef(api.getState((state) => state.width));
+	// const width = useRef(api.getState((state) => state.width));
+	const width = useStore((state) => state.width);
 	const shelvesY = useStore((state) => state.shelvesY);
 
 	const topIndex = shelvesY.length - 1;
@@ -277,7 +279,10 @@ const TestBox = ({ ...props }) => {
 export default () => {
 	return (
 		<Wrapper>
-			<h1>Built with React-Three-Fiber and Zustand</h1>
+			<h1 style={{ margin: '1rem' }}>
+				Built with React-Three-Fiber and Zustand with funcitonal
+				components and hooks.
+			</h1>
 
 			<Canvas camera={{ position: [700, 1000, 2500], far: 11000 }}>
 				<ambientLight />

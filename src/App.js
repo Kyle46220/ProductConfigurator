@@ -116,9 +116,13 @@ class App extends React.Component {
 							flexDirection: 'column',
 							border: '1px solid black',
 							width: '50vw',
+							margin: '3em',
 						}}
 					>
-						<h3>built with normal three.js and redux</h3>
+						<h3 style={{ margin: '1rem' }}>
+							built with normal three.js and redux with class
+							components
+						</h3>
 						<Viewer />
 						<FormContainer />
 					</div>
