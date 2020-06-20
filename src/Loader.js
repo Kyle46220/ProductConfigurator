@@ -23,9 +23,9 @@ class Loader {
 	}
 
 	loadDrawer = (scene, position, matrix) => {
-		const cab = '/cabinetTest1.gltf';
+		// const cab = '/cabinetTest1.gltf';
 		const drawer = '/drawer.gltf';
-		const test = '/newtest.gltf';
+		// const test = '/newtest.gltf';
 		this.loader.load(drawer, (gltf) => {
 			this.root = gltf.scene;
 			const drawerMesh = this.root.children[0];

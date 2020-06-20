@@ -1,6 +1,6 @@
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { connect } from 'react-redux';
 import React from 'react';
-import { render } from 'react-dom';
+// import { render } from 'react-dom';
 import styled from 'styled-components';
 import Slider from './Slider';
 

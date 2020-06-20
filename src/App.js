@@ -1,16 +1,16 @@
 import React from 'react';
-import { render } from 'react-dom';
+// import { render } from 'react-dom';
 import Viewer from './Viewer';
-import Width from './width';
-import Height from './height';
-import FiberViewer from './fiberViewer';
+// import Width from './width';
+// import Height from './height';
+// import FiberViewer from './fiberViewer';
 import ZusViewer from './zustandViewer';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import FormContainer from './form';
 import styled from 'styled-components';
-import WidthControls from './zusWidth';
-import HeightControls from './zusHeight';
+// import WidthControls from './zusWidth';
+// import HeightControls from './zusHeight';
 const initialState = {
 	shelvesY: [0, 280, 560, 840, 1120],
 	divsX: [

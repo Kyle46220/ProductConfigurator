@@ -12,11 +12,11 @@ export const [useStore, api] = create((set) => ({
 	height: 900,
 	width: 900,
 	depth: 400,
-	config: [
-		{ y: 0, x: [0, 300, 600, 900] },
-		{ y: 300, x: [0, 300, 600, 900] },
-		{ y: 600, x: [0, 300, 600, 900] },
-	],
+	// config: [
+	// 	{ y: 0, x: [0, 300, 600, 900] },
+	// 	{ y: 300, x: [0, 300, 600, 900] },
+	// 	{ y: 600, x: [0, 300, 600, 900] },
+	// ],
 	divsX: [
 		[0, 300, 600, 900],
 		[0, 300, 600, 900],
@@ -58,7 +58,6 @@ export function WidthControls() {
 	const state = useStore();
 	const {
 		shelvesY,
-		divsX,
 		width,
 		adjustWidth: newWidth,
 		changeDivsX: newDivsX,
@@ -110,7 +109,7 @@ export function HeightControls() {
 			shelfHeights,
 		};
 		const result = getHeight(state, e.target.value);
-		// console.log(result);
+
 		const { shelvesY: resultShelvesY, divsX: resultDivsX, height } = result;
 		newHeight(height);
 		newDivsX(resultDivsX);
@@ -125,7 +124,7 @@ export function HeightControls() {
 				step={1}
 				onChange={handleChange}
 				name={'height'}
-				value={height}
+				// value={height}
 			/>
 			<h1>HEIGHT:{height}</h1>
 		</label>

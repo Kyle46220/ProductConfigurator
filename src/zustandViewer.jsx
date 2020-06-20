@@ -1,20 +1,13 @@
-import React, { useRef, useState, useEffect } from 'react';
-import * as THREE from 'three';
+import React, { useRef, useEffect } from 'react';
+// import * as THREE from 'three';
 import styled from 'styled-components';
 
 import { useStore, WidthControls, HeightControls, api } from './zusStore';
-import shallow from 'zustand/shallow';
 
-import {
-	Canvas,
-	useFrame,
-	useThree,
-	extend,
-	applyProps,
-} from 'react-three-fiber';
+import { Canvas, useFrame, useThree, extend } from 'react-three-fiber';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-i;
+// import { TestBox } from './testbox';
 
 extend({ OrbitControls });
 
@@ -105,17 +98,9 @@ const Build = ({ ...props }) => {
 	);
 };
 
-// there's something here about how things are rendered. height changes only show up when width slider is used. Width works fine, because width is defined every change inside the row component. the shelf array is also definined inside this component. i had this problem in the impoerative code as well. what did i do to solve it? is it perhaps how in viewer.jsx i had the position shelf function that ran after the logic that decides whether to remove or add. It may be this separation of positioning and creating differently?
-//though fiber seems to update the width fine. why is this?
-
-// it looks like it just re-renders from within the conditional if else
-// like it just stays there and doesn't go all the way back to the start of the component and loops through the return of each cnoditional part as long as its there.
-
-// the difference is adjusting the items that are already there vs creating/deleting new ones. I need to make it so that all shapes are loaded on every frame.
-
 const Row = ({ ...props }) => {
 	console.log(props);
-	// these useStores will cause component re-render.
+	// these useStores will cause component re-render?
 	const divsX = useStore((state) => state.divsX);
 	const width = useStore((state) => state.width);
 	const shelvesY = useStore((state) => state.shelvesY);
@@ -158,13 +143,13 @@ const Row = ({ ...props }) => {
 };
 const ShelvesOnly = ({ ...props }) => {
 	// these useStores will cause update re-render. we only want a re-render when another shelf is added?
-	const divsX = useStore((state) => state.divsX);
+	// const divsX = useStore((state) => state.divsX);
 	const shelvesY = useStore((state) => state.shelvesY);
-	const height = shelvesY[props.index + 1] - shelvesY[props.index];
+	// const height = shelvesY[props.index + 1] - shelvesY[props.index];
 	const width = useRef(api.getState().width);
 	// const shelfYPos = shelvesY[props.index];
-	const index = props.index;
-	const pos = shelvesY[props.index];
+	// const index = props.index;
+	// const pos = shelvesY[props.index];
 	const mesh = useRef();
 	const shelves = shelvesY.map((pos, index) => {
 		return (
@@ -177,11 +162,13 @@ const ShelvesOnly = ({ ...props }) => {
 			/>
 		);
 	});
-	// I think this is the idea with the transient updating. Is this important?
+
+	// I think this is the idea with the transient updating.
 
 	// docs https://github.com/react-spring/zustand/
 
 	// example https://codesandbox.io/s/peaceful-johnson-txtws?file=/src/store.js
+
 	useEffect(() => {
 		api.subscribe(
 			(value) => {
@@ -196,87 +183,41 @@ const ShelvesOnly = ({ ...props }) => {
 	return <group>{shelves}</group>;
 };
 
-const Verts = ({ ...props }) => {
-	const { width, shelvesY, divsX } = props.state;
+// const Verts = ({ ...props }) => {
+// 	const { width, shelvesY, divsX } = props.state;
 
-	const shelfYPos = shelvesY[props.index];
+// 	const shelfYPos = shelvesY[props.index];
 
-	const height = 180;
+// 	const height = 180;
 
-	const verticals = divsX.map((pos, index) => {
-		return (
-			<Vertical
-				key={'vertical' + pos + index}
-				position={[pos, shelfYPos, 0]}
-				size={[18, height, 400]}
-			/>
-		);
-	});
+// 	const verticals = divsX.map((pos, index) => {
+// 		return (
+// 			<Vertical
+// 				key={'vertical' + pos + index}
+// 				position={[pos, shelfYPos, 0]}
+// 				size={[18, height, 400]}
+// 			/>
+// 		);
+// 	});
 
-	return <group {...props}>{verticals}</group>;
-	// }
-};
+// 	return <group {...props}>{verticals}</group>;
+// 	// }
+// };
 
-function usePosition(source) {
-	const bind = useRef();
+// function usePosition(source) {
+// 	const bind = useRef();
 
-	useFrame(() => bind.current.position.set(source[0], source[1], 0));
+// 	useFrame(() => bind.current.position.set(source[0], source[1], 0));
 
-	return bind;
-}
+// 	return bind;
+// }
 
-function useTransientData(source) {
-	const bind = useRef();
-	useFrame(() => applyProps(bind.current, source));
+// function useTransientData(source) {
+// 	const bind = useRef();
+// 	useFrame(() => applyProps(bind.current, source));
 
-	return bind;
-}
-
-const TestBox = ({ ...props }) => {
-	const { position } = props;
-	console.log('Box Rendered', api.getState().width);
-
-	const width = useRef(api.getState().width);
-	const height = useRef(api.getState().height);
-	console.log(width, height);
-	const mesh = useRef();
-	console.log(width);
-	useEffect(() => {
-		console.log('render', width, height);
-		api.subscribe(
-			(value) => {
-				width.current = value;
-
-				mesh.current.scale.x = value;
-
-				//what i want to update goes in this callback. this is almost just like a nested useEffect. I cant call hooks from in here, but if I call a variable that was assigned with useStore it will triger a component re-render. I think it's no rendering because we are stuck listening inside this callback and never get to the return.
-			},
-			(state) => state.width
-		);
-		api.subscribe(
-			(value) => {
-				height.current = value;
-
-				mesh.current.scale.y = value;
-			},
-			(state) => state.height
-		);
-	}, [width, height]);
-
-	return (
-		<mesh ref={mesh} position={position}>
-			<boxGeometry
-				attach="geometry"
-				args={[1, 1, 400]}
-				// you can't set these with the api.getstate
-			></boxGeometry>
-			<meshStandardMaterial
-				attach="material"
-				color="hotpink"
-			></meshStandardMaterial>
-		</mesh>
-	);
-};
+// 	return bind;
+// }
 
 export default () => {
 	return (
@@ -292,7 +233,7 @@ export default () => {
 
 				<Build position={[0, 0, 0]} />
 				{/* <Row position={[0, 0, 0]} index={1} /> */}
-				{/* <ShelvesOnly /> */}
+				<ShelvesOnly />
 				{/* <TestBox position={[0, 0, 0]} /> */}
 				<ControlOrbit />
 			</Canvas>

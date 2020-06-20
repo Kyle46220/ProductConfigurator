@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import Loader from './Loader.js';
-import App from './App.js';
+// import App from './App.js';
 
 class PickHelper {
 	constructor() {

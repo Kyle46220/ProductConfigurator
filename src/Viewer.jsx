@@ -1,6 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
-import { extend, useFrame, useThree } from 'react-three-fiber';
+import { extend } from 'react-three-fiber';
 import styled from 'styled-components';
 import * as THREE from 'three';
 
@@ -34,7 +34,7 @@ class Viewer extends React.Component {
 		this.sceneSetup();
 		// this.loadDrawer();
 		this.addObjectsToScene();
-		this.rayCasty();
+		this.startRayCast();
 		this.startAnimationLoop();
 	}
 
@@ -78,9 +78,9 @@ class Viewer extends React.Component {
 	};
 	loadDrawer = () => {
 		const loader = new GLTFLoader();
-		const cab = '/cabinetTest1.gltf';
+		// const cab = '/cabinetTest1.gltf';
 		const drawer = '/drawer.gltf';
-		const test = '/newtest.gltf';
+		// const test = '/newtest.gltf';
 		loader.load(drawer, (gltf) => {
 			this.root = gltf.scene;
 		});
@@ -163,6 +163,7 @@ class Viewer extends React.Component {
 		this.canvas.addEventListener('mousemove', this.onMouseMove, false);
 		this.canvas.addEventListener('click', this.clickHandler);
 	};
+
 	createMesh = (geom) => {
 		// create meshes, add to Mesh Store array, give default name
 
@@ -174,6 +175,7 @@ class Viewer extends React.Component {
 		this.meshStore.push(mesh);
 		// ;
 	};
+
 	initializeDefaultMeshes = (num) => {
 		let i = 0;
 		const geom = new THREE.BoxGeometry(1, 1, 1);
@@ -182,7 +184,8 @@ class Viewer extends React.Component {
 			i++;
 		}
 	};
-	addShelf = (shelfPos) => {
+
+	addShelf = () => {
 		const shelfMesh = this.meshStore.pop();
 		this.shelfMeshes.push(shelfMesh);
 		this.scene.add(shelfMesh);
@@ -190,12 +193,13 @@ class Viewer extends React.Component {
 		shelfMesh.scale.setY(18);
 		shelfMesh.scale.setZ(400);
 	};
+
 	removeShelf = (meshArray) => {
 		this.returnToStore(meshArray.pop());
 	};
 
-	addDivider = (divPos, shelfIndex, height) => {
-		const { shelvesY } = this.props;
+	addDivider = (divPos, shelfIndex, num) => {
+		// const { shelvesY } = this.props;
 		const divMesh = this.meshStore.pop();
 		divMesh.name = 'div';
 		this.divMeshes[shelfIndex].push(divMesh);
@@ -203,10 +207,10 @@ class Viewer extends React.Component {
 	};
 
 	addDividerRow = (divArr, shelfPos, shelfIndex) => {
-		const { shelvesY } = this.props;
+		// const { shelvesY } = this.props;
 		this.divMeshes.push([]);
 
-		let divHeight;
+		// let divHeight;
 
 		divArr[shelfIndex].forEach((divPos, i) => {
 			this.addDivider(divPos, shelfIndex, 180);
@@ -319,8 +323,8 @@ class Viewer extends React.Component {
 	};
 	positionShelf = (mesh, position) => {
 		const width = this.props.width;
-		const height = this.props.materialThickness;
-		const depth = this.props.depth;
+		// const height = this.props.materialThickness;
+		// const depth = this.props.depth;
 		mesh.position.setX(width / 2);
 		mesh.position.setY(position);
 		mesh.position.setZ(0);
@@ -328,9 +332,9 @@ class Viewer extends React.Component {
 	};
 	positionDivider = (mesh, position, shelfPos, shelfIndex) => {
 		const { shelvesY } = this.props;
-		const width = this.props.materialThickness;
-		const height = 100;
-		const depth = this.props.depth;
+		// const width = this.props.materialThickness;
+		// const height = 100;
+		// const depth = this.props.depth;
 		mesh.position.setX(position);
 
 		mesh.position.setZ(0);
@@ -365,8 +369,8 @@ class Viewer extends React.Component {
 	};
 
 	createBoxPositions = () => {
-		const { shelvesY, divsX, width, height, depth } = this.props;
-		const divMeshes = this.divMeshes.flat();
+		const { shelvesY, divsX, depth } = this.props;
+		// const divMeshes = this.divMeshes.flat();
 		this.boxValueArray = [];
 
 		divsX.forEach((arr, index) => {
@@ -431,7 +435,7 @@ class Viewer extends React.Component {
 		this.pickHelper.click(this.mouse, this.boxes, this.camera, this.scene);
 	};
 
-	rayCasty = () => {
+	startRayCast = () => {
 		this.pickHelper = new PickHelper();
 	};
 
