@@ -353,3 +353,8 @@ maybe using transient update when only the positions change, and then re-renderi
 Can we listen for changes in the stores elements. Like when the qty of shelves changes, re-render, but the position just do transient update?
 
 The error just happens when you do the slider really quickly.
+
+netlify deploy. took ages but got the deploy working. the settings were
+base directory - not set
+build command - yarn build (renamed to yarn build2)
+publish directory - build

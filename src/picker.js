@@ -3,6 +3,7 @@ import * as THREE from 'three';
 // import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import Loader from './Loader.js';
 // import App from './App.js';
+import { useStore } from './zusStore';
 
 class PickHelper {
 	constructor() {
@@ -55,14 +56,12 @@ class PickHelper {
 		const intersectedObjects = this.raycaster.intersectObjects(array);
 		if (intersectedObjects.length > 0) {
 			const object = intersectedObjects[0].object;
-			console.log('intersected object', object);
+
 			const { position } = object;
 			const matrix = object.matrix;
 
-			console.log('matrix', matrix);
-
 			this.loader.loadDrawer(scene, position, matrix);
-			console.log('position', position);
+
 			// App.store.dispatch({
 			// 	type: 'UPDATE_DRAWERS',
 			// 	newDrawers: position

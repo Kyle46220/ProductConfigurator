@@ -76,6 +76,7 @@ class Viewer extends React.Component {
 		this.createBoxPositions();
 		this.addBoxes(this.boxValueArray);
 	};
+
 	loadDrawer = () => {
 		const loader = new GLTFLoader();
 		// const cab = '/cabinetTest1.gltf';
@@ -85,6 +86,7 @@ class Viewer extends React.Component {
 			this.root = gltf.scene;
 		});
 	};
+
 	rand(min, max) {
 		if (max === undefined) {
 			max = min;
@@ -92,8 +94,6 @@ class Viewer extends React.Component {
 		}
 		return min + (max - min) * Math.random();
 	}
-
-	positionDrawer = (drawer) => {};
 
 	randomColor() {
 		return `hsl(${this.rand(360) | 0}, ${this.rand(50, 100) | 0}%, 50%)`;
