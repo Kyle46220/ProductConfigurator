@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, Suspense } from 'react';
 // import * as THREE from 'three';
 import styled from 'styled-components';
 
@@ -7,6 +7,7 @@ import { useStore, WidthControls, HeightControls, api } from './zusStore';
 import { Canvas, useFrame, useThree, extend } from 'react-three-fiber';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import Model from './DrawerGLTFJSX';
 // import { TestBox } from './testbox';
 
 extend({ OrbitControls });
@@ -220,6 +221,7 @@ const ShelvesOnly = ({ ...props }) => {
 // }
 
 export default () => {
+	const height = useStore((state) => state.height);
 	return (
 		<Wrapper>
 			<h1 style={{ margin: '1rem' }}>
@@ -230,10 +232,15 @@ export default () => {
 			<Canvas camera={{ position: [700, 1000, 2500], far: 11000 }}>
 				<ambientLight />
 				<pointLight position={[10, 10, 10]} />
+				<Suspense fallback={null}>
+					<Model
+						position={[useStore((state) => state.width), height, 0]}
+					/>
+				</Suspense>
 
 				<Build position={[0, 0, 0]} />
 				{/* <Row position={[0, 0, 0]} index={1} /> */}
-				<ShelvesOnly />
+				{/* <ShelvesOnly /> */}
 				{/* <TestBox position={[0, 0, 0]} /> */}
 				<ControlOrbit />
 			</Canvas>

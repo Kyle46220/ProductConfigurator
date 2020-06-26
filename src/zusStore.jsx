@@ -29,6 +29,8 @@ export const [useStore, api] = create((set) => ({
 
 	shelfHeights: [180, 280, 380],
 
+	drawers: [[0, 0]],
+
 	adjustHeight: (e) =>
 		set((state) => {
 			return { height: e };
