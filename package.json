@@ -7,11 +7,8 @@
 		"@testing-library/react": "^9.3.2",
 		"@testing-library/user-event": "^7.1.2",
 		"eslint-plugin-react-hooks": "^3.0.0",
-<<<<<<< HEAD
 		"gltfjsx": "^2.0.3",
-=======
 		"global": "^4.4.0",
->>>>>>> master
 		"react": "^16.13.0",
 		"react-dom": "^16.13.0",
 		"react-redux": "^7.2.0",
