@@ -1,11 +1,8 @@
 import * as THREE from 'three';
 
 import Loader from './Loader.js';
-<<<<<<< HEAD
-=======
 // import App from './App.js';
 import { useStore } from './zusStore';
->>>>>>> master
 
 class PickHelper {
 	constructor() {
@@ -58,16 +55,11 @@ class PickHelper {
 		const intersectedObjects = this.raycaster.intersectObjects(array);
 		if (intersectedObjects.length > 0) {
 			const object = intersectedObjects[0].object;
-<<<<<<< HEAD
-=======
 
->>>>>>> master
 			const { position } = object;
 			const matrix = object.matrix;
 
 			this.loader.loadDrawer(scene, position, matrix);
-<<<<<<< HEAD
-=======
 
 			// App.store.dispatch({
 			// 	type: 'UPDATE_DRAWERS',
@@ -75,7 +67,6 @@ class PickHelper {
 			// });
 
 			// alert(`${JSON.stringify(intersectedObjects[0].object.position)}`);
->>>>>>> master
 		}
 	}
 }

@@ -24,6 +24,7 @@ const Wrapper = styled.section`
 
 const ControlOrbit = () => {
 	const orbitRef = useRef();
+
 	const { camera, gl } = useThree();
 
 	useFrame(() => {
@@ -35,13 +36,15 @@ const ControlOrbit = () => {
 };
 
 const Shelf = (props) => {
+	const mesh = useRef();
+	console.log('shelf');
 	const {
 		position,
 		size: [x, y, z],
 	} = props;
 
 	return (
-		<mesh position={position}>
+		<mesh ref={mesh} position={position} onClick={handleClick}>
 			<boxGeometry attach="geometry" args={[x, y, z]}></boxGeometry>
 			<meshStandardMaterial
 				attach="material"
@@ -68,39 +71,8 @@ const Vertical = (props) => {
 	);
 };
 
-const Build = ({ ...props }) => {
-	// const width = useRef(api.getState((state) => state.width));
-	const width = useStore((state) => state.width);
-	const shelvesY = useStore((state) => state.shelvesY);
-
-	const topIndex = shelvesY.length - 1;
-	const topShelf = shelvesY[topIndex];
-
-	const builder = shelvesY.slice(0, -1).map((pos, index) => {
-		return (
-			<Row
-				position={[0, pos, 0]}
-				index={index}
-				key={'row' + pos + index}
-			/>
-		);
-	});
-
-	return (
-		<group>
-			<Shelf
-				position={[width / 2, topShelf, 0]}
-				size={[width, 18, 400]}
-				key={'shelf' + topShelf + topIndex}
-				index={topIndex}
-			/>
-			{builder}
-		</group>
-	);
-};
-
 const Row = ({ ...props }) => {
-	console.log(props);
+	// console.log(props);
 	// these useStores will cause component re-render?
 	const divsX = useStore((state) => state.divsX);
 	const width = useStore((state) => state.width);
@@ -110,18 +82,7 @@ const Row = ({ ...props }) => {
 	const shelfYPos = shelvesY[props.index];
 	const index = props.index;
 
-	console.log(
-		'DIVSX',
-		'height:',
-		divsX.length,
-		'width:',
-		divsX[0].length,
-		divsX,
-		'shelvesY:',
-		shelvesY
-	);
 	const verticals = divsX[props.index].map((pos, index) => {
-		console.log('POS', pos, index);
 		return (
 			<Vertical
 				key={'vertical' + pos + index}
@@ -219,6 +180,54 @@ const ShelvesOnly = ({ ...props }) => {
 
 // 	return bind;
 // }
+// const divsX = useStore((state) => state.shelvesY);
+
+const Build = ({ ...props }) => {
+	// const width = useRef(api.getState((state) => state.width));
+	const width = useStore((state) => state.width);
+	const shelvesY = useStore((state) => state.shelvesY);
+
+	const topIndex = shelvesY.length - 1;
+	const topShelf = shelvesY[topIndex];
+
+	const builder = shelvesY.slice(0, -1).map((pos, index) => {
+		return (
+			<Row
+				position={[0, pos, 0]}
+				index={index}
+				key={'row' + pos + index}
+			/>
+		);
+	});
+	return (
+		<group>
+			<Shelf
+				position={[width / 2, topShelf, 0]}
+				size={[width, 18, 400]}
+				key={'shelf' + topShelf + topIndex}
+				index={topIndex}
+			/>
+			{builder}
+		</group>
+	);
+};
+const handleClick = (e) => {
+	// const mesh = useRef();
+	console.log('click', e.clientX, e.clientY);
+	const x = e.clientX;
+	const y = e.clientY;
+	// return <Model position={[e.clientX, e.clientY, 0]} />;
+	return MakeDrawers({ arr: [x, y] });
+};
+
+const MakeDrawers = (props) => {
+	const { arr } = props;
+	console.log('arr', arr);
+	const thingo = arr.map((element) => {
+		return <Model position={[0, element, 0]} />;
+	});
+	return <>{thingo}</>;
+};
 
 export default () => {
 	const height = useStore((state) => state.height);
@@ -236,6 +245,11 @@ export default () => {
 					<Model
 						position={[useStore((state) => state.width), height, 0]}
 					/>
+					<Model
+						position={[height, useStore((state) => state.width), 0]}
+					/>
+					<Model position={[0, 0, 0]} />
+					<MakeDrawers arr={[100, 200, 300]} />
 				</Suspense>
 
 				<Build position={[0, 0, 0]} />

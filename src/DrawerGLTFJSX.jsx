@@ -12,7 +12,12 @@ export default function Model(props) {
 	const group = useRef();
 	const { position } = props;
 	const width = useStore((state) => state.width);
+
+	console.log('model component', position);
+	// const divsX = useStore((state)=> state.width)
 	const { nodes, materials } = useLoader(GLTFLoader, '/drawer.gltf');
+	console.log('nodes', nodes);
+
 	return (
 		<group ref={group} {...props} dispose={null} position={position}>
 			<mesh
