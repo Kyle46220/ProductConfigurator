@@ -31,6 +31,13 @@ export const [useStore, api] = create((set) => ({
 
 	drawers: [[0, 0]],
 
+	drawer: [500, 500, 500],
+
+	adjustDrawers: (e) =>
+		set((state) => {
+			return { drawer: e };
+		}),
+
 	adjustHeight: (e) =>
 		set((state) => {
 			return { height: e };

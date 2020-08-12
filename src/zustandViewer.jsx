@@ -42,6 +42,15 @@ const Shelf = (props) => {
 		position,
 		size: [x, y, z],
 	} = props;
+	const state = useStore();
+	const { height, adjustDrawers: newDrawers } = state;
+
+	const handleClick = (e) => {
+		console.log('click', e.object.position);
+		const { x, y } = e.object.position;
+		console.log(x, y);
+		newDrawers([x, y, 0]);
+	};
 
 	return (
 		<mesh ref={mesh} position={position} onClick={handleClick}>
@@ -211,26 +220,45 @@ const Build = ({ ...props }) => {
 		</group>
 	);
 };
-const handleClick = (e) => {
-	// const mesh = useRef();
-	console.log('click', e.clientX, e.clientY);
-	const x = e.clientX;
-	const y = e.clientY;
-	// return <Model position={[e.clientX, e.clientY, 0]} />;
-	return MakeDrawers({ arr: [x, y] });
-};
+// const handleClick = (e) => {
+// 	// const mesh = useRef();
+// 	console.log('click', e.clientX, e.clientY);
+// 	const x = e.clientX;
+// 	const y = e.clientY;
+// 	// MakeDrawers({ arr: [x, y] });
 
-const MakeDrawers = (props) => {
-	const { arr } = props;
-	console.log('arr', arr);
-	const thingo = arr.map((element) => {
-		return <Model position={[0, element, 0]} />;
-	});
-	return <>{thingo}</>;
-};
+// 	const newDrawers = useStore((state) => state.adjustDrawers([x, y, 0]));
+// 	// return <Model position={[e.clientX, e.clientY, 0]} />;
+// 	return;
+// };
+
+// const MakeDrawers = (props) => {
+// 	const { arr } = props;
+// 	console.log('arr', arr);
+// 	const thingo = arr.map((element) => {
+// 		return <Model position={[0, element, 0]} />;
+// 	});
+// 	return <>{thingo}</>;
+// };
 
 export default () => {
-	const height = useStore((state) => state.height);
+	const state = useStore();
+	const { height, adjustDrawers: newDrawers } = state;
+	// const height = useStore((state) => state.height);
+
+	// const {newDrawers = useStore((state) => state.adjustDrawers([x, y, 0]));
+	// const handleClick = (e) => {
+	// 	// const mesh = useRef();
+	// 	console.log('click', e.clientX, e.clientY);
+	// 	const x = e.clientX;
+	// 	const y = e.clientY;
+	// 	// MakeDrawers({ arr: [x, y] });
+	// 	newDrawers([x, y, 0]);
+	// 	// return <Model position={[e.clientX, e.clientY, 0]} />;
+	// };
+	const handleClick = () => {
+		newDrawers([0, 0, 0]);
+	};
 	return (
 		<Wrapper>
 			<h1 style={{ margin: '1rem' }}>
@@ -243,13 +271,15 @@ export default () => {
 				<pointLight position={[10, 10, 10]} />
 				<Suspense fallback={null}>
 					<Model
-						position={[useStore((state) => state.width), height, 0]}
+						position={useStore((state) => state.drawer)}
+						onClick={handleClick}
 					/>
 					<Model
 						position={[height, useStore((state) => state.width), 0]}
+						onClick={handleClick}
 					/>
-					<Model position={[0, 0, 0]} />
-					<MakeDrawers arr={[100, 200, 300]} />
+					<Model position={[0, 0, 0]} onClick={handleClick} />
+					{/* <MakeDrawers arr={[100, 200, 300]} /> */}
 				</Suspense>
 
 				<Build position={[0, 0, 0]} />

@@ -10,4 +10,6 @@ I had an error for ages. i forgot that you have to return a JSX object in a func
 
 Now it works.
 
-THe next task is to get on onClick event to manifest a drawer in the clicked zone. i had used raycasting in the plain three.js version but now I think i can juste put an onclick event handler straight in the JSX mesh object
+THe next task is to get on onClick event to manifest a drawer in the clicked zone. i had used raycasting in the plain three.js version but now I think i can juste put an onclick event handler straight in the JSX mesh object.
+
+click handler changes state and then state is updated on main component re-render

@@ -12,6 +12,8 @@ export default function Model(props) {
 	const group = useRef();
 	const { position } = props;
 	const width = useStore((state) => state.width);
+	// const newDrawers = useStore((state) => state.adjustDrawers);
+	// const drawer = useStore((state) => state.drawer);
 
 	console.log('model component', position);
 	// const divsX = useStore((state)=> state.width)
@@ -19,7 +21,13 @@ export default function Model(props) {
 	console.log('nodes', nodes);
 
 	return (
-		<group ref={group} {...props} dispose={null} position={position}>
+		<group
+			ref={group}
+			{...props}
+			dispose={null}
+			position={position}
+			// onClick={newDrawers([0, 0, 0])}
+		>
 			<mesh
 				material={materials['191,191,191']}
 				geometry={nodes.Solid1.geometry}
