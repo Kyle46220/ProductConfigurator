@@ -29,11 +29,20 @@ export const [useStore, api] = create((set) => ({
 
 	shelfHeights: [180, 280, 380],
 
-	drawers: [[0, 0]],
+	drawers: [{ id: 1, shelf: 0, div: 0, pos: [500, 500, 500] }],
 
-	drawer: [500, 500, 500],
+	drawer: { shelf: 0, div: 0, pos: [500, 500, 500] },
+
+	// addDrawers: (e) => {
+	// const id = Date.now()
+	// set((state) => { return {state.drawers.id = e}})},
 
 	adjustDrawers: (e) =>
+		set((state) => {
+			return { drawers: e };
+		}),
+
+	adjustDrawer: (e) =>
 		set((state) => {
 			return { drawer: e };
 		}),
@@ -70,6 +79,8 @@ export function WidthControls() {
 		width,
 		adjustWidth: newWidth,
 		changeDivsX: newDivsX,
+		adjustDrawer: newDrawer,
+		drawer,
 	} = state;
 	// console.log(state);
 
@@ -77,6 +88,7 @@ export function WidthControls() {
 		const result = getWidth(width, shelvesY);
 		newWidth(e.target.value);
 		newDivsX(result);
+		newDrawer([e.target.value / 2, drawer[1], drawer[2]]);
 	};
 
 	return (
@@ -103,6 +115,9 @@ export function HeightControls() {
 	const shelfHeights = useStore((state) => state.shelfHeights);
 	const shelvesY = useStore((state) => state.shelvesY);
 	const divsX = useStore((state) => state.divsX);
+	const drawer = useStore((state) => state.drawer);
+	const drawers = useStore((state) => state.drawers);
+	const adjustDrawers = useStore((state) => state.adjustDrawers);
 	// const {
 	// 	height,
 	// 	adjustHeight: newHeight,
@@ -112,17 +127,25 @@ export function HeightControls() {
 	// const value = height;
 
 	const handleChange = (e) => {
-		const state = {
-			divsX,
-			shelvesY,
-			shelfHeights,
-		};
+		// const state = useStore((state) => state);
+		const state = { divsX, shelvesY, shelfHeights };
+
 		const result = getHeight(state, e.target.value);
 
 		const { shelvesY: resultShelvesY, divsX: resultDivsX, height } = result;
 		newHeight(height);
 		newDivsX(resultDivsX);
 		newShelvesY(resultShelvesY);
+		// adjustDrawer([drawer[0], e.target.value, drawer[2]]);
+
+		//this should return the whole array with just the values updated.
+		const newDrawers = drawers.map((item) => {
+			console.log('item', item);
+			item.pos[1] = Math.abs(height, item.pos[1]);
+			return item;
+		});
+		console.log('newDrawers', newDrawers);
+		adjustDrawers(newDrawers);
 	};
 	return (
 		<label>

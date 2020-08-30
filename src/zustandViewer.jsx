@@ -43,13 +43,21 @@ const Shelf = (props) => {
 		size: [x, y, z],
 	} = props;
 	const state = useStore();
-	const { height, adjustDrawers: newDrawers } = state;
+	const { height, adjustDrawers, drawers } = state;
 
 	const handleClick = (e) => {
-		console.log('click', e.object.position);
+		const id = Date.now();
 		const { x, y } = e.object.position;
-		console.log(x, y);
-		newDrawers([x, y, 0]);
+		console.log(drawers);
+		const newDrawer = { id: id, pos: [x, y, 0] };
+		// const result = Object.assign(drawers, newDrawer)
+		drawers = newDrawer;
+		console.log(drawers);
+
+		console.log('click', e);
+
+		// adjustDrawers(result);
+		// newDrawer([x, y, 0]);
 	};
 
 	return (
@@ -195,9 +203,15 @@ const Build = ({ ...props }) => {
 	// const width = useRef(api.getState((state) => state.width));
 	const width = useStore((state) => state.width);
 	const shelvesY = useStore((state) => state.shelvesY);
+	const drawers = useStore((state) => state.drawers);
 
 	const topIndex = shelvesY.length - 1;
 	const topShelf = shelvesY[topIndex];
+
+	const fillDrawers = drawers.map((drawer) => {
+		console.log('drawer', drawer);
+		return <Model key={drawer.id} position={drawer.pos} />;
+	});
 
 	const builder = shelvesY.slice(0, -1).map((pos, index) => {
 		return (
@@ -208,15 +222,19 @@ const Build = ({ ...props }) => {
 			/>
 		);
 	});
+
 	return (
 		<group>
-			<Shelf
-				position={[width / 2, topShelf, 0]}
-				size={[width, 18, 400]}
-				key={'shelf' + topShelf + topIndex}
-				index={topIndex}
-			/>
-			{builder}
+			<Suspense fallback={null}>
+				<Shelf
+					position={[width / 2, topShelf, 0]}
+					size={[width, 18, 400]}
+					key={'shelf' + topShelf + topIndex}
+					index={topIndex}
+				/>
+				{builder}
+				{fillDrawers}
+			</Suspense>
 		</group>
 	);
 };
@@ -241,9 +259,17 @@ const Build = ({ ...props }) => {
 // 	return <>{thingo}</>;
 // };
 
+// const fillDrawers = (drawers) => {
+// 	return drawers.map((drawer) => {
+// 		console.log(drawer);
+// 		return <Model key={drawer.id} position={drawer.pos} />;
+// 	});
+// };
+
 export default () => {
 	const state = useStore();
-	const { height, adjustDrawers: newDrawers } = state;
+	const { height, adjustDrawer: newDrawer } = state;
+	console.log('entire state', state);
 	// const height = useStore((state) => state.height);
 
 	// const {newDrawers = useStore((state) => state.adjustDrawers([x, y, 0]));
@@ -256,8 +282,8 @@ export default () => {
 	// 	newDrawers([x, y, 0]);
 	// 	// return <Model position={[e.clientX, e.clientY, 0]} />;
 	// };
-	const handleClick = () => {
-		newDrawers([0, 0, 0]);
+	const handleClick = (e) => {
+		console.log('clicked drawer', e);
 	};
 	return (
 		<Wrapper>
@@ -278,7 +304,7 @@ export default () => {
 						position={[height, useStore((state) => state.width), 0]}
 						onClick={handleClick}
 					/>
-					<Model position={[0, 0, 0]} onClick={handleClick} />
+
 					{/* <MakeDrawers arr={[100, 200, 300]} /> */}
 				</Suspense>
 
