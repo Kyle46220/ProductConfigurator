@@ -37,24 +37,25 @@ const ControlOrbit = () => {
 
 const Shelf = (props) => {
 	const mesh = useRef();
-	console.log('shelf');
+
 	const {
 		position,
 		size: [x, y, z],
 	} = props;
 	const state = useStore();
-	const { height, adjustDrawers, drawers } = state;
+	const { height, adjustDrawers, drawers, addDrawer } = state;
 
 	const handleClick = (e) => {
 		const id = Date.now();
 		const { x, y } = e.object.position;
-		console.log(drawers);
-		const newDrawer = { id: id, pos: [x, y, 0] };
-		// const result = Object.assign(drawers, newDrawer)
-		drawers = newDrawer;
-		console.log(drawers);
 
-		console.log('click', e);
+		const newDrawer = { id: id, pos: [x, y, 0] };
+		// const result = drawers;
+		// const newDrawers = result.push(newDrawer);
+		//
+		// adjustDrawers(newDrawers);
+		// drawers.push(newDrawer);
+		addDrawer(newDrawer);
 
 		// adjustDrawers(result);
 		// newDrawer([x, y, 0]);
@@ -89,7 +90,7 @@ const Vertical = (props) => {
 };
 
 const Row = ({ ...props }) => {
-	// console.log(props);
+	//
 	// these useStores will cause component re-render?
 	const divsX = useStore((state) => state.divsX);
 	const width = useStore((state) => state.width);
@@ -204,14 +205,13 @@ const Build = ({ ...props }) => {
 	const width = useStore((state) => state.width);
 	const shelvesY = useStore((state) => state.shelvesY);
 	const drawers = useStore((state) => state.drawers);
+	console.log(
+		'build',
+		drawers.map((i) => i.pos[1])
+	);
 
 	const topIndex = shelvesY.length - 1;
 	const topShelf = shelvesY[topIndex];
-
-	const fillDrawers = drawers.map((drawer) => {
-		console.log('drawer', drawer);
-		return <Model key={drawer.id} position={drawer.pos} />;
-	});
 
 	const builder = shelvesY.slice(0, -1).map((pos, index) => {
 		return (
@@ -222,7 +222,10 @@ const Build = ({ ...props }) => {
 			/>
 		);
 	});
-
+	// const fillDrawers = drawers.map((drawer) => {
+	// 	console.log('fill drawers', drawer.pos[1]);
+	// 	return <Model key={drawer.id} position={drawer.pos} />;
+	// });
 	return (
 		<group>
 			<Suspense fallback={null}>
@@ -232,15 +235,15 @@ const Build = ({ ...props }) => {
 					key={'shelf' + topShelf + topIndex}
 					index={topIndex}
 				/>
+				{/* {fillDrawers} */}
 				{builder}
-				{fillDrawers}
 			</Suspense>
 		</group>
 	);
 };
 // const handleClick = (e) => {
 // 	// const mesh = useRef();
-// 	console.log('click', e.clientX, e.clientY);
+//
 // 	const x = e.clientX;
 // 	const y = e.clientY;
 // 	// MakeDrawers({ arr: [x, y] });
@@ -252,7 +255,7 @@ const Build = ({ ...props }) => {
 
 // const MakeDrawers = (props) => {
 // 	const { arr } = props;
-// 	console.log('arr', arr);
+//
 // 	const thingo = arr.map((element) => {
 // 		return <Model position={[0, element, 0]} />;
 // 	});
@@ -261,34 +264,47 @@ const Build = ({ ...props }) => {
 
 // const fillDrawers = (drawers) => {
 // 	return drawers.map((drawer) => {
-// 		console.log(drawer);
+//
 // 		return <Model key={drawer.id} position={drawer.pos} />;
 // 	});
 // };
+const FillDrawers = () => {
+	const wholeScene = useThree();
+	console.log(
+		wholeScene.scene.children.map((i) => i.children.length),
+		wholeScene.scene.children.length
+	);
+	const drawers = useStore((state) => state.drawers);
+
+	const fillDrawers = drawers.map((drawer) => {
+		console.log('fill drawers', drawer.pos[0]);
+		return <Model key={drawer.id} position={drawer.pos} />;
+	});
+	return <>{fillDrawers}</>;
+};
 
 export default () => {
 	const state = useStore();
 	const { height, adjustDrawer: newDrawer } = state;
-	console.log('entire state', state);
+
 	// const height = useStore((state) => state.height);
 
 	// const {newDrawers = useStore((state) => state.adjustDrawers([x, y, 0]));
 	// const handleClick = (e) => {
 	// 	// const mesh = useRef();
-	// 	console.log('click', e.clientX, e.clientY);
+	//
 	// 	const x = e.clientX;
 	// 	const y = e.clientY;
 	// 	// MakeDrawers({ arr: [x, y] });
 	// 	newDrawers([x, y, 0]);
 	// 	// return <Model position={[e.clientX, e.clientY, 0]} />;
 	// };
-	const handleClick = (e) => {
-		console.log('clicked drawer', e);
-	};
+
+	const handleClick = (e) => {};
 	return (
 		<Wrapper>
 			<h1 style={{ margin: '1rem' }}>
-				Built with React-Three-Fiber and Zustand with funcitonal
+				Built with React-Three-Fiber and Zustand with functional
 				components and hooks.
 			</h1>
 
@@ -296,19 +312,18 @@ export default () => {
 				<ambientLight />
 				<pointLight position={[10, 10, 10]} />
 				<Suspense fallback={null}>
-					<Model
+					{/* <Model
 						position={useStore((state) => state.drawer)}
 						onClick={handleClick}
 					/>
 					<Model
 						position={[height, useStore((state) => state.width), 0]}
 						onClick={handleClick}
-					/>
-
+					/> */}
+					<FillDrawers />
 					{/* <MakeDrawers arr={[100, 200, 300]} /> */}
+					<Build position={[0, 0, 0]} />
 				</Suspense>
-
-				<Build position={[0, 0, 0]} />
 				{/* <Row position={[0, 0, 0]} index={1} /> */}
 				{/* <ShelvesOnly /> */}
 				{/* <TestBox position={[0, 0, 0]} /> */}

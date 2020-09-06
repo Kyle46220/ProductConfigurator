@@ -15,10 +15,8 @@ export default function Model(props) {
 	// const newDrawers = useStore((state) => state.adjustDrawers);
 	// const drawer = useStore((state) => state.drawer);
 
-	console.log('model component', position);
 	// const divsX = useStore((state)=> state.width)
 	const { nodes, materials } = useLoader(GLTFLoader, '/drawer.gltf');
-	console.log('nodes', nodes);
 
 	return (
 		<group

@@ -33,10 +33,6 @@ export const [useStore, api] = create((set) => ({
 
 	drawer: { shelf: 0, div: 0, pos: [500, 500, 500] },
 
-	// addDrawers: (e) => {
-	// const id = Date.now()
-	// set((state) => { return {state.drawers.id = e}})},
-
 	adjustDrawers: (e) =>
 		set((state) => {
 			return { drawers: e };
@@ -46,6 +42,18 @@ export const [useStore, api] = create((set) => ({
 		set((state) => {
 			return { drawer: e };
 		}),
+
+	addDrawer: (e) =>
+		set((state) => {
+			return state.drawers.push(e);
+		}),
+
+	// removeDrawer: (e) =>
+	// 	set((state) => {
+	// 		return state.drawers.filter((i) => {
+	// 			i.id != e.id;
+	// 		});
+	// 	}),
 
 	adjustHeight: (e) =>
 		set((state) => {
@@ -69,10 +77,6 @@ export const [useStore, api] = create((set) => ({
 }));
 
 export function WidthControls() {
-	// const width = useStore((state) => state.width);
-	// const shelvesY = useStore((state) => state.shelvesY);
-	// const newWidth = useStore((state) => state.adjustWidth);
-	// const newDivsX = useStore((state) => state.changeDivsX);
 	const state = useStore();
 	const {
 		shelvesY,
@@ -80,15 +84,26 @@ export function WidthControls() {
 		adjustWidth: newWidth,
 		changeDivsX: newDivsX,
 		adjustDrawer: newDrawer,
-		drawer,
+
+		drawers,
+		adjustDrawers,
 	} = state;
-	// console.log(state);
+	//
 
 	const handleChange = (e) => {
 		const result = getWidth(width, shelvesY);
 		newWidth(e.target.value);
 		newDivsX(result);
-		newDrawer([e.target.value / 2, drawer[1], drawer[2]]);
+		// newDrawer([e.target.value / 2, drawer[1], drawer[2]]);
+		// so i'm losing the rest of the object.
+		const newDrawers = drawers.map((drawer) => {
+			drawer.pos[1] = e.target.value / 2;
+			newDrawer(drawer);
+			return drawer;
+		});
+
+		adjustDrawers(newDrawers);
+		console.log(drawers.map((i) => i.pos[1]));
 	};
 
 	return (
@@ -118,16 +133,8 @@ export function HeightControls() {
 	const drawer = useStore((state) => state.drawer);
 	const drawers = useStore((state) => state.drawers);
 	const adjustDrawers = useStore((state) => state.adjustDrawers);
-	// const {
-	// 	height,
-	// 	adjustHeight: newHeight,
-	// 	changeDivsX: newDivsX,
-	// 	changeShelvesY: newShelvesY,
-	// } = state;
-	// const value = height;
 
 	const handleChange = (e) => {
-		// const state = useStore((state) => state);
 		const state = { divsX, shelvesY, shelfHeights };
 
 		const result = getHeight(state, e.target.value);
@@ -136,15 +143,9 @@ export function HeightControls() {
 		newHeight(height);
 		newDivsX(resultDivsX);
 		newShelvesY(resultShelvesY);
-		// adjustDrawer([drawer[0], e.target.value, drawer[2]]);
 
-		//this should return the whole array with just the values updated.
-		const newDrawers = drawers.map((item) => {
-			console.log('item', item);
-			item.pos[1] = Math.abs(height, item.pos[1]);
-			return item;
-		});
-		console.log('newDrawers', newDrawers);
+		const newDrawers = drawers.filter((drawer) => drawer.pos[1] < height);
+
 		adjustDrawers(newDrawers);
 	};
 	return (

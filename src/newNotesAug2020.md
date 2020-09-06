@@ -22,3 +22,22 @@ i need to make it so that the drawer state is updated with the sliders as well. 
 
 16/08
 Ok starting to get lost in the spaghetti but I think i"m still making progress. Everything is continuing to make some more sense. today I was trying to update positions of the drawers that have been clicked on. Its weird because I've got a state object that renderrs components that renders the meshes, but I wonder if there's a more sensible way to do this. sometimes I feel like ive got two parallel worlds of my state object and the actual 3d object and I want them to just be one.
+
+30/08
+
+been a week or two. trying to figure out where i was up to. I have an inlking i was think about x state last time.
+
+tryna get the drawers to update their positions on width change. There will be a simple solution. I have been rendering components from the state object. I think this is like the state machine type thing and I thinks its good.
+
+I think though that i'm creating a lot of objects rather than moving the positions when I update the state.drawers.pos. i want to know a way to calculate total of all scene children.
+const { scene } = useThree();
+console.log(
+'scene',
+scene.children.map((item) =>
+item.children.map((i) => i.children.map((x) => x.children.length))
+)
+);
+
+ok so maybe i'm not creating lots of objects because there were no blowouts in the children.length .mapping. i think this is ok because all the componenets re-render on slider change. like the whole cabinet.
+
+I think next i will have to make a grid. is it a matrix? i've got the shelves coords and the divs coords. will the most sensible unit be the row? I think I will need to make the bounding box thing again .
