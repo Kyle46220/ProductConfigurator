@@ -41,3 +41,20 @@ item.children.map((i) => i.children.map((x) => x.children.length))
 ok so maybe i'm not creating lots of objects because there were no blowouts in the children.length .mapping. i think this is ok because all the componenets re-render on slider change. like the whole cabinet.
 
 I think next i will have to make a grid. is it a matrix? i've got the shelves coords and the divs coords. will the most sensible unit be the row? I think I will need to make the bounding box thing again .
+
+something fucky is going on about the order of rendering drawers v shelves.
+
+I'm looking at the original R3F demo with the cubes https://codesandbox.io/s/rrppl0y8l4?file=/src/App.js and they just use component state for the clickability. There's a reason this isn't enough and I think its when you add the sliders and stuff in?
+
+so here's some challenges i could maybe add to the sandbox?
+
+-   put a slider in that controls something.
+-   put some panels into the box.
+-   load a model into the sandbox.
+
+there's a few challenges
+
+-   making the drawers disappear when clicked.
+-   making the drawers moved when slidden.
+
+Rather than making the drawers disappear when they're clicked. maybe i should just make the cavity clickable then it can just toggle through drawer, cuboard etc? this would be a good way to record state?

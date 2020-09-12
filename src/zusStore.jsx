@@ -91,19 +91,27 @@ export function WidthControls() {
 	//
 
 	const handleChange = (e) => {
+		console.log(
+			'change start',
+			drawers.map((i) => i.pos[1])
+		);
 		const result = getWidth(width, shelvesY);
 		newWidth(e.target.value);
+		console.log(result);
 		newDivsX(result);
 		// newDrawer([e.target.value / 2, drawer[1], drawer[2]]);
 		// so i'm losing the rest of the object.
 		const newDrawers = drawers.map((drawer) => {
 			drawer.pos[1] = e.target.value / 2;
 			newDrawer(drawer);
-			return drawer;
+			return drawer; // if i remove this return it breaks it in the other file. Why?
 		});
 
 		adjustDrawers(newDrawers);
-		console.log(drawers.map((i) => i.pos[1]));
+		console.log(
+			drawers.map((i) => i.pos[1]),
+			newDrawers.map((i) => i.pos[1])
+		);
 	};
 
 	return (

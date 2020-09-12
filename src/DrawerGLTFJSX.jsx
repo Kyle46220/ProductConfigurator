@@ -19,17 +19,11 @@ export default function Model(props) {
 	const { nodes, materials } = useLoader(GLTFLoader, '/drawer.gltf');
 
 	return (
-		<group
-			ref={group}
-			{...props}
-			dispose={null}
-			position={position}
-			// onClick={newDrawers([0, 0, 0])}
-		>
+		<group ref={group} {...props} dispose={null} position={position}>
 			<mesh
 				material={materials['191,191,191']}
 				geometry={nodes.Solid1.geometry}
-			/>
+			></mesh>
 			<mesh
 				material={materials['191,191,191']}
 				geometry={nodes.Solid2.geometry}
@@ -49,7 +43,12 @@ export default function Model(props) {
 			<mesh
 				material={materials['191,191,191']}
 				geometry={nodes.Solid6.geometry}
-			/>
+			>
+				<meshStandardMaterial
+					attach="material"
+					color="teal"
+				></meshStandardMaterial>
+			</mesh>
 		</group>
 	);
 }

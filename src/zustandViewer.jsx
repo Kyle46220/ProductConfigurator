@@ -8,7 +8,6 @@ import { Canvas, useFrame, useThree, extend } from 'react-three-fiber';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Model from './DrawerGLTFJSX';
-// import { TestBox } from './testbox';
 
 extend({ OrbitControls });
 
@@ -42,23 +41,17 @@ const Shelf = (props) => {
 		position,
 		size: [x, y, z],
 	} = props;
-	const state = useStore();
-	const { height, adjustDrawers, drawers, addDrawer } = state;
+	const addDrawer = useStore((state) => state.addDrawer);
+	// const drawers = useStore((state) => state.drawers);
 
 	const handleClick = (e) => {
 		const id = Date.now();
 		const { x, y } = e.object.position;
 
 		const newDrawer = { id: id, pos: [x, y, 0] };
-		// const result = drawers;
-		// const newDrawers = result.push(newDrawer);
-		//
-		// adjustDrawers(newDrawers);
-		// drawers.push(newDrawer);
-		addDrawer(newDrawer);
+		console.log(newDrawer);
 
-		// adjustDrawers(result);
-		// newDrawer([x, y, 0]);
+		addDrawer(newDrawer);
 	};
 
 	return (
@@ -122,14 +115,10 @@ const Row = ({ ...props }) => {
 	);
 };
 const ShelvesOnly = ({ ...props }) => {
-	// these useStores will cause update re-render. we only want a re-render when another shelf is added?
-	// const divsX = useStore((state) => state.divsX);
 	const shelvesY = useStore((state) => state.shelvesY);
-	// const height = shelvesY[props.index + 1] - shelvesY[props.index];
+
 	const width = useRef(api.getState().width);
-	// const shelfYPos = shelvesY[props.index];
-	// const index = props.index;
-	// const pos = shelvesY[props.index];
+
 	const mesh = useRef();
 	const shelves = shelvesY.map((pos, index) => {
 		return (
@@ -163,52 +152,12 @@ const ShelvesOnly = ({ ...props }) => {
 	return <group>{shelves}</group>;
 };
 
-// const Verts = ({ ...props }) => {
-// 	const { width, shelvesY, divsX } = props.state;
-
-// 	const shelfYPos = shelvesY[props.index];
-
-// 	const height = 180;
-
-// 	const verticals = divsX.map((pos, index) => {
-// 		return (
-// 			<Vertical
-// 				key={'vertical' + pos + index}
-// 				position={[pos, shelfYPos, 0]}
-// 				size={[18, height, 400]}
-// 			/>
-// 		);
-// 	});
-
-// 	return <group {...props}>{verticals}</group>;
-// 	// }
-// };
-
-// function usePosition(source) {
-// 	const bind = useRef();
-
-// 	useFrame(() => bind.current.position.set(source[0], source[1], 0));
-
-// 	return bind;
-// }
-
-// function useTransientData(source) {
-// 	const bind = useRef();
-// 	useFrame(() => applyProps(bind.current, source));
-
-// 	return bind;
-// }
-// const divsX = useStore((state) => state.shelvesY);
-
 const Build = ({ ...props }) => {
 	// const width = useRef(api.getState((state) => state.width));
 	const width = useStore((state) => state.width);
 	const shelvesY = useStore((state) => state.shelvesY);
 	const drawers = useStore((state) => state.drawers);
-	console.log(
-		'build',
-		drawers.map((i) => i.pos[1])
-	);
+	const adjustDrawers = useStore((state) => state.adjustDrawers);
 
 	const topIndex = shelvesY.length - 1;
 	const topShelf = shelvesY[topIndex];
@@ -222,10 +171,20 @@ const Build = ({ ...props }) => {
 			/>
 		);
 	});
-	// const fillDrawers = drawers.map((drawer) => {
-	// 	console.log('fill drawers', drawer.pos[1]);
-	// 	return <Model key={drawer.id} position={drawer.pos} />;
-	// });
+	const handleDrawerClick = (id) => {
+		const result = drawers.filter((i) => i !== id);
+		adjustDrawers(result);
+	};
+	const fillDrawers = drawers.map((drawer) => {
+		return (
+			<Model
+				key={drawer.id}
+				position={drawer.pos}
+				// onClick={handleDrawerClick(drawer.id)}
+			/>
+		);
+	});
+
 	return (
 		<group>
 			<Suspense fallback={null}>
@@ -235,72 +194,35 @@ const Build = ({ ...props }) => {
 					key={'shelf' + topShelf + topIndex}
 					index={topIndex}
 				/>
-				{/* {fillDrawers} */}
+				{fillDrawers}
 				{builder}
 			</Suspense>
 		</group>
 	);
 };
-// const handleClick = (e) => {
-// 	// const mesh = useRef();
 //
-// 	const x = e.clientX;
-// 	const y = e.clientY;
-// 	// MakeDrawers({ arr: [x, y] });
-
-// 	const newDrawers = useStore((state) => state.adjustDrawers([x, y, 0]));
-// 	// return <Model position={[e.clientX, e.clientY, 0]} />;
-// 	return;
-// };
-
-// const MakeDrawers = (props) => {
-// 	const { arr } = props;
-//
-// 	const thingo = arr.map((element) => {
-// 		return <Model position={[0, element, 0]} />;
-// 	});
-// 	return <>{thingo}</>;
-// };
-
-// const fillDrawers = (drawers) => {
-// 	return drawers.map((drawer) => {
-//
-// 		return <Model key={drawer.id} position={drawer.pos} />;
-// 	});
-// };
 const FillDrawers = () => {
-	const wholeScene = useThree();
-	console.log(
-		wholeScene.scene.children.map((i) => i.children.length),
-		wholeScene.scene.children.length
-	);
+	const adjustDrawers = useStore((state) => state.adjustDrawers);
 	const drawers = useStore((state) => state.drawers);
 
+	const handleDrawerClick = (id) => {
+		const result = drawers.filter((i) => i !== id);
+		adjustDrawers(result);
+	};
+
 	const fillDrawers = drawers.map((drawer) => {
-		console.log('fill drawers', drawer.pos[0]);
-		return <Model key={drawer.id} position={drawer.pos} />;
+		return (
+			<Model
+				key={drawer.id}
+				position={drawer.pos}
+				// onClick={handleDrawerClick(drawer.id)}
+			/>
+		);
 	});
 	return <>{fillDrawers}</>;
 };
 
 export default () => {
-	const state = useStore();
-	const { height, adjustDrawer: newDrawer } = state;
-
-	// const height = useStore((state) => state.height);
-
-	// const {newDrawers = useStore((state) => state.adjustDrawers([x, y, 0]));
-	// const handleClick = (e) => {
-	// 	// const mesh = useRef();
-	//
-	// 	const x = e.clientX;
-	// 	const y = e.clientY;
-	// 	// MakeDrawers({ arr: [x, y] });
-	// 	newDrawers([x, y, 0]);
-	// 	// return <Model position={[e.clientX, e.clientY, 0]} />;
-	// };
-
-	const handleClick = (e) => {};
 	return (
 		<Wrapper>
 			<h1 style={{ margin: '1rem' }}>
@@ -312,21 +234,10 @@ export default () => {
 				<ambientLight />
 				<pointLight position={[10, 10, 10]} />
 				<Suspense fallback={null}>
-					{/* <Model
-						position={useStore((state) => state.drawer)}
-						onClick={handleClick}
-					/>
-					<Model
-						position={[height, useStore((state) => state.width), 0]}
-						onClick={handleClick}
-					/> */}
-					<FillDrawers />
-					{/* <MakeDrawers arr={[100, 200, 300]} /> */}
 					<Build position={[0, 0, 0]} />
+					{/* <FillDrawers /> */}
 				</Suspense>
-				{/* <Row position={[0, 0, 0]} index={1} /> */}
-				{/* <ShelvesOnly /> */}
-				{/* <TestBox position={[0, 0, 0]} /> */}
+
 				<ControlOrbit />
 			</Canvas>
 			<div style={{ display: 'flex' }}>
