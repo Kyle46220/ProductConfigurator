@@ -41,17 +41,21 @@ const Shelf = (props) => {
 		position,
 		size: [x, y, z],
 	} = props;
-	const addDrawer = useStore((state) => state.addDrawer);
-	// const drawers = useStore((state) => state.drawers);
+	const adjustDrawers = useStore((state) => state.adjustDrawers);
+	const drawers = useStore((state) => state.drawers);
 
 	const handleClick = (e) => {
 		const id = Date.now();
-		const { x, y } = e.object.position;
+		const { x, y } = e.eventObject.position;
 
 		const newDrawer = { id: id, pos: [x, y, 0] };
-		console.log(newDrawer);
 
-		addDrawer(newDrawer);
+		const result = drawers;
+		result.push(newDrawer);
+		console.log(result);
+		adjustDrawers(result);
+
+		return newDrawer;
 	};
 
 	return (
@@ -114,46 +118,14 @@ const Row = ({ ...props }) => {
 		</group>
 	);
 };
-const ShelvesOnly = ({ ...props }) => {
-	const shelvesY = useStore((state) => state.shelvesY);
 
-	const width = useRef(api.getState().width);
+// I think this is the idea with the transient updating.
 
-	const mesh = useRef();
-	const shelves = shelvesY.map((pos, index) => {
-		return (
-			<Shelf
-				ref={mesh}
-				key={'shelf' + pos + index}
-				index={index}
-				position={[width / 2, pos, 0]}
-				size={[width, 18, 400]}
-			/>
-		);
-	});
+// docs https://github.com/react-spring/zustand/
 
-	// I think this is the idea with the transient updating.
-
-	// docs https://github.com/react-spring/zustand/
-
-	// example https://codesandbox.io/s/peaceful-johnson-txtws?file=/src/store.js
-
-	useEffect(() => {
-		api.subscribe(
-			(value) => {
-				width.current = value;
-
-				mesh.current.scale.x = value;
-			},
-			(state) => state.height
-		);
-	}, [width]);
-
-	return <group>{shelves}</group>;
-};
+// example https://codesandbox.io/s/peaceful-johnson-txtws?file=/src/store.js
 
 const Build = ({ ...props }) => {
-	// const width = useRef(api.getState((state) => state.width));
 	const width = useStore((state) => state.width);
 	const shelvesY = useStore((state) => state.shelvesY);
 	const drawers = useStore((state) => state.drawers);
@@ -194,8 +166,8 @@ const Build = ({ ...props }) => {
 					key={'shelf' + topShelf + topIndex}
 					index={topIndex}
 				/>
-				{fillDrawers}
 				{builder}
+				{fillDrawers}
 			</Suspense>
 		</group>
 	);

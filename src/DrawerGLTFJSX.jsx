@@ -11,11 +11,7 @@ import { useStore } from './zusStore';
 export default function Model(props) {
 	const group = useRef();
 	const { position } = props;
-	const width = useStore((state) => state.width);
-	// const newDrawers = useStore((state) => state.adjustDrawers);
-	// const drawer = useStore((state) => state.drawer);
 
-	// const divsX = useStore((state)=> state.width)
 	const { nodes, materials } = useLoader(GLTFLoader, '/drawer.gltf');
 
 	return (

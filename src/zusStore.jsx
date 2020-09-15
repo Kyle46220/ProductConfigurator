@@ -91,27 +91,19 @@ export function WidthControls() {
 	//
 
 	const handleChange = (e) => {
-		console.log(
-			'change start',
-			drawers.map((i) => i.pos[1])
-		);
 		const result = getWidth(width, shelvesY);
 		newWidth(e.target.value);
-		console.log(result);
+
 		newDivsX(result);
-		// newDrawer([e.target.value / 2, drawer[1], drawer[2]]);
-		// so i'm losing the rest of the object.
+
 		const newDrawers = drawers.map((drawer) => {
 			drawer.pos[1] = e.target.value / 2;
-			newDrawer(drawer);
-			return drawer; // if i remove this return it breaks it in the other file. Why?
+
+			return drawer; // if i remove this return it breaks it in the other file. Why? beacuse without the return the map creates an empty array which is then ent to state.
 		});
+		console.log(newDrawers);
 
 		adjustDrawers(newDrawers);
-		console.log(
-			drawers.map((i) => i.pos[1]),
-			newDrawers.map((i) => i.pos[1])
-		);
 	};
 
 	return (
@@ -138,7 +130,7 @@ export function HeightControls() {
 	const shelfHeights = useStore((state) => state.shelfHeights);
 	const shelvesY = useStore((state) => state.shelvesY);
 	const divsX = useStore((state) => state.divsX);
-	const drawer = useStore((state) => state.drawer);
+
 	const drawers = useStore((state) => state.drawers);
 	const adjustDrawers = useStore((state) => state.adjustDrawers);
 
@@ -165,9 +157,10 @@ export function HeightControls() {
 				step={1}
 				onChange={handleChange}
 				name={'height'}
-				// value={height}
+				value={height}
 			/>
 			<h1>HEIGHT:{height}</h1>
+			<h2>{drawers.length}</h2>
 		</label>
 	);
 }
