@@ -58,3 +58,13 @@ there's a few challenges
 -   making the drawers moved when slidden.
 
 Rather than making the drawers disappear when they're clicked. maybe i should just make the cavity clickable then it can just toggle through drawer, cuboard etc? this would be a good way to record state?
+
+15/09
+
+I've got some isues with state updating for the drawer positions. They've stopped working when I click on the shelves now. I got the woking wasily a while ago, but now they've stopped. The issue seems to be that the state object is updating but not going back to the store the refresh happens intantly with the shelf updates, but not with the drwer updates. Did I have a similar problem with the height and width? where the width would only later update when the heigth did? How did i fix this?
+
+the problem is that the drawers state is only being updated when the slider change handler is being called, and not when the onscreen sclick handler is being called.
+
+so the component the hook is in re-renders if state is accessed with the hook. on re-render of build, drawer fill will work. so put the adjust drawers hook in the build hook and then make sure it is called when you want the component to update.
+
+But it can't seem to see why this isn't working based on this. I'm going to move on to the bounding boxes because i can't seem to find this bug.

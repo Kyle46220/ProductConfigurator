@@ -23,7 +23,7 @@ class Loader {
 		mesh.matrixAutoUpdate = false;
 		let vector = new THREE.Vector3();
 		vector.setFromMatrixScale(matrix);
-
+ 
 		const bbox = new THREE.Box3();
 		bbox.expandByObject(mesh);
 

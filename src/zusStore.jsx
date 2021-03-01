@@ -32,21 +32,27 @@ export const [useStore, api] = create((set) => ({
 	drawers: [{ id: 1, shelf: 0, div: 0, pos: [500, 500, 500] }],
 
 	drawer: { shelf: 0, div: 0, pos: [500, 500, 500] },
+	boxes: [],
+
+	adjustBoxes: (e) =>
+		set((state) => {
+			return { boxes: e };
+		}),
 
 	adjustDrawers: (e) =>
 		set((state) => {
 			return { drawers: e };
 		}),
 
-	adjustDrawer: (e) =>
-		set((state) => {
-			return { drawer: e };
-		}),
+	// adjustDrawer: (e) =>
+	// 	set((state) => {
+	// 		return { drawer: e };
+	// 	}),
 
-	addDrawer: (e) =>
-		set((state) => {
-			return state.drawers.push(e);
-		}),
+	// addDrawer: (e) =>
+	// 	set((state) => {
+	// 		return state.drawers.push(e);
+	// 	}),
 
 	// removeDrawer: (e) =>
 	// 	set((state) => {
@@ -83,8 +89,6 @@ export function WidthControls() {
 		width,
 		adjustWidth: newWidth,
 		changeDivsX: newDivsX,
-		adjustDrawer: newDrawer,
-
 		drawers,
 		adjustDrawers,
 	} = state;
@@ -101,7 +105,6 @@ export function WidthControls() {
 
 			return drawer; // if i remove this return it breaks it in the other file. Why? beacuse without the return the map creates an empty array which is then ent to state.
 		});
-		console.log(newDrawers);
 
 		adjustDrawers(newDrawers);
 	};
@@ -115,7 +118,7 @@ export function WidthControls() {
 				step={1}
 				onChange={handleChange}
 				name={'width'}
-				value={width}
+				// value={width}
 			/>
 			<h1>WIDTH:{width}</h1>
 		</label>
@@ -140,12 +143,10 @@ export function HeightControls() {
 		const result = getHeight(state, e.target.value);
 
 		const { shelvesY: resultShelvesY, divsX: resultDivsX, height } = result;
+		const newDrawers = drawers.filter((drawer) => drawer.pos[1] < height);
 		newHeight(height);
 		newDivsX(resultDivsX);
 		newShelvesY(resultShelvesY);
-
-		const newDrawers = drawers.filter((drawer) => drawer.pos[1] < height);
-
 		adjustDrawers(newDrawers);
 	};
 	return (

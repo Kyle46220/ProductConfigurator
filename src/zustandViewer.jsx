@@ -41,21 +41,23 @@ const Shelf = (props) => {
 		position,
 		size: [x, y, z],
 	} = props;
-	const adjustDrawers = useStore((state) => state.adjustDrawers);
-	const drawers = useStore((state) => state.drawers);
 
+	const drawers = useStore((state) => state.drawers);
+	const adjustDrawers = useStore((state) => state.adjustDrawers);
 	const handleClick = (e) => {
+		console.log('clik');
+		console.log(drawers);
 		const id = Date.now();
 		const { x, y } = e.eventObject.position;
 
 		const newDrawer = { id: id, pos: [x, y, 0] };
 
-		const result = drawers;
-		result.push(newDrawer);
-		console.log(result);
-		adjustDrawers(result);
+		drawers.push(newDrawer);
+		console.log(drawers);
 
-		return newDrawer;
+		adjustDrawers(drawers);
+		console.log('clik end');
+		return drawers;
 	};
 
 	return (
@@ -128,8 +130,6 @@ const Row = ({ ...props }) => {
 const Build = ({ ...props }) => {
 	const width = useStore((state) => state.width);
 	const shelvesY = useStore((state) => state.shelvesY);
-	const drawers = useStore((state) => state.drawers);
-	const adjustDrawers = useStore((state) => state.adjustDrawers);
 
 	const topIndex = shelvesY.length - 1;
 	const topShelf = shelvesY[topIndex];
@@ -140,19 +140,6 @@ const Build = ({ ...props }) => {
 				position={[0, pos, 0]}
 				index={index}
 				key={'row' + pos + index}
-			/>
-		);
-	});
-	const handleDrawerClick = (id) => {
-		const result = drawers.filter((i) => i !== id);
-		adjustDrawers(result);
-	};
-	const fillDrawers = drawers.map((drawer) => {
-		return (
-			<Model
-				key={drawer.id}
-				position={drawer.pos}
-				// onClick={handleDrawerClick(drawer.id)}
 			/>
 		);
 	});
@@ -167,31 +154,32 @@ const Build = ({ ...props }) => {
 					index={topIndex}
 				/>
 				{builder}
-				{fillDrawers}
 			</Suspense>
 		</group>
 	);
 };
 //
 const FillDrawers = () => {
-	const adjustDrawers = useStore((state) => state.adjustDrawers);
 	const drawers = useStore((state) => state.drawers);
-
+	const adjustDrawers = useStore((state) => state.adjustDrawers);
 	const handleDrawerClick = (id) => {
 		const result = drawers.filter((i) => i !== id);
-		adjustDrawers(result);
+		// adjustDrawers(result);
 	};
 
-	const fillDrawers = drawers.map((drawer) => {
-		return (
-			<Model
-				key={drawer.id}
-				position={drawer.pos}
-				// onClick={handleDrawerClick(drawer.id)}
-			/>
-		);
-	});
-	return <>{fillDrawers}</>;
+	return (
+		<>
+			{drawers.map((drawer) => {
+				return (
+					<Model
+						key={drawer.id}
+						position={drawer.pos}
+						onClick={handleDrawerClick(drawer.id)}
+					/>
+				);
+			})}
+		</>
+	);
 };
 
 export default () => {
@@ -207,7 +195,7 @@ export default () => {
 				<pointLight position={[10, 10, 10]} />
 				<Suspense fallback={null}>
 					<Build position={[0, 0, 0]} />
-					{/* <FillDrawers /> */}
+					<FillDrawers />
 				</Suspense>
 
 				<ControlOrbit />
